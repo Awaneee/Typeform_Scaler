@@ -45,7 +45,7 @@ export function QuestionList({ onAdd }: { onAdd: () => void }) {
         <span className="text-sm font-semibold">Questions</span>
         <button
           onClick={onAdd}
-          className="flex h-7 w-7 items-center justify-center rounded-md bg-selected hover:bg-[#e2e0e4]"
+          className="flex h-7 w-7 items-center justify-center rounded-md bg-selected hover:bg-hover-strong"
           aria-label="Add content"
         >
           <Plus size={16} />
@@ -82,7 +82,7 @@ export function QuestionList({ onAdd }: { onAdd: () => void }) {
             selected === "ending" ? "bg-selected" : "hover:bg-bg",
           )}
         >
-          <span className="inline-flex h-6 items-center rounded-md bg-[#E4E2E6] px-1.5 text-muted">
+          <span className="inline-flex h-6 items-center rounded-md bg-selected px-1.5 text-muted">
             <CircleCheckBig size={14} />
           </span>
           <span className="truncate">{thankYouTitle || "Thank you screen"}</span>
@@ -131,7 +131,7 @@ function SortableQuestion({ question, index, selected, onSelect }: SortableQuest
       </div>
       <Menu>
         <MenuTrigger
-          className="absolute top-1/2 right-1.5 -translate-y-1/2 rounded-md p-1 text-muted opacity-0 group-hover:opacity-100 hover:bg-[#e2e0e4] focus-visible:opacity-100 data-[state=open]:opacity-100"
+          className="absolute top-1/2 right-1.5 -translate-y-1/2 rounded-md p-1 text-muted opacity-0 group-hover:opacity-100 hover:bg-hover-strong focus-visible:opacity-100 data-[state=open]:opacity-100"
           aria-label={`Question ${index + 1} actions`}
         >
           <Ellipsis size={16} />

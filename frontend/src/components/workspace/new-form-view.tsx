@@ -84,7 +84,7 @@ function OptionSoon({ icon, title, text }: { icon: React.ReactNode; title: strin
       onClick={() => toast(`${title} is coming soon`)}
       className="flex flex-col items-start gap-3 rounded-xl border border-line bg-surface p-4 text-left transition-colors hover:bg-selected"
     >
-      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-lavender text-plum">{icon}</span>
+      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-lavender text-ink">{icon}</span>
       <span>
         <span className="block text-sm font-semibold">{title}</span>
         <span className="text-xs text-muted">{text}</span>

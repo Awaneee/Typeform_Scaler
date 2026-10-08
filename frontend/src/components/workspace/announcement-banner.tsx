@@ -28,13 +28,13 @@ export function AnnouncementBanner() {
   }
 
   return (
-    <div className="flex items-center justify-center gap-3 bg-lavender px-10 py-2.5 text-center text-sm text-plum relative">
+    <div className="flex items-center justify-center gap-3 bg-lavender px-10 py-2.5 text-center text-sm text-ink relative">
       <span>
         <strong className="font-semibold">New:</strong> Share your forms with a link and watch responses arrive in real time.
       </span>
       <button
         onClick={dismiss}
-        className="absolute right-3 rounded-md p-1 hover:bg-white/50"
+        className="absolute right-3 rounded-md p-1 hover:bg-black/10"
         aria-label="Dismiss announcement"
       >
         <X size={16} />

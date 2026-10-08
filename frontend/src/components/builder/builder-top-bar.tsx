@@ -1,6 +1,7 @@
 "use client";
 
 import { Eye, Loader2 } from "lucide-react";
+import { ColorModeMenu } from "@/components/layout/color-mode-menu";
 import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -69,6 +70,7 @@ export function BuilderTopBar({ tab, onTab, onBack, onPreview, onPublish, publis
         <div className="hidden xl:block">
           <SaveIndicator />
         </div>
+        <ColorModeMenu />
         <button onClick={onPreview} className="rounded-lg p-2 text-ink hover:bg-selected" aria-label="Preview" title="Preview">
           <Eye size={18} />
         </button>

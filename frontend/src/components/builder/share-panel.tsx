@@ -63,7 +63,7 @@ export function SharePanel({ publishing, onPublish, onUnpublish }: SharePanelPro
           <div className="mb-4 flex items-center gap-2">
             <Globe size={18} />
             <h2 className="text-lg font-semibold">Share the link</h2>
-            <span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-medium ${live ? "bg-[#DDF3EA] text-teal" : "bg-selected text-muted"}`}>
+            <span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-medium ${live ? "bg-teal/15 text-teal" : "bg-selected text-muted"}`}>
               {live ? `Live · v${version}` : "Not published"}
             </span>
           </div>
@@ -72,7 +72,7 @@ export function SharePanel({ publishing, onPublish, onUnpublish }: SharePanelPro
               <p className="text-sm text-muted">Anyone with this link can fill in your form. No login needed.</p>
               <ShareLinkBox slug={slug} />
               {changed && (
-                <div className="flex items-center justify-between gap-3 rounded-lg bg-lavender/60 px-4 py-3 text-sm text-plum">
+                <div className="flex items-center justify-between gap-3 rounded-lg bg-lavender/60 px-4 py-3 text-sm text-ink">
                   You have changes that aren&apos;t live yet.
                   <Button size="sm" onClick={onPublish} disabled={publishing}>
                     Publish changes

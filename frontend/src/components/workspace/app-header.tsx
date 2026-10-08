@@ -2,6 +2,7 @@
 
 import { ChevronDown, CircleHelp, LogOut, Palette, Plug, Settings, User } from "lucide-react";
 import { toast } from "sonner";
+import { ColorModeMenu } from "@/components/layout/color-mode-menu";
 import { Logo } from "@/components/layout/logo";
 import { Menu, MenuContent, MenuItem, MenuLabel, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import type { Me } from "@/types/form";
@@ -45,6 +46,7 @@ export function AppHeader({ me }: { me: Me | null }) {
         <button onClick={comingSoon("Brand kit")} className="hidden items-center gap-1.5 rounded-md px-2.5 py-1.5 hover:bg-selected md:flex">
           <Palette size={16} /> Brand kit
         </button>
+        <ColorModeMenu />
         <button onClick={comingSoon("Help center")} className="rounded-md p-2 hover:bg-selected" aria-label="Help">
           <CircleHelp size={18} />
         </button>

@@ -13,6 +13,27 @@
   --tf-teal: #147d70;
   --tf-lavender: #e8d9fa;
   --tf-danger: #c42b1c;
+  --tf-switch-off: #d8d5db;
+  --tf-hover-strong: #e2e0e4;
+}
+
+/* Dark mode for the creator app (workspace, builder, results). Respondent forms keep their own
+   form theme. Set before first paint by the inline script in app/layout.tsx. */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --tf-bg: #141216;
+  --tf-surface: #1d1a21;
+  --tf-plum: #7b5a92;
+  --tf-plum-hover: #8d6ca4;
+  --tf-text: #ece8ef;
+  --tf-muted: #a49dab;
+  --tf-border: #312c36;
+  --tf-selected: #2a2630;
+  --tf-teal: #2a9d8f;
+  --tf-lavender: #2f2540;
+  --tf-danger: #ff6b5e;
+  --tf-switch-off: #48424e;
+  --tf-hover-strong: #36313b;
 }
 
 @theme inline {
@@ -27,6 +48,8 @@
   --color-teal: var(--tf-teal);
   --color-lavender: var(--tf-lavender);
   --color-danger: var(--tf-danger);
+  --color-switch-off: var(--tf-switch-off);
+  --color-hover-strong: var(--tf-hover-strong);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 

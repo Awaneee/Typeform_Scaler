@@ -65,7 +65,7 @@ export function WorkspaceSidebar({ me, query, onQueryChange }: SidebarProps) {
       </div>
 
       <div className="space-y-3 border-t border-line p-4">
-        <div className="flex items-start gap-2 rounded-lg bg-lavender/60 p-3 text-xs text-plum">
+        <div className="flex items-start gap-2 rounded-lg bg-lavender/60 p-3 text-xs text-ink">
           <Sparkles size={14} className="mt-0.5 shrink-0" />
           <span>AI form generation is coming soon.</span>
         </div>

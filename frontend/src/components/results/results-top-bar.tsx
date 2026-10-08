@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ColorModeMenu } from "@/components/layout/color-mode-menu";
 import { Logo } from "@/components/layout/logo";
 import { BUILDER_TABS } from "@/components/builder/builder-top-bar";
 import { cn } from "@/lib/utils";
@@ -36,7 +37,9 @@ export function ResultsTopBar({ formId, title }: { formId: string; title: string
           );
         })}
       </nav>
-      <div />
+      <div className="flex justify-end">
+        <ColorModeMenu />
+      </div>
     </header>
   );
 }
