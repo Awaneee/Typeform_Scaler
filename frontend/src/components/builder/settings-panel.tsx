@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronDown, GitBranch, ImagePlus, Plus, X } from "lucide-react";
+import { Dialog } from "radix-ui";
+import { ChevronDown, GitBranch, ImagePlus, Plus, SlidersHorizontal, X } from "lucide-react";
 import { useId, type ReactNode } from "react";
 import { toast } from "sonner";
 import { QuestionTypeBadge } from "@/components/questions/question-icon";
@@ -10,15 +11,46 @@ import { Switch } from "@/components/ui/switch";
 import { useBuilder } from "@/store/builder-store";
 import { QUESTION_TYPES, type Question } from "@/types/form";
 
+/** Right-hand panel on desktop. */
 export function SettingsPanel({ onOpenLogic }: { onOpenLogic: () => void }) {
-  const selected = useBuilder((s) => s.selected);
-  const question = useBuilder((s) => s.questions.find((q) => q.id === s.selected));
-
   return (
     <aside className="hidden w-[300px] shrink-0 overflow-y-auto border-l border-line bg-surface lg:block" aria-label="Question settings">
-      {selected === "ending" ? <EndingSettings /> : question ? <QuestionSettings key={question.id} question={question} onOpenLogic={onOpenLogic} /> : null}
+      <SettingsContent onOpenLogic={onOpenLogic} />
     </aside>
   );
+}
+
+/** Below the lg breakpoint the same settings open in a side drawer. */
+export function SettingsDrawerButton({ onOpenLogic }: { onOpenLogic: () => void }) {
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-surface px-3 text-sm hover:bg-selected lg:hidden">
+        <SlidersHorizontal size={15} /> Settings
+      </Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/20 data-[state=open]:animate-[fade-in_150ms_ease-out]" />
+        <Dialog.Content
+          className="fixed inset-y-0 right-0 z-50 w-[320px] max-w-[90vw] overflow-y-auto bg-surface shadow-2xl outline-none data-[state=open]:animate-[slide-in_200ms_ease-out]"
+          aria-describedby={undefined}
+        >
+          <div className="flex items-center justify-between border-b border-line px-5 py-3">
+            <Dialog.Title className="text-sm font-semibold">Settings</Dialog.Title>
+            <Dialog.Close className="rounded-md p-1 text-muted hover:bg-selected hover:text-ink" aria-label="Close settings">
+              <X size={16} />
+            </Dialog.Close>
+          </div>
+          <SettingsContent onOpenLogic={onOpenLogic} />
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+
+function SettingsContent({ onOpenLogic }: { onOpenLogic: () => void }) {
+  const selected = useBuilder((s) => s.selected);
+  const question = useBuilder((s) => s.questions.find((q) => q.id === s.selected));
+  if (selected === "ending") return <EndingSettings />;
+  return question ? <QuestionSettings key={question.id} question={question} onOpenLogic={onOpenLogic} /> : null;
 }
 
 function Section({ title, children }: { title?: string; children: ReactNode }) {

@@ -57,11 +57,12 @@ export function DesignPopover() {
                     </p>
                     <span className="block h-3 w-8 rounded-sm" style={{ background: t.button }} />
                   </div>
-                  <div className="flex items-center justify-between px-3 py-1.5 text-xs font-medium">
-                    <span>
-                      {t.label} <span className="font-normal text-muted">· {t.fontLabel}</span>
+                  <div className="flex items-center justify-between gap-2 px-3 py-1.5 text-xs">
+                    <span className="min-w-0">
+                      <span className="block font-medium">{t.label}</span>
+                      <span className="block truncate text-muted">{t.fontLabel}</span>
                     </span>
-                    {active && <Check size={14} />}
+                    {active && <Check size={14} className="shrink-0" />}
                   </div>
                 </button>
               );

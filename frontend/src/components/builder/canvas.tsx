@@ -67,21 +67,23 @@ function QuestionEditor({ question, number, theme }: { question: Question; numbe
           <ArrowRight size={14} strokeWidth={2.5} />
         </span>
         <div className="min-w-0 flex-1">
-          <div className="flex items-start">
+          {/* The hidden copy underneath has the same text and wrapping as the textarea, so the
+              required asterisk lands right after the last word, like on the public form. */}
+          <div className="grid text-xl leading-snug sm:text-2xl">
+            <div aria-hidden className="pointer-events-none col-start-1 row-start-1 break-words whitespace-pre-wrap text-transparent select-none">
+              {question.title || "Your question here."}
+              {question.required && <span style={{ color: theme.question }}> *</span>}
+            </div>
             <AutoTextarea
               value={question.title}
               onChange={(e) => update(question.id, { title: e.target.value.replace(/\n/g, " ") })}
               placeholder="Your question here."
               aria-label="Question title"
               autoFocus={!question.title}
-              className="w-auto max-w-full min-w-[4ch] text-xl leading-snug [field-sizing:content] sm:text-2xl placeholder:text-[var(--ph)]"
+              className="col-start-1 row-start-1 break-words placeholder:text-[var(--ph)]"
               style={{ color: theme.question, ["--ph" as string]: withAlpha(theme.question, 0.35) }}
             />
-            {question.required && (
-              <span className="text-2xl leading-snug" style={{ color: theme.question }} aria-label="required">
-                *
-              </span>
-            )}
+            {question.required && <span className="sr-only" aria-label="required" />}
           </div>
           <AutoTextarea
             value={question.description}

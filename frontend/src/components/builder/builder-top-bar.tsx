@@ -28,15 +28,15 @@ export function BuilderTopBar({ tab, onTab, onBack, onPreview, onPublish, publis
   const upToDate = status === "published" && !changed;
 
   return (
-    <header className="grid h-14 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-line bg-surface px-4">
+    <header className="grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-4 border-line bg-surface px-4">
       <div className="flex min-w-0 items-center gap-2">
         <span onClickCapture={(e) => { e.preventDefault(); onBack(); }}>
           <Logo showText={false} />
         </span>
-        <button onClick={onBack} className="hidden shrink-0 rounded-md px-1.5 py-1 text-sm text-muted hover:bg-selected hover:text-ink md:block">
+        <button onClick={onBack} className="hidden shrink-0 rounded-md px-1.5 py-1 text-sm text-muted hover:bg-selected hover:text-ink lg:block">
           My workspace
         </button>
-        <span className="hidden text-muted md:inline">/</span>
+        <span className="hidden text-muted lg:inline">/</span>
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -49,14 +49,14 @@ export function BuilderTopBar({ tab, onTab, onBack, onPreview, onPublish, publis
         />
       </div>
 
-      <nav className="flex gap-1" aria-label="Builder sections">
+      <nav className="flex gap-0.5 lg:gap-1" aria-label="Builder sections">
         {BUILDER_TABS.map((t) => (
           <button
             key={t}
             onClick={() => onTab(t)}
             aria-current={tab === t ? "page" : undefined}
             className={cn(
-              "relative rounded-md px-3 py-1.5 text-sm capitalize",
+              "relative rounded-md px-2 py-1.5 text-sm capitalize lg:px-3",
               tab === t ? "font-medium text-ink" : "text-muted hover:bg-selected hover:text-ink",
             )}
           >

@@ -19,7 +19,7 @@ import { DesignPopover } from "./design-popover";
 import { LogicEditor } from "./logic-editor";
 import { QuestionList } from "./question-list";
 import { QuestionPicker } from "./question-picker";
-import { SettingsPanel } from "./settings-panel";
+import { SettingsDrawerButton, SettingsPanel } from "./settings-panel";
 import { SharePanel, ShareLinkBox } from "./share-panel";
 
 export function Builder({ formId }: { formId: string }) {
@@ -111,6 +111,9 @@ export function Builder({ formId }: { formId: string }) {
 
   return (
     <div className="flex h-dvh flex-col bg-bg">
+      <p className="bg-lavender px-4 py-2 text-center text-xs text-ink md:hidden">
+        The builder works best on a larger screen. Your form itself works great on phones.
+      </p>
       <BuilderTopBar
         tab={tab}
         onTab={changeTab}
@@ -130,6 +133,7 @@ export function Builder({ formId }: { formId: string }) {
                   <Plus size={15} /> Add content
                 </button>
                 <DesignPopover />
+                <SettingsDrawerButton onOpenLogic={() => setTab("workflow")} />
               </div>
               <div className="flex rounded-lg border border-line bg-surface p-0.5" role="group" aria-label="Preview device">
                 {(["desktop", "mobile"] as const).map((d) => (

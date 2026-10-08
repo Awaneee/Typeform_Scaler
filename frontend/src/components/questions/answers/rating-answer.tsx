@@ -31,7 +31,9 @@ export function RatingAnswer({ question, value, onChange, theme, preview, active
   });
 
   return (
-    <div className="flex flex-wrap gap-1 sm:gap-2" role="radiogroup" aria-label={question.title || "Rating"} onMouseLeave={() => setHover(0)}>
+    // Sized by the space it actually gets (container query), so 5 stars fit on the narrow builder canvas too.
+    <div className="@container">
+    <div className="flex flex-wrap gap-1 @md:gap-2" role="radiogroup" aria-label={question.title || "Rating"} onMouseLeave={() => setHover(0)}>
       {Array.from({ length: steps }, (_, i) => i + 1).map((n) => (
         <button
           key={n}
@@ -46,7 +48,7 @@ export function RatingAnswer({ question, value, onChange, theme, preview, active
           className="flex flex-col items-center gap-1 rounded-md p-1 transition-transform hover:scale-105 disabled:cursor-default disabled:hover:scale-100"
         >
           <Star
-            className="h-9 w-9 sm:h-11 sm:w-11"
+            className="h-9 w-9 @md:h-11 @md:w-11"
             strokeWidth={1.25}
             stroke={theme.answer}
             fill={n <= shown ? theme.answer : withAlpha(theme.answer, 0.08)}
@@ -56,6 +58,7 @@ export function RatingAnswer({ question, value, onChange, theme, preview, active
           </span>
         </button>
       ))}
+    </div>
     </div>
   );
 }
