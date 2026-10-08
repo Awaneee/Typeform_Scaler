@@ -7,7 +7,7 @@ from fastapi import APIRouter, Path, Query
 from fastapi.responses import FileResponse, Response
 
 from app.api.deps import DB, OwnedForm
-from app.schemas.results import FormAnalytics, SubmissionDetail, SubmissionPage
+from app.schemas.results import FormAnalytics, PartialPage, SubmissionDetail, SubmissionPage
 from app.services import results, uploads
 
 router = APIRouter(tags=["results"])
@@ -21,6 +21,16 @@ def list_submissions(
     page_size: Annotated[int, Query(ge=1, le=100)] = 25,
 ):
     return results.list_submissions(db, form, page=page, page_size=page_size)
+
+
+@router.get("/forms/{form_id}/partials", response_model=PartialPage)
+def list_partials(
+    db: DB,
+    form: OwnedForm,
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 25,
+):
+    return results.list_partials(db, form, page=page, page_size=page_size)
 
 
 @router.get("/forms/{form_id}/submissions/{submission_id}", response_model=SubmissionDetail)

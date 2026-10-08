@@ -60,6 +60,11 @@ test("Keyboard navigation (Enter / ↓ next, ↑ back, letter keys for choices, 
   await page.goto(`/to/${form.slug}`);
   await onQuestion(page, "What's your name?");
   await page.keyboard.type("Ada");
+  await page.keyboard.press("ArrowDown"); // ↓ advances from a single-line text field too
+  await onQuestion(page, "What's your email?");
+  await page.keyboard.press("ArrowUp"); // ↑ goes back, keeping the answer
+  await onQuestion(page, "What's your name?");
+  await expect(page.getByRole("textbox")).toHaveValue("Ada");
   await page.keyboard.press("Enter");
   await onQuestion(page, "What's your email?");
   await page.keyboard.type("ada@example.com");

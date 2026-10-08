@@ -25,6 +25,8 @@ from app.schemas.results import (
     FormAnalytics,
     QuestionAnalytics,
     ResultColumn,
+    PartialPage,
+    PartialRow,
     SubmissionDetail,
     SubmissionPage,
     SubmissionRow,
@@ -120,6 +122,44 @@ def list_submissions(db: Session, form: Form, *, page: int, page_size: int) -> S
         page=page,
         page_size=page_size,
     )
+
+
+def _partial_filter(form: Form):
+    """Sessions with saved answers that never turned into a submission."""
+    return (
+        ResponseSession.form_id == form.id,
+        ResponseSession.submitted_at.is_(None),
+        ResponseSession.partial_answers_json.is_not(None),
+    )
+
+
+def list_partials(db: Session, form: Form, *, page: int, page_size: int) -> PartialPage:
+    """Sessions that answered something but never submitted, newest activity first."""
+    catalog = build_catalog(db, form)
+    by_id = {q.id: q for q in catalog.questions}
+    sessions = db.scalars(
+        select(ResponseSession)
+        .where(*_partial_filter(form))
+        .order_by(ResponseSession.last_activity_at.desc())
+    ).all()
+    sessions = [s for s in sessions if s.partial_answers_json]  # skip sessions with nothing answered
+    rows = [
+        PartialRow(
+            id=s.id,
+            started_at=s.started_at or s.viewed_at,
+            last_activity_at=s.last_activity_at or s.viewed_at,
+            version_number=catalog.numbers.get(s.form_version_id, 0),
+            answered=len(s.partial_answers_json),
+            answers={
+                qid: format_answer(by_id[qid], value, catalog.option_labels, catalog.file_names)
+                for qid, value in s.partial_answers_json.items()
+                if qid in by_id
+            },
+        )
+        for s in sessions
+    ]
+    start = (page - 1) * page_size
+    return PartialPage(columns=catalog.columns(), items=rows[start : start + page_size], total=len(rows), page=page, page_size=page_size)
 
 
 def get_submission(db: Session, form: Form, submission_id: str) -> SubmissionDetail:
@@ -222,6 +262,9 @@ def analytics(db: Session, form: Form) -> FormAnalytics:
         .where(ResponseSession.form_id == form.id, ResponseSession.started_at.is_not(None))
     ) or 0
     completion = round(min(100.0, 100 * len(subs) / starts), 1) if starts else None
+    partials = sum(
+        1 for answers in db.scalars(select(ResponseSession.partial_answers_json).where(*_partial_filter(form))) if answers
+    )
 
     today = utcnow().date()
     per_day = Counter(s.submitted_at.date() for s in subs)
@@ -234,6 +277,7 @@ def analytics(db: Session, form: Form) -> FormAnalytics:
         views=views,
         starts=starts,
         submissions=len(subs),
+        partials=partials,
         completion_rate=completion,
         daily=daily,
         questions=[

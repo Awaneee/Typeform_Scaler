@@ -37,11 +37,13 @@ test("Logic jumps / conditional branching (Workflow tab rules: is / is not / gre
   expect(Object.keys((await other.json()).error.fields)).toContain(whyNot);
 });
 
-test("Custom themes (4 presets: Design popover in builder, applied to canvas, preview and public form; snapshot per published version)", async ({ page, request }) => {
+test("Custom themes (4 presets with colours, fonts and background: Design popover in builder, applied to canvas, preview and public form; snapshot per published version)", async ({ page, request }) => {
   const form = await createForm(request, "Themes", [q("short_text", "Name")], { publish: true, settings: { theme: "midnight" } });
   await page.goto(`/to/${form.slug}`);
   await onQuestion(page, "Name");
   await expect(page.locator("main").locator("..")).toHaveCSS("background-color", "rgb(30, 27, 46)");
+  await expect(page.locator("main h1")).toHaveCSS("font-family", /Playfair Display/); // themes set the font too
+  await expect(page.getByRole("textbox")).toHaveCSS("font-family", /Playfair Display/);
   // Changing the draft's theme doesn't touch the published snapshot until republished.
   const draft = await (await request.get(`/api/v1/forms/${form.id}`)).json();
   await request.put(`/api/v1/forms/${form.id}/draft`, { data: { ...draft, settings: { ...draft.settings, theme: "ocean" } } });
@@ -61,7 +63,7 @@ test("Export responses as CSV (Download CSV button on results)", async ({ page, 
   expect(text).toContain('"Ada, Countess",Delhi'); // labels resolved, commas quoted
 });
 
-test("Partial-response tracking / completion rate (views, starts, submissions, completion % on results)", async ({ page, browser, request }) => {
+test("Partial-response tracking / completion rate (partial answers autosaved and listed, views, starts, submissions, completion %)", async ({ page, browser, request }) => {
   const form = await createForm(request, "Completion", [q("short_text", "Name", { required: true }), q("short_text", "City")], { publish: true });
   // Visitor 1 only looks; visitor 2 starts but leaves; visitor 3 completes.
   for (const action of ["view", "start", "complete"] as const) {
@@ -69,7 +71,10 @@ test("Partial-response tracking / completion rate (views, starts, submissions, c
     const p = await ctx.newPage();
     await p.goto(`/to/${form.slug}`);
     await onQuestion(p, "Name");
-    if (action !== "view") await p.keyboard.type("Ada");
+    if (action !== "view") {
+      await p.keyboard.type("Ada");
+      await p.waitForTimeout(1500); // partial answers autosave ~1s after typing
+    }
     if (action === "complete") {
       await p.keyboard.press("Enter");
       await onQuestion(p, "City");
@@ -85,6 +90,14 @@ test("Partial-response tracking / completion rate (views, starts, submissions, c
   await expect(stat("Starts")).toContainText("2");
   await expect(stat("Submissions")).toContainText("1");
   await expect(stat("Completion rate")).toContainText("50%");
+
+  // The visitor who left halfway shows up as a partial response with their answer.
+  await page.getByRole("button", { name: /^responses/i }).click();
+  await page.getByRole("button", { name: /partial \(1\)/i }).click();
+  const partial = page.getByRole("row", { name: "Partial response" });
+  await expect(partial).toHaveCount(1);
+  await expect(partial).toContainText("Ada");
+  await expect(partial).toContainText("1 of 2");
 });
 
 test("File-upload question type (drag & drop, size limit, stored on backend disk, downloadable from results)", async ({ page, request }) => {

@@ -28,7 +28,12 @@ export function FormRunner({ form, mode }: FormRunnerProps) {
   // Global keys when focus isn't in a text field: Enter / ↓ = next, ↑ = back.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (screen.kind === "thankyou" || isTyping(e) || e.metaKey || e.altKey) return;
+      if (screen.kind === "thankyou" || e.metaKey || e.altKey) return;
+      // Text fields keep their keys, except ↑/↓ in single-line inputs (they have no use there).
+      // Long text and the dropdown combobox still use arrows to move the caret / highlight.
+      const el = e.target as HTMLElement;
+      const singleLine = el.tagName === "INPUT" && el.getAttribute("role") !== "combobox";
+      if (isTyping(e) && !(singleLine && (e.key === "ArrowDown" || e.key === "ArrowUp"))) return;
       if (e.key === "Enter" || e.key === "ArrowDown") {
         e.preventDefault();
         next();

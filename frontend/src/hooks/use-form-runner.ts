@@ -20,6 +20,7 @@ export type RunnerMode = { kind: "live"; slug: string } | { kind: "preview" };
 export type Screen = { kind: "welcome" } | { kind: "question"; index: number } | { kind: "thankyou" };
 
 const AUTO_ADVANCE_MS = 350;
+const PARTIAL_SAVE_MS = 1000;
 
 /** All respondent-flow logic: navigation, validation, auto-advance, submission, session tracking. */
 export function useFormRunner(form: RunnerForm, modeProp: RunnerMode) {
@@ -50,6 +51,23 @@ export function useFormRunner(form: RunnerForm, modeProp: RunnerMode) {
     if (mode.kind === "live") publicApi.trackSession(mode.slug, sessionId.current, "view").catch(() => {});
     return () => clearTimeout(advanceTimer.current);
   }, [mode]);
+
+  // Partial responses: autosave answers so far (live forms only) until the form is submitted.
+  const finished = screen.kind === "thankyou";
+  useEffect(() => {
+    if (mode.kind !== "live" || finished || !started.current) return;
+    const payload = toPayload(questions, answers);
+    const save = (keepalive = false) =>
+      publicApi.savePartial(mode.slug, sessionId.current, payload, keepalive).catch(() => {});
+    const timer = setTimeout(save, PARTIAL_SAVE_MS);
+    // Leaving the page before the timer fires still saves the latest answers.
+    const onHide = () => document.visibilityState === "hidden" && save(true);
+    document.addEventListener("visibilitychange", onHide);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onHide);
+    };
+  }, [answers, finished, mode, questions]);
 
   const index = screen.kind === "question" ? screen.index : -1;
   const current = index >= 0 ? questions[index] : undefined;

@@ -17,6 +17,13 @@ export const publicApi = {
       { method: "POST", body },
     );
   },
+  /** Autosaves an unfinished response. `keepalive` lets it finish while the tab is closing. */
+  savePartial: (slug: string, clientSessionId: string, answers: Answers, keepalive = false) =>
+    request<void>(`/public/forms/${encodeURIComponent(slug)}/sessions/${clientSessionId}/answers`, {
+      method: "PUT",
+      json: { answers },
+      keepalive,
+    }),
   trackSession: (slug: string, clientSessionId: string, event: "view" | "start") =>
     request<void>(`/public/forms/${encodeURIComponent(slug)}/sessions`, {
       method: "POST",

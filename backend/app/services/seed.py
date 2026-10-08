@@ -149,10 +149,23 @@ def _seed_responses(db: Session, form: Form, definition: dict, count: int, rng: 
         create_submission(db, form, form.published_version, answers, new_id(), client_session_id=session_id,
                           submitted_at=when)
     # Visitors who looked but didn't finish, so the completion rate is realistic.
+    # Those who started leave a partial response (their first answers).
     for _ in range(count // 2):
         when = now - timedelta(days=rng.uniform(0, 20))
-        started = when if rng.random() < 0.5 else None
-        db.add(ResponseSession(form_id=form.id, client_session_id=new_id(), viewed_at=when, started_at=started))
+        if rng.random() < 0.5:
+            db.add(ResponseSession(form_id=form.id, client_session_id=new_id(), viewed_at=when))
+            continue
+        person = (rng.choice(FIRST), rng.choice(LAST))
+        first = definition["questions"][: rng.randint(1, 2)]
+        db.add(ResponseSession(
+            form_id=form.id,
+            client_session_id=new_id(),
+            viewed_at=when,
+            started_at=when,
+            form_version_id=form.published_version_id,
+            partial_answers_json={q["id"]: _answer(q, rng, person) for q in first},
+            last_activity_at=when + timedelta(minutes=rng.randint(1, 5)),
+        ))
     db.commit()
 
 

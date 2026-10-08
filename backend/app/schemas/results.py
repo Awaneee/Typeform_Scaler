@@ -20,6 +20,23 @@ class SubmissionRow(BaseModel):
     answers: dict[str, str]
 
 
+class PartialRow(BaseModel):
+    id: str
+    started_at: datetime
+    last_activity_at: datetime
+    version_number: int
+    answered: int
+    answers: dict[str, str]
+
+
+class PartialPage(BaseModel):
+    columns: list[ResultColumn]
+    items: list[PartialRow]
+    total: int
+    page: int
+    page_size: int
+
+
 class SubmissionPage(BaseModel):
     columns: list[ResultColumn]
     items: list[SubmissionRow]
@@ -70,6 +87,7 @@ class FormAnalytics(BaseModel):
     views: int
     starts: int
     submissions: int
+    partials: int
     completion_rate: float | None
     daily: list[dict[str, Any]]
     questions: list[QuestionAnalytics]

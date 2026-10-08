@@ -9,7 +9,8 @@ import { formsApi } from "@/lib/api/forms";
 import { resultsApi } from "@/lib/api/results";
 import { cn } from "@/lib/utils";
 import type { FormDetail } from "@/types/form";
-import type { FormAnalytics, SubmissionPage } from "@/types/results";
+import type { FormAnalytics, PartialPage, SubmissionPage } from "@/types/results";
+import { PartialsTable } from "./partials-table";
 import { ResponseDrawer } from "./response-drawer";
 import { ResponsesTab } from "./responses-tab";
 import { ResultsTopBar } from "./results-top-bar";
@@ -26,6 +27,8 @@ export function ResultsView({ formId }: { formId: string }) {
   const [page, setPage] = useState(1);
   const [tab, setTab] = useState<Tab>("summary");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [show, setShow] = useState<"completed" | "partial">("completed");
+  const [partials, setPartials] = useState<PartialPage | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -42,6 +45,11 @@ export function ResultsView({ formId }: { formId: string }) {
       cancelled = true;
     };
   }, [formId, page]);
+
+  useEffect(() => {
+    if (show !== "partial") return;
+    resultsApi.partials(formId).then(setPartials, (e) => setError(message(e)));
+  }, [formId, show]);
 
   return (
     <div className="flex min-h-dvh flex-col bg-bg">
@@ -75,10 +83,28 @@ export function ResultsView({ formId }: { formId: string }) {
           <p className="rounded-lg border border-danger/30 bg-danger/5 p-4 text-sm text-danger">{error}</p>
         ) : tab === "summary" ? (
           analytics ? <SummaryTab data={analytics} /> : <LoadingBlocks />
-        ) : submissions ? (
-          <ResponsesTab page={submissions} onPage={setPage} onOpen={setOpenId} />
         ) : (
-          <LoadingBlocks />
+          <div className="space-y-4">
+            <div className="flex w-fit rounded-lg border border-line bg-surface p-0.5 text-sm" role="group" aria-label="Response type">
+              {(["completed", "partial"] as const).map((kind) => (
+                <button
+                  key={kind}
+                  onClick={() => setShow(kind)}
+                  aria-pressed={show === kind}
+                  className={cn("rounded-md px-3 py-1.5 capitalize", show === kind ? "bg-selected font-medium" : "text-muted hover:text-ink")}
+                >
+                  {kind} <span className="tabular-nums">({kind === "completed" ? (submissions?.total ?? "…") : (analytics?.partials ?? "…")})</span>
+                </button>
+              ))}
+            </div>
+            {show === "completed" ? (
+              submissions ? <ResponsesTab page={submissions} onPage={setPage} onOpen={setOpenId} /> : <LoadingBlocks />
+            ) : partials ? (
+              <PartialsTable page={partials} />
+            ) : (
+              <LoadingBlocks />
+            )}
+          </div>
         )}
       </main>
 

@@ -41,7 +41,8 @@ class Answer(Base):
 
 
 class ResponseSession(Base):
-    """One respondent visit to a published form. Powers views / starts / completion rate."""
+    """One respondent visit to a published form. Powers views / starts / completion rate,
+    and keeps the answers of people who started but haven't submitted (partial responses)."""
 
     __tablename__ = "response_sessions"
     __table_args__ = (Index("ix_response_sessions_form", "form_id"),)
@@ -52,6 +53,11 @@ class ResponseSession(Base):
     viewed_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
     started_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
     submitted_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    # Partial responses: answers so far, against the version the respondent is filling.
+    form_version_id: Mapped[str | None] = mapped_column(ForeignKey("form_versions.id", ondelete="CASCADE"))
+    # none_as_null: store Python None as SQL NULL (not the JSON text "null") so filters work.
+    partial_answers_json: Mapped[dict[str, Any] | None] = mapped_column(JSON(none_as_null=True))
+    last_activity_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
 
 
 class FileUpload(Base):

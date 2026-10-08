@@ -84,6 +84,7 @@ def create_submission(
         if session is not None and session.form_id == form.id:
             session.started_at = session.started_at or submitted_at
             session.submitted_at = submitted_at
+            session.partial_answers_json = None  # completed: no longer a partial response
 
     try:
         db.commit()

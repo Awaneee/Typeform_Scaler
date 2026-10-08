@@ -10,6 +10,7 @@ export interface Theme {
   button: string;
   buttonText: string;
   font: string;
+  fontLabel: string;
 }
 
 export const THEMES: Record<ThemeName, Theme> = {
@@ -21,7 +22,8 @@ export const THEMES: Record<ThemeName, Theme> = {
     answer: "#0445AF",
     button: "#0445AF",
     buttonText: "#FFFFFF",
-    font: "var(--font-inter)",
+    font: "var(--font-inter), sans-serif",
+    fontLabel: "Inter",
   },
   lavender: {
     name: "lavender",
@@ -31,7 +33,8 @@ export const THEMES: Record<ThemeName, Theme> = {
     answer: "#7D3FC9",
     button: "#7D3FC9",
     buttonText: "#FFFFFF",
-    font: "var(--font-inter)",
+    font: "var(--font-karla), var(--font-inter), sans-serif",
+    fontLabel: "Karla",
   },
   ocean: {
     name: "ocean",
@@ -41,7 +44,8 @@ export const THEMES: Record<ThemeName, Theme> = {
     answer: "#147D70",
     button: "#147D70",
     buttonText: "#FFFFFF",
-    font: "var(--font-inter)",
+    font: "var(--font-montserrat), var(--font-inter), sans-serif",
+    fontLabel: "Montserrat",
   },
   midnight: {
     name: "midnight",
@@ -51,7 +55,8 @@ export const THEMES: Record<ThemeName, Theme> = {
     answer: "#B9A7FF",
     button: "#B9A7FF",
     buttonText: "#1E1B2E",
-    font: "var(--font-inter)",
+    font: "var(--font-playfair), var(--font-inter), sans-serif",
+    fontLabel: "Playfair Display",
   },
 };
 

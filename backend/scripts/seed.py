@@ -9,6 +9,7 @@ import argparse
 from app.core.db import SessionLocal
 from app.models import Base
 from app.services.seed import seed, seed_if_empty
+from app.services.uploads import upload_dir
 
 
 def main() -> None:
@@ -21,6 +22,8 @@ def main() -> None:
             for table in reversed(Base.metadata.sorted_tables):
                 db.execute(table.delete())
             db.commit()
+            for path in upload_dir().glob("*"):  # uploaded files belong to the deleted rows
+                path.unlink()
             seed(db)
             print("Database reset and seeded.")
         elif seed_if_empty(db):

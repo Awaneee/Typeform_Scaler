@@ -48,7 +48,7 @@ export function DesignPopover() {
                     active ? "border-plum ring-2 ring-plum" : "border-line",
                   )}
                 >
-                  <div className="space-y-1.5 p-3" style={{ background: t.background }}>
+                  <div className="space-y-1.5 p-3" style={{ background: t.background, fontFamily: t.font }}>
                     <p className="text-sm font-medium" style={{ color: t.question }}>
                       Question
                     </p>
@@ -58,7 +58,9 @@ export function DesignPopover() {
                     <span className="block h-3 w-8 rounded-sm" style={{ background: t.button }} />
                   </div>
                   <div className="flex items-center justify-between px-3 py-1.5 text-xs font-medium">
-                    {t.label}
+                    <span>
+                      {t.label} <span className="font-normal text-muted">· {t.fontLabel}</span>
+                    </span>
                     {active && <Check size={14} />}
                   </div>
                 </button>

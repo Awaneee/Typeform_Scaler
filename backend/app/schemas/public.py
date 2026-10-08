@@ -35,3 +35,7 @@ class UploadCreated(BaseModel):
     id: str
     filename: str
     size_bytes: int
+
+
+class PartialAnswers(BaseModel):
+    answers: dict[str, Any] = Field(max_length=500)

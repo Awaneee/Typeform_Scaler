@@ -21,6 +21,23 @@ export interface SubmissionPage {
   page_size: number;
 }
 
+export interface PartialRow {
+  id: string;
+  started_at: string;
+  last_activity_at: string;
+  version_number: number;
+  answered: number;
+  answers: Record<string, string>;
+}
+
+export interface PartialPage {
+  columns: ResultColumn[];
+  items: PartialRow[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
 export interface SubmissionDetail {
   id: string;
   number: number;
@@ -54,6 +71,7 @@ export interface FormAnalytics {
   views: number;
   starts: number;
   submissions: number;
+  partials: number;
   completion_rate: number | null;
   daily: { date: string; count: number }[];
   questions: QuestionAnalytics[];
