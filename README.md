@@ -390,17 +390,24 @@ and uploads. A volume is required: without one, every restart would wipe the dat
 
 ### Backend on Railway
 
-1. New project → *Deploy from GitHub repo* → this repo. In the service settings set **Root directory** to `backend`.
-2. Add a **Volume** mounted at `/data`.
-3. Variables:
+Live: `https://backend-production-4bd9.up.railway.app` (health: `/api/v1/health`, docs: `/docs`).
+
+1. New project → *Deploy from GitHub repo* → this repo, branch `main`. Every push to `main` that changes
+   `backend/**` redeploys automatically.
+2. Service settings:
+   - **Root directory:** `backend` · **Watch paths:** `/backend/**`
+   - **Start command:** `alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+     (migrations run on every deploy, before the server starts)
+   - **Health check path:** `/api/v1/health` · **Restart policy:** on failure
+3. Add a **Volume** mounted at `/data` (keeps the SQLite file and uploads across restarts and redeploys).
+4. Variables:
    ```
    DATABASE_URL=sqlite:////data/app.db
    UPLOAD_DIR=/data/uploads
    CORS_ORIGINS=https://<your-vercel-app>.vercel.app
    SEED_ON_EMPTY=true
    ```
-4. `backend/railway.json` sets the start command (`alembic upgrade head && uvicorn …`) and the health check
-   (`/api/v1/health`). Generate a public domain and check `https://<backend>/api/v1/health`.
+5. Generate a public domain. On first boot the empty database is seeded with the demo forms.
 
 ### Frontend on Vercel
 
