@@ -26,16 +26,30 @@ export function AiPanel() {
       <div className="rounded-xl border border-[#e6d8f7] p-2">
         <input
           readOnly
-          onFocus={soon}
+          onClick={soon}
+          onKeyDown={(e) => {
+            if (e.key.length === 1 || e.key === "Enter") {
+              e.preventDefault();
+              soon();
+            }
+          }}
           placeholder="Ask Formflow AI"
           aria-label="Ask Formflow AI (coming soon)"
           className="w-full bg-transparent px-1 py-1 text-sm outline-none placeholder:text-muted"
         />
-        <div className="mt-1 flex items-center gap-2 text-muted">
-          <Mic size={15} />
-          <Plus size={15} />
-          <MoreHorizontal size={15} />
-          <Send size={15} className="ml-auto" />
+        <div className="mt-1 flex items-center gap-1 text-muted">
+          {[
+            { label: "Dictate audio message", icon: Mic },
+            { label: "Add files", icon: Plus },
+            { label: "More options", icon: MoreHorizontal },
+          ].map(({ label, icon: Icon }) => (
+            <button key={label} onClick={soon} aria-label={label} className="rounded-md p-1 hover:bg-selected hover:text-ink">
+              <Icon size={15} />
+            </button>
+          ))}
+          <button onClick={soon} aria-label="Send message" className="ml-auto rounded-md p-1 hover:bg-selected hover:text-ink">
+            <Send size={15} />
+          </button>
         </div>
       </div>
     </aside>

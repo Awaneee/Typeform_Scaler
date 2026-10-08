@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { ApiError } from "@/lib/api/client";
 import { formsApi } from "@/lib/api/forms";
 
+const aiSoon = () => toast("Formflow AI form generation is coming soon. Start from scratch for now.");
+
 export function NewFormView() {
   const router = useRouter();
   const [creating, setCreating] = useState(false);
@@ -37,26 +39,40 @@ export function NewFormView() {
         <p className="text-sm text-muted">Formflow AI</p>
         <h1 className="mt-2 text-center text-2xl sm:text-[26px]">What would you like to create?</h1>
 
-        {/* Lavender glow around the prompt, like Typeform's AI box. */}
+        {/* Lavender glow around the prompt, like Typeform's AI box. AI generation is a placeholder:
+            every control in it answers with a "coming soon" toast. */}
         <div className="mt-8 w-full max-w-xl rounded-2xl bg-[#f3e9fc] p-1.5 shadow-[0_0_0_1px_#e6d8f7]">
           <div className="rounded-xl border border-[#c9a8ee] bg-surface p-2">
             <textarea
               rows={3}
-              disabled
+              readOnly
+              onClick={aiSoon}
+              onKeyDown={(e) => {
+                if (e.key.length === 1 || e.key === "Enter") {
+                  e.preventDefault();
+                  aiSoon();
+                }
+              }}
               placeholder="Explain the goal"
-              className="w-full resize-none bg-transparent px-1.5 py-1 text-sm outline-none placeholder:text-muted disabled:cursor-not-allowed"
+              className="w-full cursor-text resize-none bg-transparent px-1.5 py-1 text-sm outline-none placeholder:text-muted"
               aria-label="Explain the goal (AI generation coming soon)"
             />
-            <div className="flex items-center gap-2 px-1 text-muted">
-              <Mic size={15} />
-              <Plus size={15} />
-              <MoreHorizontal size={15} />
+            <div className="flex items-center gap-1 text-muted">
+              {[
+                { label: "Dictate audio message", icon: Mic },
+                { label: "Add files", icon: Plus },
+                { label: "More options", icon: MoreHorizontal },
+              ].map(({ label, icon: Icon }) => (
+                <button key={label} onClick={aiSoon} aria-label={label} className="rounded-md p-1.5 hover:bg-selected hover:text-ink">
+                  <Icon size={15} />
+                </button>
+              ))}
               <span className="ml-auto flex items-center gap-1.5 text-xs">
                 <Sparkles size={13} /> Coming soon
               </span>
-              <span className="rounded-md border border-line p-1 opacity-50">
+              <button onClick={aiSoon} aria-label="Generate form" className="rounded-md border border-line p-1.5 hover:bg-selected hover:text-ink">
                 <Send size={13} />
-              </span>
+              </button>
             </div>
           </div>
         </div>

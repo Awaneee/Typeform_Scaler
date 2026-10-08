@@ -85,6 +85,21 @@ test.describe("Mocked / placeholder sections", () => {
     await expect(picker.getByRole("button", { name: "File Upload", exact: true })).toBeEnabled();
   });
 
+  test("AI form generation (\"Coming soon\" on the create screen and AI panel)", async ({ page }) => {
+    await page.goto("/forms/new");
+    await page.waitForLoadState("networkidle"); // let React hydrate before clicking
+    await page.getByRole("textbox", { name: /Explain the goal/ }).click();
+    await expect(page.getByText(/AI form generation is coming soon/)).toBeVisible();
+    for (const name of ["Dictate audio message", "Generate form"]) {
+      await page.getByRole("button", { name }).click();
+      await expect(page.getByText(/AI form generation is coming soon/).first()).toBeVisible();
+    }
+    await page.goto("/workspace");
+    await page.waitForLoadState("networkidle");
+    await page.getByRole("button", { name: "Help me get started" }).click();
+    await expect(page.getByText("Formflow AI is coming soon")).toBeVisible();
+  });
+
   test("Simplified auth (one default logged-in creator)", async ({ page }) => {
     const me = await (await page.request.get("/api/v1/me")).json();
     expect(me.email).toBe("creator@example.com");
