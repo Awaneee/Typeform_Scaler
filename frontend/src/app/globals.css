@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+/* Design tokens, approximating Typeform's app UI. */
+:root {
+  --tf-bg: #f8f8fa;
+  --tf-surface: #ffffff;
+  --tf-plum: #39303e;
+  --tf-plum-hover: #4b4151;
+  --tf-text: #302732;
+  --tf-muted: #77717b;
+  --tf-border: #e8e6ea;
+  --tf-selected: #eeedef;
+  --tf-teal: #147d70;
+  --tf-lavender: #e8d9fa;
+  --tf-danger: #c42b1c;
+}
+
+@theme inline {
+  --color-bg: var(--tf-bg);
+  --color-surface: var(--tf-surface);
+  --color-plum: var(--tf-plum);
+  --color-plum-hover: var(--tf-plum-hover);
+  --color-ink: var(--tf-text);
+  --color-muted: var(--tf-muted);
+  --color-line: var(--tf-border);
+  --color-selected: var(--tf-selected);
+  --color-teal: var(--tf-teal);
+  --color-lavender: var(--tf-lavender);
+  --color-danger: var(--tf-danger);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+html,
+body {
+  background: var(--tf-bg);
+  color: var(--tf-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    scale: 0.97;
+  }
+}

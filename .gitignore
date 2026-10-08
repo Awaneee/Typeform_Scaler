@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+backend/data/
+*.db
+*.db-shm
+*.db-wal
+
+# Node
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Tooling
+.vercel/
+playwright-report/
+test-results/
+.DS_Store
+
+# Personal working notes (not part of the submission)
+context.md
+markdown.md
+
+# Playwright MCP screenshots/traces
+.playwright-mcp/
+
+# Claude Code local settings
+.claude/settings.local.json
