@@ -90,6 +90,7 @@ export function FormRunner({ form, mode }: FormRunnerProps) {
                 onChange={(v) => runner.setAnswer(current.id, v)}
                 onSubmit={next}
                 onCommit={runner.commit}
+                upload={current.type === "file_upload" ? runner.uploadFor(current.id) : undefined}
                 okLabel={runner.isLast ? "Submit" : "OK"}
                 submitting={runner.submitting}
                 submitError={runner.isLast ? runner.submitError : null}
@@ -134,9 +135,10 @@ interface QuestionScreenProps {
   okLabel: string;
   submitting: boolean;
   submitError: string | null;
+  upload?: Parameters<typeof AnswerField>[0]["upload"];
 }
 
-function QuestionScreen({ question, number, theme, value, error, onChange, onSubmit, onCommit, okLabel, submitting, submitError }: QuestionScreenProps) {
+function QuestionScreen({ question, number, theme, value, error, onChange, onSubmit, onCommit, okLabel, submitting, submitError, upload }: QuestionScreenProps) {
   const headingId = `q-${question.id}`;
   return (
     <section aria-labelledby={headingId} className="flex gap-2 sm:gap-3">
@@ -155,7 +157,7 @@ function QuestionScreen({ question, number, theme, value, error, onChange, onSub
           </p>
         )}
         <div className="mt-8">
-          <AnswerField question={question} value={value} onChange={onChange} theme={theme} active onSubmit={onSubmit} onCommit={onCommit} />
+          <AnswerField question={question} value={value} onChange={onChange} theme={theme} active onSubmit={onSubmit} onCommit={onCommit} upload={upload} />
         </div>
 
         <div aria-live="assertive">

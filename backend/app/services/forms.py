@@ -147,17 +147,32 @@ def duplicate_form(db: Session, form: Form) -> Form:
                 required=q.required,
                 settings_json=dict(q.settings_json or {}),
                 options=[QuestionOption(id=new_id(), position=o.position, label=o.label) for o in q.options],
+                logic_json=[],  # rules reference old ids; remapped below
             )
         )
+    # Copy logic jumps, pointing them at the new question and option ids.
+    id_map = {old.id: new.id for old, new in zip(form.questions, copy.questions)}
+    for old, new in zip(form.questions, copy.questions):
+        id_map.update({o.id: n.id for o, n in zip(old.options, new.options)})
+    for old, new in zip(form.questions, copy.questions):
+        new.logic_json = [
+            {**r, "goto": id_map.get(r["goto"], r["goto"]), "value": id_map.get(r["value"], r["value"]) if isinstance(r["value"], str) else r["value"]}
+            for r in old.logic_json or []
+        ]
     db.add(copy)
     db.commit()
     return copy
 
 
 def delete_form(db: Session, form: Form) -> None:
-    # DB-level ON DELETE CASCADE removes questions, versions, submissions and answers.
+    from app.services.uploads import delete_files_for_form
+
+    files = delete_files_for_form(db, form.id)
+    # DB-level ON DELETE CASCADE removes questions, versions, submissions, answers and upload rows.
     db.delete(form)
     db.commit()
+    for path in files:  # only after the commit succeeded
+        path.unlink(missing_ok=True)
 
 
 def latest_version(db: Session, form_id: str) -> FormVersion | None:

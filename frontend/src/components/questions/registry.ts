@@ -20,7 +20,7 @@ import {
   Upload,
   type LucideIcon,
 } from "lucide-react";
-import type { Question, QuestionType } from "@/types/form";
+import type { LogicOp, Question, QuestionType } from "@/types/form";
 
 /** Front-end half of the question-type registry (the backend has the authoritative validators). */
 export interface QuestionTypeMeta {
@@ -79,12 +79,25 @@ export const QUESTION_REGISTRY: Record<QuestionType, QuestionTypeMeta> = {
     type: "rating", label: "Rating", icon: Star, ...RATING, category: "Rating & ranking",
     defaults: () => ({ settings: { steps: 5, shape: "star" }, options: [] }),
   },
+  file_upload: {
+    type: "file_upload", label: "File Upload", icon: Upload, ...OTHER, category: "Other",
+    defaults: () => ({ settings: { max_size_mb: 10 }, options: [] }),
+  },
+};
+
+/** Which logic-jump comparisons each type supports (mirrors the backend registry). */
+export const LOGIC_OPS: Partial<Record<QuestionType, LogicOp[]>> = {
+  multiple_choice: ["is", "is_not"],
+  dropdown: ["is", "is_not"],
+  yes_no: ["is", "is_not"],
+  rating: ["is", "is_not", "gt", "lt"],
+  number: ["is", "is_not", "gt", "lt"],
 };
 
 export const hasOptions = (type: QuestionType) => type === "multiple_choice" || type === "dropdown";
 
 export function createQuestion(type: QuestionType): Question {
-  return { id: newId(), type, title: "", description: "", required: false, ...QUESTION_REGISTRY[type].defaults() };
+  return { id: newId(), type, title: "", description: "", required: false, logic: [], ...QUESTION_REGISTRY[type].defaults() };
 }
 
 /** Types shown in the picker but not implemented (assignment allows "Coming soon"). */
@@ -106,7 +119,6 @@ export const COMING_SOON_TYPES: ComingSoonType[] = [
   { label: "Ranking", icon: ListOrdered, ...RATING, category: "Rating & ranking" },
   { label: "Matrix", icon: Grid3x3, ...RATING, category: "Rating & ranking" },
   { label: "Date", icon: Calendar, ...OTHER, category: "Other" },
-  { label: "File Upload", icon: Upload, ...OTHER, category: "Other" },
   { label: "Payment", icon: CreditCard, ...OTHER, category: "Other" },
 ];
 

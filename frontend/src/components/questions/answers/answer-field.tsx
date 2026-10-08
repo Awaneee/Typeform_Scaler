@@ -3,6 +3,7 @@
 import type { QuestionType } from "@/types/form";
 import { MultipleChoiceAnswer, YesNoAnswer } from "./choice-answer";
 import { DropdownAnswer } from "./dropdown-answer";
+import { FileAnswer } from "./file-answer";
 import { RatingAnswer } from "./rating-answer";
 import { LongTextAnswer, TextAnswer } from "./text-answer";
 import type { AnswerProps } from "./types";
@@ -16,6 +17,7 @@ const RENDERERS: Record<QuestionType, (props: AnswerProps) => React.ReactNode> =
   dropdown: DropdownAnswer,
   yes_no: YesNoAnswer,
   rating: RatingAnswer,
+  file_upload: FileAnswer,
 };
 
 /** Renders the answer control for any question type. Shared by the builder canvas and respondent flow. */

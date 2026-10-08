@@ -21,8 +21,9 @@ logger = logging.getLogger(__name__)
 
 
 def _q(type_: str, title: str, *, required: bool = False, description: str = "", settings: dict | None = None,
-       options: list[str] | None = None) -> dict[str, Any]:
+       options: list[str] | None = None, logic: list[dict] | None = None) -> dict[str, Any]:
     return {
+        "logic": logic or [],
         "id": new_id(),
         "type": type_,
         "title": title,
@@ -49,7 +50,9 @@ def _event_registration() -> dict:
             _q("multiple_choice", "Which sessions are you interested in?", description="Choose as many as you like.",
                settings={"allow_multiple": True},
                options=["Keynote talks", "Hands-on workshops", "Panel discussions", "Networking mixer"]),
-            _q("yes_no", "Will you attend in person?", required=True),
+            # Logic jump: people who won't attend skip the last question.
+            _q("yes_no", "Will you attend in person?", required=True,
+               logic=[{"op": "is", "value": False, "goto": "end"}]),
             _q("rating", "How excited are you about this event?", settings={"steps": 5}),
         ],
     }
@@ -87,6 +90,7 @@ def _job_application() -> dict:
             _q("dropdown", "Which role are you applying for?", required=True,
                options=["Frontend Engineer", "Backend Engineer", "Product Designer", "Data Analyst"]),
             _q("long_text", "Why do you want to work with us?", required=True),
+            _q("file_upload", "Upload your CV", description="PDF or Word, up to 10 MB.", settings={"max_size_mb": 10}),
         ],
     }
 

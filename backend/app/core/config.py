@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     # Seed demo data at startup when the database has no creator yet.
     seed_on_empty: bool = True
     default_creator_email: str = "creator@example.com"
+    # Where uploaded files are stored. On Railway, point it at the volume (e.g. /data/uploads).
+    upload_dir: Path = BACKEND_DIR / "data" / "uploads"
 
     @property
     def cors_origin_list(self) -> list[str]:

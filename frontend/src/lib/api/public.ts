@@ -8,6 +8,15 @@ export const publicApi = {
       method: "POST",
       json: body,
     }),
+  upload: (slug: string, questionId: string, file: File) => {
+    const body = new FormData();
+    body.append("question_id", questionId);
+    body.append("file", file);
+    return request<{ id: string; filename: string; size_bytes: number }>(
+      `/public/forms/${encodeURIComponent(slug)}/uploads`,
+      { method: "POST", body },
+    );
+  },
   trackSession: (slug: string, clientSessionId: string, event: "view" | "start") =>
     request<void>(`/public/forms/${encodeURIComponent(slug)}/sessions`, {
       method: "POST",

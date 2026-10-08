@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { ApiError } from "@/lib/api/client";
 import { formsApi } from "@/lib/api/forms";
 import { createQuestion, hasOptions, newId, QUESTION_REGISTRY } from "@/components/questions/registry";
-import type { FormDetail, FormSettings, Question, QuestionSettings, QuestionType } from "@/types/form";
+import type { FormDetail, FormSettings, LogicRule, Question, QuestionSettings, QuestionType } from "@/types/form";
 
 export type SaveStatus = "saved" | "unsaved" | "saving" | "error" | "conflict";
 /** A question id, or "ending" for the thank-you screen. */
@@ -50,6 +50,7 @@ interface BuilderActions {
   updateOption: (questionId: string, optionId: string, label: string) => void;
   removeOption: (questionId: string, optionId: string) => void;
   setPublishErrors: (errors: Record<string, string>) => void;
+  setLogic: (questionId: string, logic: LogicRule[]) => void;
 }
 
 export type BuilderStore = BuilderState & BuilderActions;
@@ -160,7 +161,13 @@ export const useBuilder = create<BuilderStore>()((set, get) => {
     duplicateQuestion: (id) => {
       const source = get().questions.find((q) => q.id === id);
       if (!source) return;
-      const copy: Question = { ...structuredClone(source), id: newId(), options: source.options.map((o) => ({ ...o, id: newId() })) };
+      const optionIds = new Map(source.options.map((o) => [o.id, newId()]));
+      const copy: Question = {
+        ...structuredClone(source),
+        id: newId(),
+        options: source.options.map((o) => ({ ...o, id: optionIds.get(o.id)! })),
+        logic: source.logic.map((r) => ({ ...r, value: optionIds.get(r.value as string) ?? r.value })),
+      };
       edit((s) => {
         const at = s.questions.findIndex((q) => q.id === id) + 1;
         return { questions: [...s.questions.slice(0, at), copy, ...s.questions.slice(at)], selected: copy.id };
@@ -170,7 +177,9 @@ export const useBuilder = create<BuilderStore>()((set, get) => {
     deleteQuestion: (id) =>
       edit((s) => {
         const index = s.questions.findIndex((q) => q.id === id);
-        const questions = s.questions.filter((q) => q.id !== id);
+        const questions = s.questions
+          .filter((q) => q.id !== id)
+          .map((q) => (q.logic.some((r) => r.goto === id) ? { ...q, logic: q.logic.filter((r) => r.goto !== id) } : q));
         const neighbour = questions[Math.min(index, questions.length - 1)];
         return { questions, selected: s.selected === id ? (neighbour?.id ?? null) : s.selected };
       }),
@@ -196,9 +205,15 @@ export const useBuilder = create<BuilderStore>()((set, get) => {
       })),
 
     removeOption: (questionId, optionId) =>
-      mapQuestion(questionId, (q) => ({ ...q, options: q.options.filter((o) => o.id !== optionId) })),
+      mapQuestion(questionId, (q) => ({
+        ...q,
+        options: q.options.filter((o) => o.id !== optionId),
+        logic: q.logic.filter((r) => r.value !== optionId),
+      })),
 
     setPublishErrors: (publishErrors) => set({ publishErrors }),
+
+    setLogic: (questionId, logic) => mapQuestion(questionId, (q) => ({ ...q, logic })),
   };
 });
 

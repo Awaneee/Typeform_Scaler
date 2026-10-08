@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from app.core.errors import ConflictError, NotFoundError, ValidationFailedError
-from app.core.types import utcnow
+from app.core.types import new_id, utcnow
 from app.models import Answer, Form, FormVersion, ResponseSession, Submission
 from app.schemas.definition import FormDefinition
 from app.schemas.public import PublicForm, SubmissionCreate
@@ -63,6 +63,7 @@ def create_submission(
 
     submitted_at = submitted_at or utcnow()
     submission = Submission(
+        id=new_id(),
         form_id=form.id,
         form_version_id=version.id,
         client_submission_id=client_submission_id,
@@ -70,6 +71,13 @@ def create_submission(
         answers=[Answer(question_id=qid, value_json=value) for qid, value in clean.items()],
     )
     db.add(submission)
+
+    from app.services.uploads import claim_uploads  # local import: uploads imports this module
+
+    file_errors = claim_uploads(db, form.id, version_definition(version).questions, clean, submission.id)
+    if file_errors:
+        db.rollback()
+        raise ValidationFailedError("Some answers need another look.", fields=file_errors)
 
     if client_session_id:
         session = db.scalar(select(ResponseSession).where(ResponseSession.client_session_id == client_session_id))

@@ -7,6 +7,7 @@ from pathlib import Path
 _tmp = Path(tempfile.mkdtemp()) / "test.db"
 os.environ["DATABASE_URL"] = f"sqlite:///{_tmp.as_posix()}"
 os.environ["SEED_ON_EMPTY"] = "false"
+os.environ["UPLOAD_DIR"] = str(_tmp.parent / "uploads")
 
 import pytest  # noqa: E402
 from alembic import command  # noqa: E402

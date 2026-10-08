@@ -2,12 +2,12 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Path, status
+from fastapi import APIRouter, File, Form, Path, UploadFile, status
 from fastapi.responses import Response
 
 from app.api.deps import DB
-from app.schemas.public import PublicForm, SessionEvent, SubmissionCreate, SubmissionCreated
-from app.services import sessions, submissions
+from app.schemas.public import PublicForm, SessionEvent, SubmissionCreate, SubmissionCreated, UploadCreated
+from app.services import sessions, submissions, uploads
 
 router = APIRouter(prefix="/public/forms", tags=["public"])
 Slug = Annotated[str, Path(max_length=32)]
@@ -28,3 +28,15 @@ def submit(db: DB, slug: Slug, body: SubmissionCreate):
 def track_session(db: DB, slug: Slug, body: SessionEvent):
     sessions.record_event(db, slug, body)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/{slug}/uploads", response_model=UploadCreated, status_code=status.HTTP_201_CREATED)
+async def upload_file(
+    db: DB,
+    slug: Slug,
+    question_id: Annotated[str, Form(max_length=36)],
+    file: Annotated[UploadFile, File()],
+):
+    form, version = submissions.get_published_form(db, slug)
+    upload = await uploads.store_upload(db, form, version, question_id, file)
+    return UploadCreated(id=upload.id, filename=upload.filename, size_bytes=upload.size_bytes)

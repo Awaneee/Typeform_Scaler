@@ -14,6 +14,12 @@ export interface AnswerProps {
   onSubmit?: () => void;
   /** A selection finished (single choice, yes/no, rating, dropdown) — the flow may auto-advance. */
   onCommit?: () => void;
+  /** File questions only: upload handling provided by the respondent flow. */
+  upload?: {
+    current?: { filename: string; size_bytes: number };
+    send: (file: File) => Promise<void>;
+    clear: () => void;
+  };
 }
 
 /** Letter key shown next to each choice: A, B, C... */

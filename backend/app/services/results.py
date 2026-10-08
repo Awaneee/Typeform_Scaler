@@ -18,6 +18,7 @@ from app.core.errors import NotFoundError
 from app.core.types import utcnow
 from app.models import Form, FormVersion, ResponseSession, Submission
 from app.schemas.definition import FormDefinition, QuestionDef
+from app.services.uploads import file_names
 from app.schemas.results import (
     AnswerDetail,
     ChoiceCount,
@@ -37,6 +38,7 @@ class QuestionCatalog:
     questions: list[QuestionDef] = field(default_factory=list)
     removed: set[str] = field(default_factory=set)
     option_labels: dict[str, str] = field(default_factory=dict)
+    file_names: dict[str, str] = field(default_factory=dict)  # upload id -> original filename
     definitions: dict[str, FormDefinition] = field(default_factory=dict)  # version_id -> definition
     numbers: dict[str, int] = field(default_factory=dict)  # version_id -> version_number
 
@@ -48,7 +50,7 @@ def build_catalog(db: Session, form: Form) -> QuestionCatalog:
     versions = db.scalars(
         select(FormVersion).where(FormVersion.form_id == form.id).order_by(FormVersion.version_number)
     ).all()
-    catalog = QuestionCatalog()
+    catalog = QuestionCatalog(file_names=file_names(db, form.id))
     latest: dict[str, QuestionDef] = {}
     for version in versions:
         definition = FormDefinition.model_validate(version.definition_json)
@@ -66,9 +68,11 @@ def build_catalog(db: Session, form: Form) -> QuestionCatalog:
     return catalog
 
 
-def format_answer(q: QuestionDef, value: Any, labels: dict[str, str]) -> str:
+def format_answer(q: QuestionDef, value: Any, labels: dict[str, str], files: dict[str, str] | None = None) -> str:
     if value is None:
         return ""
+    if q.type == "file_upload":
+        return (files or {}).get(value, "(file)")
     if q.type == "yes_no":
         return "Yes" if value else "No"
     if q.type == "multiple_choice":
@@ -90,7 +94,7 @@ def _row(sub: Submission, number: int, catalog: QuestionCatalog) -> SubmissionRo
         submitted_at=sub.submitted_at,
         version_number=catalog.numbers.get(sub.form_version_id, 0),
         answers={
-            a.question_id: format_answer(by_id[a.question_id], a.value_json, catalog.option_labels)
+            a.question_id: format_answer(by_id[a.question_id], a.value_json, catalog.option_labels, catalog.file_names)
             for a in sub.answers
             if a.question_id in by_id
         },
@@ -146,14 +150,15 @@ def get_submission(db: Session, form: Form, submission_id: str) -> SubmissionDet
                 title=q.title,
                 type=q.type,
                 value=values.get(q.id),
-                display=format_answer(q, values[q.id], catalog.option_labels) if q.id in values else None,
+                display=format_answer(q, values[q.id], catalog.option_labels, catalog.file_names) if q.id in values else None,
+                file_url=f"/api/v1/forms/{form.id}/files/{values[q.id]}" if q.type == "file_upload" and q.id in values else None,
             )
             for q in definition.questions
         ],
     )
 
 
-def _question_analytics(q: QuestionDef, values: list[Any], total: int, removed: bool, labels: dict[str, str]):
+def _question_analytics(q: QuestionDef, values: list[Any], total: int, removed: bool, labels: dict[str, str], files: dict[str, str]):
     base = dict(question_id=q.id, title=q.title, type=q.type, removed=removed, answered=len(values),
                 skipped=max(total - len(values), 0))
 
@@ -184,6 +189,8 @@ def _question_analytics(q: QuestionDef, values: list[Any], total: int, removed: 
             minimum=min(values) if values else None,
             maximum=max(values) if values else None,
         )
+    if q.type == "file_upload":
+        return QuestionAnalytics(**base, kind="text", recent=[files.get(v, "(file)") for v in values[:10]])
     return QuestionAnalytics(**base, kind="text", recent=[str(v) for v in values[:10]])
 
 
@@ -230,7 +237,7 @@ def analytics(db: Session, form: Form) -> FormAnalytics:
         completion_rate=completion,
         daily=daily,
         questions=[
-            _question_analytics(q, values[q.id], seen_by[q.id], q.id in catalog.removed, catalog.option_labels)
+            _question_analytics(q, values[q.id], seen_by[q.id], q.id in catalog.removed, catalog.option_labels, catalog.file_names)
             for q in catalog.questions
         ],
     )

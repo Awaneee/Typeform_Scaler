@@ -4,11 +4,11 @@ import re
 from typing import Annotated
 
 from fastapi import APIRouter, Path, Query
-from fastapi.responses import Response
+from fastapi.responses import FileResponse, Response
 
 from app.api.deps import DB, OwnedForm
 from app.schemas.results import FormAnalytics, SubmissionDetail, SubmissionPage
-from app.services import results
+from app.services import results, uploads
 
 router = APIRouter(tags=["results"])
 
@@ -41,3 +41,10 @@ def export_csv(db: DB, form: OwnedForm):
         media_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": f'attachment; filename="{filename}.csv"'},
     )
+
+
+@router.get("/forms/{form_id}/files/{upload_id}", response_class=FileResponse)
+def download_file(db: DB, form: OwnedForm, upload_id: Annotated[str, Path(max_length=36)]):
+    upload, path = uploads.get_upload(db, form, upload_id)
+    # Always a download (never rendered inline), so uploaded HTML/SVG can't run in our origin.
+    return FileResponse(path, media_type="application/octet-stream", filename=upload.filename)

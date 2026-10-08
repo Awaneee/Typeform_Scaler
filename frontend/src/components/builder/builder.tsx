@@ -16,6 +16,7 @@ import { flushSave, hasUnsavedChanges, useBuilder } from "@/store/builder-store"
 import { BuilderTopBar, type BuilderTab } from "./builder-top-bar";
 import { Canvas, type Device } from "./canvas";
 import { DesignPopover } from "./design-popover";
+import { LogicEditor } from "./logic-editor";
 import { QuestionList } from "./question-list";
 import { QuestionPicker } from "./question-picker";
 import { SettingsPanel } from "./settings-panel";
@@ -70,7 +71,7 @@ export function Builder({ formId }: { formId: string }) {
         const first = Object.keys(perQuestion)[0];
         if (first) {
           useBuilder.getState().select(first);
-          setTab("content");
+          setTab(/logic/i.test(perQuestion[first]) ? "workflow" : "content");
         }
         toast.error(general ?? `${e.message} Fix the highlighted questions.`);
       } else {
@@ -146,11 +147,11 @@ export function Builder({ formId }: { formId: string }) {
             </div>
             <Canvas device={device} onAdd={() => setPickerOpen(true)} />
           </main>
-          <SettingsPanel />
+          <SettingsPanel onOpenLogic={() => setTab("workflow")} />
         </div>
       )}
       {tab === "share" && <SharePanel publishing={publishing} onPublish={publish} onUnpublish={unpublish} />}
-      {tab === "workflow" && <ComingSoon title="Logic and workflows" description="Branching and logic jumps are on the way." />}
+      {tab === "workflow" && <LogicEditor />}
       {tab === "connect" && <ComingSoon title="Integrations" description="Webhooks and app integrations are on the way." />}
 
       <QuestionPicker open={pickerOpen} onOpenChange={setPickerOpen} />

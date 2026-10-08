@@ -22,8 +22,27 @@ def check_publishable(definition: FormDefinition) -> None:
             labels = [o.label.strip() for o in q.options]
             if not labels or not all(labels):
                 errors[q.id] = "Choice questions need at least one choice, and no empty choices."
+    errors.update({k: v for k, v in _logic_errors(definition).items() if k not in errors})
     if errors:
         raise ValidationFailedError("This form isn't ready to publish yet.", fields=errors)
+
+
+def _logic_errors(definition: FormDefinition) -> dict[str, str]:
+    """Each jump must target a later question (or the end) and compare against a sensible value."""
+    errors: dict[str, str] = {}
+    position = {q.id: i for i, q in enumerate(definition.questions)}
+    for i, q in enumerate(definition.questions):
+        option_ids = {o.id for o in q.options}
+        for rule in q.logic:
+            if rule.goto != "end" and position.get(rule.goto, -1) <= i:
+                errors[q.id] = "Logic jumps can only go to a later question or the end."
+            elif q.type in ("multiple_choice", "dropdown") and rule.value not in option_ids:
+                errors[q.id] = "A logic rule refers to a choice that no longer exists."
+            elif q.type == "yes_no" and not isinstance(rule.value, bool):
+                errors[q.id] = "A logic rule needs Yes or No."
+            elif q.type in ("rating", "number") and (isinstance(rule.value, bool) or not isinstance(rule.value, int | float)):
+                errors[q.id] = "A logic rule needs a number."
+    return errors
 
 
 def _unique_slug(db: Session) -> str:

@@ -2,7 +2,7 @@
 and the FormDefinition document used by the API and published snapshots."""
 
 from app.models import Form, Question, QuestionOption
-from app.schemas.definition import FormDefinition, FormSettings, OptionDef, QuestionDef
+from app.schemas.definition import FormDefinition, FormSettings, LogicRule, OptionDef, QuestionDef
 
 
 def read_settings(form: Form) -> FormSettings:
@@ -18,6 +18,7 @@ def question_to_def(q: Question) -> QuestionDef:
         required=q.required,
         settings=q.settings_json or {},
         options=[OptionDef(id=o.id, label=o.label) for o in q.options],
+        logic=[LogicRule.model_validate(r) for r in q.logic_json or []],
     )
 
 
@@ -49,6 +50,7 @@ def apply_definition(form: Form, definition: FormDefinition) -> None:
         question.description = qdef.description
         question.required = qdef.required
         question.settings_json = qdef.settings
+        question.logic_json = [r.model_dump() for r in qdef.logic]
         _apply_options(question, qdef.options)
         ordered.append(question)
 

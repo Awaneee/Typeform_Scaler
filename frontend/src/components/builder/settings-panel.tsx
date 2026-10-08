@@ -4,19 +4,19 @@ import { ChevronDown, GitBranch, ImagePlus, Plus, X } from "lucide-react";
 import { useId, type ReactNode } from "react";
 import { toast } from "sonner";
 import { QuestionTypeBadge } from "@/components/questions/question-icon";
-import { QUESTION_REGISTRY } from "@/components/questions/registry";
+import { LOGIC_OPS, QUESTION_REGISTRY } from "@/components/questions/registry";
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@/components/ui/menu";
 import { Switch } from "@/components/ui/switch";
 import { useBuilder } from "@/store/builder-store";
 import { QUESTION_TYPES, type Question } from "@/types/form";
 
-export function SettingsPanel() {
+export function SettingsPanel({ onOpenLogic }: { onOpenLogic: () => void }) {
   const selected = useBuilder((s) => s.selected);
   const question = useBuilder((s) => s.questions.find((q) => q.id === s.selected));
 
   return (
     <aside className="hidden w-[300px] shrink-0 overflow-y-auto border-l border-line bg-surface lg:block" aria-label="Question settings">
-      {selected === "ending" ? <EndingSettings /> : question ? <QuestionSettings key={question.id} question={question} /> : null}
+      {selected === "ending" ? <EndingSettings /> : question ? <QuestionSettings key={question.id} question={question} onOpenLogic={onOpenLogic} /> : null}
     </aside>
   );
 }
@@ -67,7 +67,7 @@ function OptionalNumber({
   );
 }
 
-function QuestionSettings({ question }: { question: Question }) {
+function QuestionSettings({ question, onOpenLogic }: { question: Question; onOpenLogic: () => void }) {
   const updateQuestion = useBuilder((s) => s.updateQuestion);
   const updateSettings = useBuilder((s) => s.updateQuestionSettings);
   const changeType = useBuilder((s) => s.changeQuestionType);
@@ -122,6 +122,23 @@ function QuestionSettings({ question }: { question: Question }) {
           <ToggleRow label="Multiple selection" checked={!!s.allow_multiple} onChange={(allow_multiple) => set({ allow_multiple })} />
         )}
 
+        {question.type === "file_upload" && (
+          <label className="flex items-center justify-between gap-3 text-sm">
+            Max file size
+            <select
+              value={s.max_size_mb ?? 10}
+              onChange={(e) => set({ max_size_mb: Number(e.target.value) })}
+              className="h-9 rounded-lg border border-line bg-surface px-2 text-sm outline-none focus:border-plum"
+            >
+              {[1, 2, 5, 10].map((n) => (
+                <option key={n} value={n}>
+                  {n} MB
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+
         {question.type === "rating" && (
           <label className="flex items-center justify-between gap-3 text-sm">
             Steps
@@ -165,12 +182,15 @@ function QuestionSettings({ question }: { question: Question }) {
       </Section>
 
       <Section title="Logic">
-        <button
-          onClick={() => toast("Logic jumps are coming soon")}
-          className="flex w-full items-center gap-2 rounded-lg px-1 py-1 text-sm text-muted hover:text-ink"
-        >
-          <GitBranch size={16} /> Add logic jump <span className="ml-auto rounded bg-lavender px-1.5 py-0.5 text-[10px] font-semibold text-plum">SOON</span>
-        </button>
+        {LOGIC_OPS[question.type] ? (
+          <button onClick={onOpenLogic} className="flex w-full items-center gap-2 rounded-lg px-1 py-1 text-sm hover:text-teal">
+            <GitBranch size={16} />
+            {question.logic.length ? `${question.logic.length} logic jump${question.logic.length > 1 ? "s" : ""}` : "Add logic jump"}
+            <span className="ml-auto text-xs text-muted">Workflow →</span>
+          </button>
+        ) : (
+          <p className="text-xs text-muted">Logic jumps work with choice, yes/no, rating and number questions.</p>
+        )}
       </Section>
     </>
   );

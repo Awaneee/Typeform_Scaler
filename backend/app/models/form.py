@@ -54,6 +54,8 @@ class Question(TimestampMixin, Base):
     required: Mapped[bool] = mapped_column(Boolean, default=False)
     # Type-specific config (placeholder, min/max, rating steps...). See validators/question_types.py.
     settings_json: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    # Logic jumps: [{"op", "value", "goto"}], see schemas.definition.LogicRule.
+    logic_json: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list, server_default="[]")
 
     form: Mapped[Form] = relationship(back_populates="questions")
     options: Mapped[list["QuestionOption"]] = relationship(

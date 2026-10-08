@@ -29,3 +29,9 @@ class SubmissionCreated(BaseModel):
 class SessionEvent(BaseModel):
     client_session_id: str = Field(min_length=8, max_length=64)
     event: Literal["view", "start"]
+
+
+class UploadCreated(BaseModel):
+    id: str
+    filename: str
+    size_bytes: int

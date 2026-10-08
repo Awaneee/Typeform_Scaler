@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import JSON, ForeignKey, Index, String, UniqueConstraint
+from sqlalchemy import JSON, ForeignKey, Index, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.types import UTCDateTime, new_id, utcnow
@@ -52,3 +52,23 @@ class ResponseSession(Base):
     viewed_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
     started_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
     submitted_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+
+
+class FileUpload(Base):
+    """A file a respondent uploaded for a file_upload question. Uploaded before the
+    submission exists (so big files don't block submit), then attached to it."""
+
+    __tablename__ = "file_uploads"
+    __table_args__ = (Index("ix_file_uploads_form", "form_id"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    form_id: Mapped[str] = mapped_column(ForeignKey("forms.id", ondelete="CASCADE"))
+    question_id: Mapped[str] = mapped_column(String(36))
+    # NULL until a submission claims it; SET NULL keeps the row if a submission is removed.
+    submission_id: Mapped[str | None] = mapped_column(ForeignKey("submissions.id", ondelete="SET NULL"), index=True)
+    filename: Mapped[str] = mapped_column(String(255))
+    content_type: Mapped[str] = mapped_column(String(127))
+    size_bytes: Mapped[int] = mapped_column(Integer)
+    # Name of the file inside settings.upload_dir (never the user-supplied name).
+    storage_key: Mapped[str] = mapped_column(String(64), unique=True)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)

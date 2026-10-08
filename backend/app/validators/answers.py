@@ -8,6 +8,7 @@ from typing import Any
 from email_validator import EmailNotValidError, validate_email
 
 from app.schemas.definition import QuestionDef
+from app.validators.logic import next_index
 
 
 class AnswerError(ValueError):
@@ -78,6 +79,13 @@ def _yes_no(_q: QuestionDef, value: Any) -> bool:
     return value
 
 
+def _file_upload(_q: QuestionDef, value: Any) -> str:
+    # Only the shape is checked here; submissions.py checks the upload exists for this form/question.
+    if not isinstance(value, str) or not 1 <= len(value) <= 36:
+        raise AnswerError("Please upload a file.")
+    return value
+
+
 def _rating(q: QuestionDef, value: Any) -> int:
     steps = q.settings.get("steps", 5)
     if isinstance(value, bool) or not isinstance(value, int) or not 1 <= value <= steps:
@@ -94,30 +102,37 @@ ANSWER_VALIDATORS: dict[str, Callable[[QuestionDef, Any], Any]] = {
     "dropdown": _dropdown,
     "yes_no": _yes_no,
     "rating": _rating,
+    "file_upload": _file_upload,
 }
 
 
 def validate_answers(questions: list[QuestionDef], answers: dict[str, Any]) -> tuple[dict[str, Any], dict[str, str]]:
-    """Returns (clean answers, field errors). Empty optional answers are dropped."""
+    """Returns (clean answers, field errors).
+
+    Walks the respondent's path through the form (following logic jumps), so
+    only questions they actually reached are validated and stored. Answers to
+    questions a jump skipped are dropped; empty optional answers too.
+    """
     by_id = {q.id: q for q in questions}
-    errors: dict[str, str] = {}
+    errors: dict[str, str] = {question_id: "Unknown question." for question_id in answers.keys() - by_id.keys()}
     clean: dict[str, Any] = {}
 
-    for question_id in answers.keys() - by_id.keys():
-        errors[question_id] = "Unknown question."
-
-    for q in questions:
+    index: int | None = 0 if questions else None
+    while index is not None:
+        q = questions[index]
         value = answers.get(q.id)
         if is_empty(value):
             if q.required:
                 errors[q.id] = "Please fill this in."
-            continue
-        try:
-            clean[q.id] = ANSWER_VALIDATORS[q.type](q, value)
-        except AnswerError as exc:
-            errors[q.id] = str(exc)
         else:
-            if q.required and is_empty(clean[q.id]):
-                errors[q.id] = "Please fill this in."
+            try:
+                clean[q.id] = ANSWER_VALIDATORS[q.type](q, value)
+            except AnswerError as exc:
+                errors[q.id] = str(exc)
+            else:
+                if q.required and is_empty(clean[q.id]):
+                    errors[q.id] = "Please fill this in."
+        # Route on the validated value; an invalid answer simply follows the default path.
+        index = next_index(questions, index, clean.get(q.id))
 
     return clean, errors

@@ -14,7 +14,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 QuestionType = Literal[
-    "short_text", "long_text", "multiple_choice", "dropdown", "email", "number", "yes_no", "rating"
+    "short_text", "long_text", "multiple_choice", "dropdown", "email", "number", "yes_no", "rating", "file_upload"
 ]
 
 
@@ -61,21 +61,28 @@ class RatingSettings(_Settings):
     shape: Literal["star"] = "star"
 
 
+class FileUploadSettings(_Settings):
+    max_size_mb: int = Field(10, ge=1, le=10)
+
+
 @dataclass(frozen=True)
 class QuestionTypeSpec:
     settings_model: type[_Settings]
     has_options: bool = False
+    # Which logic-jump comparisons make sense for this type (empty = no logic).
+    logic_ops: tuple[str, ...] = ()
 
 
 QUESTION_TYPES: dict[str, QuestionTypeSpec] = {
     "short_text": QuestionTypeSpec(TextSettings),
     "long_text": QuestionTypeSpec(TextSettings),
     "email": QuestionTypeSpec(EmailSettings),
-    "number": QuestionTypeSpec(NumberSettings),
-    "multiple_choice": QuestionTypeSpec(MultipleChoiceSettings, has_options=True),
-    "dropdown": QuestionTypeSpec(DropdownSettings, has_options=True),
-    "yes_no": QuestionTypeSpec(YesNoSettings),
-    "rating": QuestionTypeSpec(RatingSettings),
+    "number": QuestionTypeSpec(NumberSettings, logic_ops=("is", "is_not", "gt", "lt")),
+    "multiple_choice": QuestionTypeSpec(MultipleChoiceSettings, has_options=True, logic_ops=("is", "is_not")),
+    "dropdown": QuestionTypeSpec(DropdownSettings, has_options=True, logic_ops=("is", "is_not")),
+    "yes_no": QuestionTypeSpec(YesNoSettings, logic_ops=("is", "is_not")),
+    "rating": QuestionTypeSpec(RatingSettings, logic_ops=("is", "is_not", "gt", "lt")),
+    "file_upload": QuestionTypeSpec(FileUploadSettings),
 }
 
 

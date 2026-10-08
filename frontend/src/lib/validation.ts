@@ -39,6 +39,8 @@ export function validateAnswer(q: Question, value: AnswerValue | undefined): str
       return q.options.some((o) => o.id === value) ? null : "Please select an option from the list.";
     case "yes_no":
       return typeof value === "boolean" ? null : "Please choose yes or no.";
+    case "file_upload":
+      return typeof value === "string" ? null : "Please upload a file.";
     case "rating": {
       const steps = s.steps ?? 5;
       return typeof value === "number" && value >= 1 && value <= steps ? null : `Rating must be between 1 and ${steps}.`;

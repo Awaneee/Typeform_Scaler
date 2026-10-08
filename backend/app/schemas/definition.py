@@ -16,6 +16,14 @@ class OptionDef(BaseModel):
     label: str = Field("", max_length=500)
 
 
+class LogicRule(BaseModel):
+    """"If this question's answer <op> <value>, jump to <goto>" (a later question id, or "end")."""
+
+    op: Literal["is", "is_not", "gt", "lt"]
+    value: bool | int | float | str
+    goto: str = Field(min_length=1, max_length=36, pattern=r"^[A-Za-z0-9_-]+$")
+
+
 class QuestionDef(BaseModel):
     id: str = ID
     type: QuestionType
@@ -24,10 +32,14 @@ class QuestionDef(BaseModel):
     required: bool = False
     settings: dict[str, Any] = Field(default_factory=dict)
     options: list[OptionDef] = Field(default_factory=list, max_length=200)
+    logic: list[LogicRule] = Field(default_factory=list, max_length=20)
 
     @model_validator(mode="after")
     def _normalize(self):
         self.settings = normalize_settings(self.type, self.settings)
+        allowed_ops = QUESTION_TYPES[self.type].logic_ops
+        # Rules that don't fit the (possibly changed) type are dropped, not rejected.
+        self.logic = [r for r in self.logic if r.op in allowed_ops]
         if not QUESTION_TYPES[self.type].has_options:
             self.options = []
         elif len({o.id for o in self.options}) != len(self.options):

@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog } from "radix-ui";
-import { X } from "lucide-react";
+import { Download, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { QuestionTypeBadge } from "@/components/questions/question-icon";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -71,7 +71,13 @@ export function ResponseDrawer({ formId, submissionId, onClose }: ResponseDrawer
                     <QuestionTypeBadge type={a.type as QuestionType} number={i + 1} />
                     <div className="min-w-0">
                       <p className="text-sm text-muted">{a.title || "Untitled question"}</p>
-                      <p className={`mt-1 whitespace-pre-line ${a.display ? "" : "text-sm text-muted italic"}`}>{a.display ?? "No answer"}</p>
+                      {a.file_url ? (
+                        <a href={a.file_url} download className="mt-1 inline-flex items-center gap-1.5 font-medium text-teal hover:underline">
+                          <Download size={15} /> {a.display}
+                        </a>
+                      ) : (
+                        <p className={`mt-1 whitespace-pre-line ${a.display ? "" : "text-sm text-muted italic"}`}>{a.display ?? "No answer"}</p>
+                      )}
                     </div>
                   </li>
                 ))}

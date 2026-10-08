@@ -9,6 +9,7 @@ export const QUESTION_TYPES = [
   "number",
   "yes_no",
   "rating",
+  "file_upload",
 ] as const;
 export type QuestionType = (typeof QUESTION_TYPES)[number];
 
@@ -28,6 +29,16 @@ export interface QuestionSettings {
   allow_multiple?: boolean;
   steps?: number;
   shape?: "star";
+  max_size_mb?: number;
+}
+
+export type LogicOp = "is" | "is_not" | "gt" | "lt";
+
+/** "If the answer <op> <value>, go to <goto>" — goto is a later question id or "end". */
+export interface LogicRule {
+  op: LogicOp;
+  value: string | number | boolean;
+  goto: string;
 }
 
 export interface Question {
@@ -38,6 +49,7 @@ export interface Question {
   required: boolean;
   settings: QuestionSettings;
   options: Option[];
+  logic: LogicRule[];
 }
 
 export interface FormSettings {

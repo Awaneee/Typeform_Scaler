@@ -34,6 +34,7 @@ class AnswerDetail(BaseModel):
     type: str
     value: Any
     display: str | None
+    file_url: str | None = None
 
 
 class SubmissionDetail(BaseModel):
