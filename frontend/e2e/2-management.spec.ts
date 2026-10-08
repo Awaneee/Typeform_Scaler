@@ -27,7 +27,7 @@ test("List of the creator's forms with status (draft/published) and response cou
 test('Create a form (`/forms/new` → "Start from scratch")', async ({ page }) => {
   await page.goto("/workspace");
     await page.waitForLoadState("networkidle"); // let React hydrate before clicking
-  await page.getByRole("link", { name: "Create a new form" }).click();
+  await page.getByRole("link", { name: "Create form" }).click();
   await expect(page.getByRole("heading", { name: "What would you like to create?" })).toBeVisible();
   await page.getByRole("button", { name: /Start from scratch/ }).click();
   await expect(page).toHaveURL(/\/forms\/.+\/edit/);

@@ -28,7 +28,7 @@ export function ChoiceEditor({ question, theme }: { question: Question; theme: T
   }
 
   return (
-    <div className="flex w-full max-w-md flex-col gap-2">
+    <div className="inline-flex max-w-full min-w-[220px] flex-col gap-2 sm:max-w-md">
       {question.settings.allow_multiple && (
         <p className="text-sm" style={{ color: withAlpha(theme.question, 0.7) }}>
           Choose as many as you like
@@ -37,12 +37,12 @@ export function ChoiceEditor({ question, theme }: { question: Question; theme: T
       {question.options.map((option, i) => (
         <div
           key={option.id}
-          className="group flex items-center gap-3 rounded-[4px] border px-2 py-1.5"
-          style={{ color: theme.answer, borderColor: withAlpha(theme.answer, 0.6), background: withAlpha(theme.answer, 0.1) }}
+          className="group flex items-center gap-2.5 rounded-md px-2.5 py-2"
+          style={{ color: theme.question, background: withAlpha(theme.answer, 0.08) }}
         >
           <span
-            className="flex h-6 min-w-6 items-center justify-center rounded-[2px] border text-xs font-semibold"
-            style={{ borderColor: withAlpha(theme.answer, 0.6), background: theme.background }}
+            className="flex h-6 min-w-6 items-center justify-center rounded-[4px] border text-xs font-semibold"
+            style={{ borderColor: withAlpha(theme.answer, 0.3), background: theme.background, color: theme.answer }}
           >
             {choiceKey(i)}
           </span>
@@ -65,7 +65,7 @@ export function ChoiceEditor({ question, theme }: { question: Question; theme: T
             placeholder={`Choice ${choiceKey(i)}`}
             aria-label={`Choice ${choiceKey(i)}`}
             className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[var(--ph)] sm:text-lg"
-            style={{ ["--ph" as string]: withAlpha(theme.answer, 0.45) }}
+            style={{ ["--ph" as string]: withAlpha(theme.question, 0.4) }}
           />
           {question.options.length > 1 && (
             <button
@@ -80,8 +80,8 @@ export function ChoiceEditor({ question, theme }: { question: Question; theme: T
       ))}
       <button
         onClick={() => setFocusId(addOption(question.id))}
-        className="flex w-fit items-center gap-1 px-1 py-1 text-sm font-medium underline-offset-4 hover:underline"
-        style={{ color: theme.answer }}
+        className="flex w-fit items-center gap-1 px-1 py-1 text-sm underline underline-offset-4"
+        style={{ color: theme.question }}
       >
         <Plus size={15} /> Add choice
       </button>

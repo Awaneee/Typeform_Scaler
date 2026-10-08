@@ -1,6 +1,5 @@
 "use client";
 
-import { Check } from "lucide-react";
 import { useEffect } from "react";
 import { withAlpha } from "@/lib/color";
 import type { Theme } from "@/lib/themes";
@@ -25,18 +24,19 @@ export function ChoiceButton({ label, keyHint, selected, theme, preview, onClick
       onClick={onClick}
       disabled={preview}
       tabIndex={preview ? -1 : undefined}
-      className="group flex w-full min-w-0 items-center gap-3 rounded-[4px] border px-2 py-1.5 text-left text-base transition-colors sm:text-lg disabled:cursor-default"
+      className="group flex w-full min-w-0 items-center gap-2.5 rounded-md py-2 pr-6 pl-2.5 text-left text-base transition-[background-color,box-shadow] sm:text-lg disabled:cursor-default"
       style={{
-        color: theme.answer,
-        borderColor: withAlpha(theme.answer, selected ? 0.9 : 0.6),
-        background: withAlpha(theme.answer, selected ? 0.3 : 0.1),
-        boxShadow: selected ? `inset 0 0 0 1px ${theme.answer}` : undefined,
+        color: theme.question,
+        background: selected ? theme.background : withAlpha(theme.answer, 0.08),
+        boxShadow: selected ? `inset 0 0 0 2px ${theme.answer}` : undefined,
       }}
+      onMouseEnter={(e) => !selected && !preview && (e.currentTarget.style.background = withAlpha(theme.answer, 0.14))}
+      onMouseLeave={(e) => !selected && (e.currentTarget.style.background = withAlpha(theme.answer, 0.08))}
     >
       <span
-        className="flex h-6 min-w-6 items-center justify-center rounded-[2px] border px-1 text-xs font-semibold"
+        className="flex h-6 min-w-6 items-center justify-center rounded-[4px] border px-1 text-xs font-semibold"
         style={{
-          borderColor: withAlpha(theme.answer, 0.6),
+          borderColor: selected ? theme.answer : withAlpha(theme.answer, 0.3),
           background: selected ? theme.answer : theme.background,
           color: selected ? theme.background : theme.answer,
         }}
@@ -44,7 +44,6 @@ export function ChoiceButton({ label, keyHint, selected, theme, preview, onClick
         {keyHint}
       </span>
       <span className="min-w-0 flex-1 break-words">{label}</span>
-      <Check size={20} className={selected ? "opacity-100" : "opacity-0"} aria-hidden />
     </button>
   );
 }
@@ -88,7 +87,7 @@ export function MultipleChoiceAnswer({ question, value, onChange, theme, preview
           Choose as many as you like
         </p>
       )}
-      <div className="flex w-full max-w-md flex-col gap-2">
+      <div className="inline-flex max-w-full min-w-[200px] flex-col gap-2 sm:max-w-md">
         {question.options.map((option, i) => (
           <ChoiceButton
             key={option.id}
@@ -126,7 +125,7 @@ export function YesNoAnswer({ value, onChange, theme, preview, active, onCommit 
   });
 
   return (
-    <div className="flex w-full max-w-[200px] flex-col gap-2">
+    <div className="inline-flex min-w-[160px] flex-col gap-2">
       <ChoiceButton label="Yes" keyHint="Y" selected={value === true} theme={theme} preview={preview} onClick={() => pick(true)} />
       <ChoiceButton label="No" keyHint="N" selected={value === false} theme={theme} preview={preview} onClick={() => pick(false)} />
     </div>

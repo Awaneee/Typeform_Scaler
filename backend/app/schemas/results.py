@@ -89,5 +89,7 @@ class FormAnalytics(BaseModel):
     submissions: int
     partials: int
     completion_rate: float | None
+    # Average seconds from starting to submitting (None until someone completes it).
+    avg_completion_seconds: float | None
     daily: list[dict[str, Any]]
     questions: list[QuestionAnalytics]

@@ -20,10 +20,10 @@ export function Switch({ checked, onCheckedChange, id, ...rest }: SwitchProps) {
       className={cn(
         "relative h-5 w-9 shrink-0 rounded-full transition-colors outline-none",
         "focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2",
-        checked ? "bg-teal" : "bg-switch-off",
+        checked ? "bg-ink" : "bg-switch-off",
       )}
     >
-      <RadixSwitch.Thumb className="block h-4 w-4 translate-x-0.5 rounded-full bg-white shadow transition-transform data-[state=checked]:translate-x-[18px]" />
+      <RadixSwitch.Thumb className="block h-4 w-4 translate-x-0.5 rounded-full bg-surface shadow transition-transform data-[state=checked]:translate-x-[18px]" />
     </RadixSwitch.Root>
   );
 }

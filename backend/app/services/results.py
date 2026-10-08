@@ -262,6 +262,18 @@ def analytics(db: Session, form: Form) -> FormAnalytics:
         .where(ResponseSession.form_id == form.id, ResponseSession.started_at.is_not(None))
     ) or 0
     completion = round(min(100.0, 100 * len(subs) / starts), 1) if starts else None
+    durations = [
+        (finished - started).total_seconds()
+        for started, finished in db.execute(
+            select(ResponseSession.started_at, ResponseSession.submitted_at).where(
+                ResponseSession.form_id == form.id,
+                ResponseSession.started_at.is_not(None),
+                ResponseSession.submitted_at.is_not(None),
+            )
+        ).all()
+        if finished >= started
+    ]
+    avg_completion = round(mean(durations), 1) if durations else None
     partials = sum(
         1 for answers in db.scalars(select(ResponseSession.partial_answers_json).where(*_partial_filter(form))) if answers
     )
@@ -279,6 +291,7 @@ def analytics(db: Session, form: Form) -> FormAnalytics:
         submissions=len(subs),
         partials=partials,
         completion_rate=completion,
+        avg_completion_seconds=avg_completion,
         daily=daily,
         questions=[
             _question_analytics(q, values[q.id], seen_by[q.id], q.id in catalog.removed, catalog.option_labels, catalog.file_names)

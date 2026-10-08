@@ -56,7 +56,7 @@ interface BuilderActions {
 export type BuilderStore = BuilderState & BuilderActions;
 
 const DEFAULT_SETTINGS: FormSettings = {
-  theme: "classic",
+  theme: "pearl",
   welcome: { enabled: false, title: "", description: "", button_text: "Start" },
   thank_you: { title: "Thanks for completing this form", description: "", button_text: "Create a typeform" },
 };

@@ -34,25 +34,25 @@ export interface QuestionTypeMeta {
   defaults: () => Pick<Question, "settings" | "options">;
 }
 
-export type Category = "Contact info" | "Choice" | "Text" | "Rating & ranking" | "Other";
+export type Category = "Contact info" | "Choice" | "Rating & ranking" | "Text & Video" | "Other";
 
 export const newId = () => crypto.randomUUID();
 
 const CONTACT = { bg: "#FCE1EA", fg: "#9B2C55" };
 const CHOICE = { bg: "#E9DFFB", fg: "#5B32A8" };
 const TEXT = { bg: "#DCEBFF", fg: "#1F4E99" };
-const RATING = { bg: "#FFF0C9", fg: "#8A5A00" };
-const OTHER = { bg: "#DDF3EA", fg: "#1D6B4F" };
+const RATING = { bg: "#D7F0D2", fg: "#2F6B2A" };
+const OTHER = { bg: "#FFEBC2", fg: "#8A5A00" };
 
 const options = (...labels: string[]) => labels.map((label) => ({ id: newId(), label }));
 
 export const QUESTION_REGISTRY: Record<QuestionType, QuestionTypeMeta> = {
   short_text: {
-    type: "short_text", label: "Short Text", icon: TextCursorInput, ...TEXT, category: "Text",
+    type: "short_text", label: "Short Text", icon: TextCursorInput, ...TEXT, category: "Text & Video",
     defaults: () => ({ settings: {}, options: [] }),
   },
   long_text: {
-    type: "long_text", label: "Long Text", icon: AlignLeft, ...TEXT, category: "Text",
+    type: "long_text", label: "Long Text", icon: AlignLeft, ...TEXT, category: "Text & Video",
     defaults: () => ({ settings: {}, options: [] }),
   },
   email: {
@@ -114,7 +114,8 @@ export const COMING_SOON_TYPES: ComingSoonType[] = [
   { label: "Address", icon: MapPin, ...CONTACT, category: "Contact info" },
   { label: "Website", icon: Globe, ...CONTACT, category: "Contact info" },
   { label: "Picture Choice", icon: Image, ...CHOICE, category: "Choice" },
-  { label: "Statement", icon: Quote, ...TEXT, category: "Text" },
+  { label: "Video and Audio", icon: Quote, ...TEXT, category: "Text & Video" },
+  { label: "Statement", icon: Quote, ...TEXT, category: "Text & Video" },
   { label: "Opinion Scale", icon: Gauge, ...RATING, category: "Rating & ranking" },
   { label: "Ranking", icon: ListOrdered, ...RATING, category: "Rating & ranking" },
   { label: "Matrix", icon: Grid3x3, ...RATING, category: "Rating & ranking" },
@@ -122,4 +123,4 @@ export const COMING_SOON_TYPES: ComingSoonType[] = [
   { label: "Payment", icon: CreditCard, ...OTHER, category: "Other" },
 ];
 
-export const CATEGORIES: Category[] = ["Contact info", "Choice", "Text", "Rating & ranking", "Other"];
+export const CATEGORIES: Category[] = ["Contact info", "Choice", "Rating & ranking", "Text & Video", "Other"];

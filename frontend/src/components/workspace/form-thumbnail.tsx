@@ -7,7 +7,7 @@ export function FormThumbnail({ theme, title, className }: { theme: ThemeName; t
   const t = getTheme(theme);
   return (
     <div
-      className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-black/5 text-sm font-semibold", className)}
+      className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-black/5 text-sm font-semibold", className)}
       style={{ background: t.background, color: t.answer }}
       aria-hidden
     >

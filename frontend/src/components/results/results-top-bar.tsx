@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ColorModeMenu } from "@/components/layout/color-mode-menu";
-import { Logo } from "@/components/layout/logo";
+import { ChevronRight, PanelsTopLeft } from "lucide-react";
 import { BUILDER_TABS } from "@/components/builder/builder-top-bar";
 import { cn } from "@/lib/utils";
 
@@ -11,11 +11,10 @@ export function ResultsTopBar({ formId, title }: { formId: string; title: string
   return (
     <header className="grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-4 border-line bg-surface px-4">
       <div className="flex min-w-0 items-center gap-2">
-        <Logo showText={false} />
-        <Link href="/workspace" className="hidden shrink-0 rounded-md px-1.5 py-1 text-sm text-muted hover:bg-selected hover:text-ink lg:block">
-          My workspace
+        <Link href="/workspace" className="flex shrink-0 items-center gap-1.5 rounded-md px-1.5 py-1 text-sm text-muted hover:bg-selected hover:text-ink">
+          <PanelsTopLeft size={16} /> Forms
         </Link>
-        <span className="hidden text-muted lg:inline">/</span>
+        <ChevronRight size={14} className="shrink-0 text-muted" aria-hidden />
         <span className="truncate px-1.5 text-sm font-medium">{title}</span>
       </div>
       <nav className="flex gap-0.5 lg:gap-1" aria-label="Form sections">

@@ -15,6 +15,7 @@
   --tf-danger: #c42b1c;
   --tf-switch-off: #d8d5db;
   --tf-hover-strong: #e2e0e4;
+  --tf-panel: #f4f4f5;
 }
 
 /* Dark mode for the creator app (workspace, builder, results). Respondent forms keep their own
@@ -34,6 +35,7 @@
   --tf-danger: #ff6b5e;
   --tf-switch-off: #48424e;
   --tf-hover-strong: #36313b;
+  --tf-panel: #1d1a21;
 }
 
 @theme inline {
@@ -50,6 +52,7 @@
   --color-danger: var(--tf-danger);
   --color-switch-off: var(--tf-switch-off);
   --color-hover-strong: var(--tf-hover-strong);
+  --color-panel: var(--tf-panel);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 

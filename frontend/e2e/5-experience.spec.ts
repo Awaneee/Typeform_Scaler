@@ -65,7 +65,7 @@ test.describe("Mocked / placeholder sections", () => {
   test("Integrations / webhooks (\"Coming soon\" in workspace header)", async ({ page }) => {
     await page.goto("/workspace");
     await page.waitForLoadState("networkidle"); // let React hydrate before clicking
-    await page.getByRole("button", { name: "Integrations" }).click();
+    await page.getByRole("button", { name: "Integrations", exact: true }).click();
     await expect(page.getByText("Integrations is coming soon")).toBeVisible();
   });
 

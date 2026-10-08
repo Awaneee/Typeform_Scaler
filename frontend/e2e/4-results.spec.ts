@@ -50,6 +50,7 @@ test("View an individual response in full (side panel, questions as that respond
 test("Basic summary stats per question (choice/yes-no bars with % and counts, rating average + distribution, number avg/min/max, recent text answers)", async ({ page, request }) => {
   const form = await formWithResponses(request);
   await page.goto(`/forms/${form.id}/results`);
+  await page.getByRole("button", { name: "Response summary" }).click();
   const card = (title: string) => page.locator("section", { has: page.getByRole("heading", { name: title, exact: true }) });
   await expect(card("Colour")).toContainText("66.7% (2)"); // Red
   await expect(card("Colour")).toContainText("33.3% (1)"); // Green

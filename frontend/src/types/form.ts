@@ -13,7 +13,7 @@ export const QUESTION_TYPES = [
 ] as const;
 export type QuestionType = (typeof QUESTION_TYPES)[number];
 
-export type ThemeName = "classic" | "lavender" | "ocean" | "midnight";
+export type ThemeName = "pearl" | "classic" | "inky" | "lavender" | "ocean" | "midnight";
 export type FormStatus = "draft" | "published";
 
 export interface Option {
@@ -64,6 +64,7 @@ export interface FormSummary {
   status: FormStatus;
   slug: string | null;
   response_count: number;
+  completion_rate: number | null;
   question_count: number;
   has_unpublished_changes: boolean;
   theme: ThemeName;

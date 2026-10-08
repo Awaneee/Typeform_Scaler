@@ -38,7 +38,7 @@ def _event_registration() -> dict:
     return {
         "title": "Event Registration",
         "settings": {
-            "theme": "classic",
+            "theme": "pearl",
             "thank_you": {"title": "You're on the list! 🎉", "description": "We'll email your ticket a week before the event."},
         },
         "questions": [
@@ -145,7 +145,8 @@ def _seed_responses(db: Session, form: Form, definition: dict, count: int, rng: 
             if q["required"] or rng.random() < 0.8:
                 answers[q["id"]] = _answer(q, rng, person)
         session_id = new_id()
-        db.add(ResponseSession(form_id=form.id, client_session_id=session_id, viewed_at=when, started_at=when))
+        started = when - timedelta(seconds=rng.randint(45, 300))  # time spent filling the form
+        db.add(ResponseSession(form_id=form.id, client_session_id=session_id, viewed_at=started, started_at=started))
         create_submission(db, form, form.published_version, answers, new_id(), client_session_id=session_id,
                           submitted_at=when)
     # Visitors who looked but didn't finish, so the completion rate is realistic.

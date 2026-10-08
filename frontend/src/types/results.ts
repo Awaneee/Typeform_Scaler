@@ -73,6 +73,7 @@ export interface FormAnalytics {
   submissions: number;
   partials: number;
   completion_rate: number | null;
+  avg_completion_seconds: number | null;
   daily: { date: string; count: number }[];
   questions: QuestionAnalytics[];
 }

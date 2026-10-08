@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, Copy, Ellipsis, Eye, Globe, Link2, Pencil, PencilLine, Trash2, Undo2 } from "lucide-react";
+import { Ellipsis } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import { cn } from "@/lib/utils";
@@ -28,40 +28,26 @@ export function FormActionsMenu({ form, actions, onRename, onDelete, className }
       >
         <Ellipsis size={18} />
       </MenuTrigger>
-      <MenuContent onClick={(e) => e.stopPropagation()}>
-        <MenuItem icon={<Pencil size={15} />} onSelect={() => router.push(`/forms/${form.id}/edit`)}>
-          Open
-        </MenuItem>
-        <MenuItem icon={<Eye size={15} />} onSelect={() => window.open(`/forms/${form.id}/preview`, "_blank")}>
-          Preview
-        </MenuItem>
-        <MenuItem icon={<BarChart3 size={15} />} onSelect={() => router.push(`/forms/${form.id}/results`)}>
-          Results
-        </MenuItem>
-        <MenuSeparator />
-        <MenuItem icon={<PencilLine size={15} />} onSelect={onRename}>
-          Rename
-        </MenuItem>
-        <MenuItem icon={<Copy size={15} />} onSelect={() => actions.duplicate(form)}>
-          Duplicate
-        </MenuItem>
-        <MenuSeparator />
-        {published ? (
+      <MenuContent onClick={(e) => e.stopPropagation()} className="min-w-48 p-1.5">
+        {published && (
           <>
-            <MenuItem icon={<Link2 size={15} />} onSelect={() => actions.copyLink(form)}>
-              Copy link
-            </MenuItem>
-            <MenuItem icon={<Undo2 size={15} />} onSelect={() => actions.unpublish(form)}>
-              Unpublish
-            </MenuItem>
+            <MenuItem onSelect={() => actions.copyLink(form)}>Copy link</MenuItem>
+            <MenuSeparator />
           </>
+        )}
+        <MenuItem onSelect={() => router.push(`/forms/${form.id}/edit`)}>Content</MenuItem>
+        <MenuItem onSelect={() => window.open(`/forms/${form.id}/preview`, "_blank")}>Preview</MenuItem>
+        <MenuItem onSelect={() => router.push(`/forms/${form.id}/results`)}>Results</MenuItem>
+        <MenuSeparator />
+        <MenuItem onSelect={onRename}>Rename</MenuItem>
+        <MenuItem onSelect={() => actions.duplicate(form)}>Duplicate</MenuItem>
+        {published ? (
+          <MenuItem onSelect={() => actions.unpublish(form)}>Unpublish</MenuItem>
         ) : (
-          <MenuItem icon={<Globe size={15} />} onSelect={() => actions.publish(form)}>
-            Publish
-          </MenuItem>
+          <MenuItem onSelect={() => actions.publish(form)}>Publish</MenuItem>
         )}
         <MenuSeparator />
-        <MenuItem icon={<Trash2 size={15} />} destructive onSelect={onDelete}>
+        <MenuItem destructive onSelect={onDelete}>
           Delete
         </MenuItem>
       </MenuContent>

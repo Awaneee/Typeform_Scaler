@@ -1,12 +1,13 @@
 "use client";
 
-import { AlertTriangle, ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
+import { AlertTriangle, ChevronDown, ChevronUp, CircleCheck } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useEffect } from "react";
 import { AnswerField } from "@/components/questions/answers/answer-field";
 import { isTyping } from "@/components/questions/answers/types";
 import { OkButton } from "@/components/questions/ok-button";
+import { QuestionNumber } from "@/components/questions/question-number";
 import { useFormRunner, type RunnerForm, type RunnerMode } from "@/hooks/use-form-runner";
 import { withAlpha } from "@/lib/color";
 import { getTheme, type Theme } from "@/lib/themes";
@@ -110,18 +111,28 @@ export function FormRunner({ form, mode }: FormRunnerProps) {
 
       {screen.kind === "question" && (
         <footer className="pointer-events-none absolute right-4 bottom-4 flex items-center gap-2 sm:right-6 sm:bottom-6">
-          <span className="pointer-events-auto hidden rounded-[4px] px-2.5 py-1.5 text-xs font-medium sm:block" style={{ background: withAlpha(theme.answer, 0.1), color: theme.answer }}>
+          {/* Progress for screen readers; sighted users get the bar along the top. */}
+          <span className="sr-only">
             {runner.answeredCount} of {total} answered
           </span>
-          <div className="pointer-events-auto flex overflow-hidden rounded-[4px]" style={{ background: theme.button }}>
-            <button onClick={previous} disabled={!runner.canGoBack} aria-label="Previous question" className="p-2 disabled:opacity-40" style={{ color: theme.buttonText }}>
-              <ChevronUp size={22} />
-            </button>
-            <span className="w-px" style={{ background: withAlpha(theme.buttonText, 0.3) }} />
-            <button onClick={next} aria-label="Next question" className="p-2" style={{ color: theme.buttonText }}>
-              <ChevronDown size={22} />
-            </button>
+          <div className="pointer-events-auto flex gap-px">
+            {[
+              { label: "Previous question", icon: ChevronUp, onClick: previous, disabled: !runner.canGoBack },
+              { label: "Next question", icon: ChevronDown, onClick: next, disabled: false },
+            ].map(({ label, icon: Icon, onClick, disabled }, i) => (
+              <button
+                key={label}
+                onClick={onClick}
+                disabled={disabled}
+                aria-label={label}
+                className={`p-1.5 transition-opacity hover:opacity-80 disabled:opacity-40 ${i === 0 ? "rounded-l-md" : "rounded-r-md"}`}
+                style={{ background: withAlpha(theme.answer, 0.12), color: theme.answer }}
+              >
+                <Icon size={20} />
+              </button>
+            ))}
           </div>
+          <PoweredBy />
         </footer>
       )}
     </div>
@@ -147,10 +158,7 @@ function QuestionScreen({ question, number, theme, value, error, onChange, onSub
   const headingId = `q-${question.id}`;
   return (
     <section aria-labelledby={headingId} className="flex gap-2 sm:gap-3">
-      <span className="mt-[6px] flex shrink-0 items-center gap-1 self-start text-sm sm:text-base" style={{ color: theme.answer }}>
-        {number}
-        <ArrowRight size={14} strokeWidth={2.5} />
-      </span>
+      <QuestionNumber number={number} theme={theme} />
       <div className="min-w-0 flex-1">
         <h1 id={headingId} className="text-xl leading-snug sm:text-2xl" style={{ color: theme.question }}>
           {question.title}
@@ -201,29 +209,52 @@ function WelcomeScreen({ form, theme, onStart }: { form: RunnerForm; theme: Them
 function ThankYouScreen({ form, theme, onRestart }: { form: RunnerForm; theme: Theme; onRestart?: () => void }) {
   const t = form.settings.thank_you;
   return (
-    <div className="text-center">
-      <h1 className="text-2xl leading-snug sm:text-3xl" style={{ color: theme.question }}>
-        {t.title || "Thanks for completing this form"}
-      </h1>
-      {t.description && (
-        <p className="mt-3 text-lg whitespace-pre-line" style={{ color: withAlpha(theme.question, 0.7) }}>
-          {t.description}
-        </p>
-      )}
-      <div className="mt-8 flex flex-col items-center gap-3">
-        {onRestart ? (
-          <button onClick={onRestart} className="rounded-[4px] px-5 py-2.5 text-lg font-bold" style={{ background: theme.button, color: theme.buttonText }}>
+    <>
+      <div className="text-center">
+        <CircleCheck className="mx-auto mb-6 h-20 w-20" strokeWidth={1.25} style={{ color: theme.question }} aria-hidden />
+        <h1 className="text-2xl leading-snug sm:text-3xl" style={{ color: theme.question }}>
+          {t.title || "Thanks for completing this form"}
+        </h1>
+        {t.description && (
+          <p className="mt-3 text-lg whitespace-pre-line" style={{ color: withAlpha(theme.question, 0.7) }}>
+            {t.description}
+          </p>
+        )}
+        {onRestart && (
+          <button
+            onClick={onRestart}
+            className="mt-8 rounded-md px-5 py-2.5 text-lg font-semibold"
+            style={{ background: theme.button, color: theme.buttonText }}
+          >
             Restart preview
           </button>
-        ) : (
-          <Link href="/forms/new" className="rounded-[4px] px-5 py-2.5 text-lg font-bold" style={{ background: theme.button, color: theme.buttonText }}>
-            {t.button_text || "Create a typeform"}
-          </Link>
         )}
-        <span className="text-xs" style={{ color: withAlpha(theme.question, 0.6) }}>
-          Made with Formflow
-        </span>
       </div>
-    </div>
+      {/* Typeform-style footer bar on the ending screen. */}
+      <div
+        className="fixed inset-x-0 bottom-0 flex items-center justify-end gap-3 px-4 py-3 text-sm sm:px-6"
+        style={{ background: withAlpha(theme.question, 0.06), color: theme.question }}
+      >
+        How you ask is everything
+        <Link
+          href="/forms/new"
+          className="rounded-md px-2.5 py-1 text-xs font-semibold"
+          style={{ background: theme.button, color: theme.buttonText }}
+        >
+          {t.button_text && t.button_text !== "Create a typeform" ? t.button_text : "Create a formflow"}
+        </Link>
+      </div>
+    </>
+  );
+}
+
+function PoweredBy() {
+  return (
+    <a
+      href="/workspace"
+      className="pointer-events-auto hidden items-center gap-1 rounded-md bg-[#29232B] px-2.5 py-1.5 text-xs text-white sm:flex"
+    >
+      Powered by <strong className="font-semibold">Formflow</strong>
+    </a>
   );
 }

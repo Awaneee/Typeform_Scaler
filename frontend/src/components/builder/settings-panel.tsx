@@ -14,7 +14,7 @@ import { QUESTION_TYPES, type Question } from "@/types/form";
 /** Right-hand panel on desktop. */
 export function SettingsPanel({ onOpenLogic }: { onOpenLogic: () => void }) {
   return (
-    <aside className="hidden w-[300px] shrink-0 overflow-y-auto border-l border-line bg-surface lg:block" aria-label="Question settings">
+    <aside className="hidden w-[300px] shrink-0 flex-col gap-3 overflow-y-auto lg:flex" aria-label="Question settings">
       <SettingsContent onOpenLogic={onOpenLogic} />
     </aside>
   );
@@ -24,7 +24,7 @@ export function SettingsPanel({ onOpenLogic }: { onOpenLogic: () => void }) {
 export function SettingsDrawerButton({ onOpenLogic }: { onOpenLogic: () => void }) {
   return (
     <Dialog.Root>
-      <Dialog.Trigger className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-surface px-3 text-sm hover:bg-selected lg:hidden">
+      <Dialog.Trigger className="flex h-8 items-center gap-1.5 rounded-lg px-3 text-sm hover:bg-hover-strong lg:hidden">
         <SlidersHorizontal size={15} /> Settings
       </Dialog.Trigger>
       <Dialog.Portal>
@@ -39,7 +39,9 @@ export function SettingsDrawerButton({ onOpenLogic }: { onOpenLogic: () => void 
               <X size={16} />
             </Dialog.Close>
           </div>
-          <SettingsContent onOpenLogic={onOpenLogic} />
+          <div className="flex flex-col gap-3 p-3">
+            <SettingsContent onOpenLogic={onOpenLogic} />
+          </div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -55,8 +57,8 @@ function SettingsContent({ onOpenLogic }: { onOpenLogic: () => void }) {
 
 function Section({ title, children }: { title?: string; children: ReactNode }) {
   return (
-    <section className="space-y-3 border-b border-line px-5 py-4">
-      {title && <h3 className="text-xs font-semibold tracking-wide text-muted uppercase">{title}</h3>}
+    <section className="space-y-3 rounded-xl bg-panel p-4">
+      {title && <h3 className="text-sm font-semibold">{title}</h3>}
       {children}
     </section>
   );
@@ -109,9 +111,9 @@ function QuestionSettings({ question, onOpenLogic }: { question: Question; onOpe
 
   return (
     <>
-      <Section>
+      <Section title="Answer">
         <Menu>
-          <MenuTrigger className="flex h-10 w-full items-center gap-2.5 rounded-lg border border-line px-3 text-sm hover:bg-bg">
+          <MenuTrigger className="flex h-10 w-full items-center gap-2.5 rounded-lg border border-line bg-surface px-3 text-sm hover:bg-selected">
             <QuestionTypeBadge type={question.type} />
             <span className="flex-1 text-left font-medium">{meta.label}</span>
             <ChevronDown size={16} className="text-muted" />
@@ -204,10 +206,10 @@ function QuestionSettings({ question, onOpenLogic }: { question: Question; onOpe
 
       {question.type === "dropdown" && <DropdownOptions question={question} />}
 
-      <Section title="Media">
+      <Section title="Image or video">
         <button
           onClick={() => toast("Images and videos are coming soon")}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-line py-3 text-sm text-muted hover:bg-bg"
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-line bg-surface py-3 text-sm text-muted hover:text-ink"
         >
           <ImagePlus size={16} /> Add image or video
         </button>

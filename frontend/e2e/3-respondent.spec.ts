@@ -79,7 +79,10 @@ test("Keyboard navigation (Enter / ↓ next, ↑ back, letter keys for choices, 
   await onQuestion(page, "Coming?");
   await page.keyboard.press("y");
   await onQuestion(page, "Rate us");
-  await page.keyboard.press("4"); // number key rates and submits (last question)
+  await page.keyboard.press("4"); // number key rates; on the last question Typeform waits for Submit
+  await expect(page.getByRole("radio", { name: "4 stars" })).toHaveAttribute("aria-checked", "true");
+  await expect(page.getByText("Thanks, you rock!")).toHaveCount(0);
+  await page.keyboard.press("Enter");
   await expect(page.getByText("Thanks, you rock!")).toBeVisible();
   expect(await responseCount(page, form.id)).toBe(1);
 });
@@ -90,10 +93,10 @@ test('Progress indicator (top bar + "x of n answered")', async ({ page, request 
   await onQuestion(page, "What's your name?");
   const bar = page.getByRole("progressbar", { name: "Form progress" });
   await expect(bar).toHaveAttribute("aria-valuenow", "0");
-  await expect(page.getByText("0 of 5 answered")).toBeVisible();
+  await expect(page.getByText("0 of 5 answered")).toBeAttached(); // screen-reader text; the bar is visual
   await page.keyboard.type("Ada");
   await expect(bar).toHaveAttribute("aria-valuenow", "1");
-  await expect(page.getByText("1 of 5 answered")).toBeVisible();
+  await expect(page.getByText("1 of 5 answered")).toBeAttached();
 });
 
 test("Validation: server side (required, email, number, choices, rating)", async ({ request }) => {

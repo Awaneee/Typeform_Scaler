@@ -16,6 +16,8 @@ class FormSummary(BaseModel):
     status: Literal["draft", "published"]
     slug: str | None
     response_count: int
+    # Submissions ÷ started visits, in percent (None until someone starts the form).
+    completion_rate: float | None
     question_count: int
     has_unpublished_changes: bool
     theme: str

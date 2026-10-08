@@ -1,10 +1,12 @@
 "use client";
 
-import { X } from "lucide-react";
+import { Gem, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const STORAGE_KEY = "ff:banner-dismissed";
 
+/** Typeform-style mint announcement card with an action and a close button. */
 export function AnnouncementBanner() {
   // Hidden until we know it wasn't dismissed, to avoid a flash on reload.
   const [visible, setVisible] = useState(false);
@@ -28,16 +30,19 @@ export function AnnouncementBanner() {
   }
 
   return (
-    <div className="flex items-center justify-center gap-3 bg-lavender px-10 py-2.5 text-center text-sm text-ink relative">
+    <div className="relative flex items-center justify-center gap-3 rounded-xl border border-teal/40 bg-teal/5 px-12 py-3 text-center text-[15px]">
+      <Gem size={18} className="hidden shrink-0 text-teal sm:block" />
       <span>
-        <strong className="font-semibold">New:</strong> Share your forms with a link and watch responses arrive in real time.
+        Share your forms with a link and watch <strong className="font-semibold">responses arrive in real time</strong>.
       </span>
       <button
-        onClick={dismiss}
-        className="absolute right-3 rounded-md p-1 hover:bg-black/10"
-        aria-label="Dismiss announcement"
+        onClick={() => toast("Plans are coming soon")}
+        className="hidden shrink-0 rounded-md bg-teal px-2.5 py-1 text-sm font-medium text-white hover:brightness-110 md:block"
       >
-        <X size={16} />
+        Get more responses
+      </button>
+      <button onClick={dismiss} className="absolute right-3 rounded-md p-1 hover:bg-black/5" aria-label="Dismiss announcement">
+        <X size={18} />
       </button>
     </div>
   );

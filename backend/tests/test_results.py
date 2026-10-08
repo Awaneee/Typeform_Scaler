@@ -42,6 +42,7 @@ def test_completion_rate_from_sessions(client):
 
     data = client.get(f"/api/v1/forms/{form['id']}/analytics").json()
     assert (data["views"], data["starts"], data["submissions"], data["completion_rate"]) == (4, 2, 1, 50.0)
+    assert data["avg_completion_seconds"] is not None and data["avg_completion_seconds"] >= 0
 
 
 def test_submissions_pagination_and_csv(client):

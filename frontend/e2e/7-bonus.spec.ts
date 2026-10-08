@@ -144,8 +144,8 @@ test("Dark mode (creator app: Light / Dark / System toggle in every top bar, no 
     await page.goto(url);
     await expect(page.getByRole("button", { name: "Appearance" })).toBeVisible();
   }
-  // The public form keeps its own (light, classic) theme.
+  // The public form keeps its own (light, Pearl White default) theme.
   await page.goto(`/to/${form.slug}`);
   await onQuestion(page, "Name");
-  await expect(page.locator("main").locator("..")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expect(page.locator("main").locator("..")).toHaveCSS("background-color", "rgb(250, 250, 250)");
 });

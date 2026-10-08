@@ -12,14 +12,14 @@ import {
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { CircleCheckBig, Copy, Ellipsis, GripVertical, Plus, Trash2 } from "lucide-react";
+import { ArrowRight, CircleCheckBig, Copy, Ellipsis, GripVertical, Lightbulb, Plus, Trash2 } from "lucide-react";
 import { QuestionTypeBadge } from "@/components/questions/question-icon";
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@/components/ui/menu";
 import { cn } from "@/lib/utils";
 import { useBuilder } from "@/store/builder-store";
 import type { Question } from "@/types/form";
 
-export function QuestionList({ onAdd }: { onAdd: () => void }) {
+export function QuestionList({ onAdd, onOpenLogic }: { onAdd: () => void; onOpenLogic: () => void }) {
   const questions = useBuilder((s) => s.questions);
   const selected = useBuilder((s) => s.selected);
   const select = useBuilder((s) => s.select);
@@ -40,54 +40,57 @@ export function QuestionList({ onAdd }: { onAdd: () => void }) {
   }
 
   return (
-    <aside className="flex w-[280px] shrink-0 flex-col border-r border-line bg-surface">
-      <div className="flex items-center justify-between px-4 pt-4 pb-2">
-        <span className="text-sm font-semibold">Questions</span>
+    <aside className="flex w-[256px] shrink-0 flex-col gap-3">
+      <section className="flex min-h-0 flex-1 flex-col rounded-xl bg-panel p-3" aria-label="Questions panel">
+        <h2 className="px-2 pt-1 pb-3 text-sm font-semibold">Questions</h2>
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="rounded-lg border border-line bg-surface p-1">
+            {questions.length > 0 && (
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd} modifiers={[restrictToVerticalAxis]}>
+                <SortableContext items={questions.map((q) => q.id)} strategy={verticalListSortingStrategy}>
+                  <ol className="space-y-0.5" aria-label="Questions">
+                    {questions.map((q, i) => (
+                      <SortableQuestion key={q.id} question={q} index={i} selected={selected === q.id} onSelect={() => select(q.id)} />
+                    ))}
+                  </ol>
+                </SortableContext>
+              </DndContext>
+            )}
+            <button
+              onClick={onAdd}
+              className="flex w-full items-center justify-center gap-1.5 rounded-md py-2 text-sm text-muted hover:bg-panel hover:text-ink"
+              aria-label="Add content"
+            >
+              <Plus size={15} /> Add content
+            </button>
+          </div>
+        </div>
         <button
-          onClick={onAdd}
-          className="flex h-7 w-7 items-center justify-center rounded-md bg-selected hover:bg-hover-strong"
-          aria-label="Add content"
+          onClick={onOpenLogic}
+          className="mt-3 flex items-center justify-between gap-2 rounded-lg border border-dashed border-line px-3 py-2.5 text-left text-sm font-medium hover:bg-surface"
         >
-          <Plus size={16} />
+          <span className="flex items-center gap-2">
+            <Lightbulb size={16} className="shrink-0" /> Personalize with branching
+          </span>
+          <ArrowRight size={16} className="shrink-0" />
         </button>
-      </div>
+      </section>
 
-      <div className="flex-1 overflow-y-auto px-2 pb-2">
-        {questions.length === 0 ? (
-          <button
-            onClick={onAdd}
-            className="mx-2 mt-2 w-[calc(100%-16px)] rounded-lg border border-dashed border-line p-4 text-center text-sm text-muted hover:bg-bg"
-          >
-            Add your first question
-          </button>
-        ) : (
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd} modifiers={[restrictToVerticalAxis]}>
-            <SortableContext items={questions.map((q) => q.id)} strategy={verticalListSortingStrategy}>
-              <ol className="space-y-1" aria-label="Questions">
-                {questions.map((q, i) => (
-                  <SortableQuestion key={q.id} question={q} index={i} selected={selected === q.id} onSelect={() => select(q.id)} />
-                ))}
-              </ol>
-            </SortableContext>
-          </DndContext>
-        )}
-      </div>
-
-      <div className="border-t border-line px-2 py-3">
-        <p className="px-2 pb-1.5 text-xs font-semibold text-muted">Endings</p>
+      <section className="rounded-xl bg-panel p-3" aria-label="Endings">
+        <h2 className="px-2 pt-1 pb-2 text-sm font-semibold">Endings</h2>
         <button
           onClick={() => select("ending")}
           className={cn(
             "flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm",
-            selected === "ending" ? "bg-selected" : "hover:bg-bg",
+            selected === "ending" ? "bg-hover-strong" : "hover:bg-surface",
           )}
         >
-          <span className="inline-flex h-6 items-center rounded-md bg-selected px-1.5 text-muted">
+          <span className="inline-flex h-6 items-center rounded-md bg-surface px-1.5 text-muted">
             <CircleCheckBig size={14} />
           </span>
           <span className="truncate">{thankYouTitle || "Thank you screen"}</span>
         </button>
-      </div>
+      </section>
     </aside>
   );
 }
@@ -120,7 +123,7 @@ function SortableQuestion({ question, index, selected, onSelect }: SortableQuest
         className={cn(
           "flex cursor-pointer items-center gap-2.5 rounded-lg py-2 pr-9 pl-2 text-sm outline-none select-none",
           "focus-visible:ring-2 focus-visible:ring-plum",
-          selected ? "bg-selected" : "hover:bg-bg",
+          selected ? "bg-hover-strong" : "hover:bg-panel",
           isDragging && "bg-surface shadow-lg ring-1 ring-line",
         )}
       >

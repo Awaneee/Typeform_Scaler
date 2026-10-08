@@ -19,12 +19,12 @@ export function OkButton({ theme, label = "OK", onClick, disabled, showCheck = t
         onClick={onClick}
         disabled={disabled}
         tabIndex={onClick ? undefined : -1}
-        className="flex items-center gap-1.5 rounded-[4px] px-4 py-2 text-lg font-bold shadow-sm transition-opacity hover:opacity-90 disabled:opacity-60"
+        className="flex items-center gap-1.5 rounded-md px-4 py-2 text-lg font-semibold transition-opacity hover:opacity-90 disabled:opacity-60"
         style={{ background: theme.button, color: theme.buttonText }}
       >
         {label} {showCheck && <Check size={18} strokeWidth={3} />}
       </button>
-      <span className="hidden items-center gap-1 text-xs sm:flex" style={{ color: withAlpha(theme.question, 0.7) }}>
+      <span className={`items-center gap-1 text-xs ${label === "OK" ? "hidden sm:flex" : "hidden"}`} style={{ color: withAlpha(theme.question, 0.7) }}>
         press <strong>Enter</strong> <CornerDownLeft size={12} />
       </span>
     </div>

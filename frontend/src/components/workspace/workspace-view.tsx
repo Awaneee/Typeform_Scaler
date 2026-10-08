@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowDownUp, LayoutGrid, List, Plus, Search } from "lucide-react";
+import { CalendarDays, ChevronDown, LayoutGrid, List, Plus, Search, UserPlus } from "lucide-react";
+import { toast } from "sonner";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ComingSoon } from "@/components/layout/coming-soon";
@@ -11,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { cn } from "@/lib/utils";
 import type { FormSort, FormSummary } from "@/types/form";
+import { AiPanel } from "./ai-panel";
 import { AnnouncementBanner } from "./announcement-banner";
 import { AppHeader } from "./app-header";
 import { FormActionsMenu } from "./form-actions-menu";
@@ -55,9 +57,15 @@ export function WorkspaceView() {
   );
 
   return (
-    <div className="flex h-dvh flex-col">
+    <div className="flex h-dvh gap-3 bg-surface p-0 sm:p-3">
+      <AiPanel />
+      <div className="flex min-w-0 flex-1 flex-col gap-3">
       <AppHeader me={me} />
-      <AnnouncementBanner />
+      <div className="px-3 sm:px-0">
+        <AnnouncementBanner />
+      </div>
+      {/* Typeform keeps tabs, sidebar and list together in one rounded grey container. */}
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-panel sm:rounded-2xl">
       <MainNav active={section} onChange={setSection} />
 
       {section !== "Forms" ? (
@@ -66,13 +74,22 @@ export function WorkspaceView() {
         <div className="flex min-h-0 flex-1">
           <WorkspaceSidebar me={me} query={query} onQueryChange={setQuery} />
 
-          <main className="min-w-0 flex-1 overflow-y-auto px-4 py-6 sm:px-8">
-            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-              <h1 className="text-xl font-semibold">{me?.workspaces[0]?.name ?? "My workspace"}</h1>
+          <main className="min-w-0 flex-1 overflow-y-auto px-4 py-6 sm:px-10">
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-6">
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl">{me?.workspaces[0]?.name ?? "My workspace"}</h1>
+                <button
+                  onClick={() => toast("Team collaboration is coming soon")}
+                  className="flex items-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium hover:bg-hover-strong"
+                >
+                  <UserPlus size={16} /> Invite
+                </button>
+              </div>
               <div className="flex items-center gap-2">
                 <Menu>
-                  <MenuTrigger className="flex h-9 items-center gap-2 rounded-lg px-3 text-sm hover:bg-selected">
-                    <ArrowDownUp size={15} className="text-muted" /> {SORT_LABELS[sort]}
+                  <MenuTrigger className="flex h-9 items-center gap-2 rounded-lg border border-line bg-surface px-3 text-sm hover:bg-selected">
+                    <CalendarDays size={15} className="text-muted" /> {SORT_LABELS[sort]}
+                    <ChevronDown size={15} className="text-muted" />
                   </MenuTrigger>
                   <MenuContent>
                     <MenuLabel>Sort by</MenuLabel>
@@ -92,9 +109,13 @@ export function WorkspaceView() {
                       onClick={() => changeView(v)}
                       aria-pressed={view === v}
                       aria-label={`${v} view`}
-                      className={cn("rounded-md p-1.5", view === v ? "bg-selected text-ink" : "text-muted hover:text-ink")}
+                      className={cn(
+                        "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-sm capitalize",
+                        view === v ? "bg-hover-strong text-ink" : "text-muted hover:text-ink",
+                      )}
                     >
                       {v === "list" ? <List size={16} /> : <LayoutGrid size={16} />}
+                      <span className="hidden sm:inline">{v}</span>
                     </button>
                   ))}
                 </div>
@@ -129,6 +150,8 @@ export function WorkspaceView() {
           </main>
         </div>
       )}
+      </div>
+      </div>
 
       {renaming && (
         <RenameDialog

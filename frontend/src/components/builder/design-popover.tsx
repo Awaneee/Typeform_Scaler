@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Paintbrush } from "lucide-react";
+import { Check, Palette } from "lucide-react";
 import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { THEMES } from "@/lib/themes";
@@ -16,8 +16,8 @@ export function DesignPopover() {
 
   return (
     <Popover>
-      <PopoverTrigger className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-surface px-3 text-sm hover:bg-selected">
-        <Paintbrush size={15} /> Design
+      <PopoverTrigger className="flex h-8 items-center gap-1.5 rounded-lg px-3 text-sm hover:bg-hover-strong data-[state=open]:bg-hover-strong">
+        <Palette size={15} /> Design
       </PopoverTrigger>
       <PopoverContent align="start" className="w-[340px] p-0">
         <div className="flex gap-4 border-b border-line px-4 pt-3">

@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from app.validators.question_types import QUESTION_TYPES, QuestionType, normalize_settings
 
-ThemeName = Literal["classic", "lavender", "ocean", "midnight"]
+ThemeName = Literal["pearl", "classic", "inky", "lavender", "ocean", "midnight"]
 ID = Field(min_length=1, max_length=36, pattern=r"^[A-Za-z0-9_-]+$")
 
 
@@ -63,7 +63,7 @@ class WelcomeScreen(BaseModel):
 class FormSettings(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
-    theme: ThemeName = "classic"
+    theme: ThemeName = "pearl"
     welcome: WelcomeScreen = Field(default_factory=WelcomeScreen)
     thank_you: ThankYouScreen = Field(default_factory=ThankYouScreen)
 

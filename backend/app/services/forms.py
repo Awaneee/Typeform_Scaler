@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.core.errors import ConflictError, NotFoundError
 from app.core.types import new_id, utcnow
-from app.models import Creator, Form, FormVersion, Question, QuestionOption, Submission, Workspace
+from app.models import Creator, Form, FormVersion, Question, QuestionOption, ResponseSession, Submission, Workspace
 from app.schemas.forms import DraftSaved, DraftUpdate, FormDetail, FormSort, FormSummary
 from app.services.creators import get_default_workspace
 from app.services.definitions import apply_definition, draft_definition, read_settings
@@ -16,6 +16,17 @@ def _response_counts(db: Session, form_ids: list[str]) -> dict[str, int]:
         return {}
     rows = db.execute(
         select(Submission.form_id, func.count()).where(Submission.form_id.in_(form_ids)).group_by(Submission.form_id)
+    )
+    return dict(rows.all())
+
+
+def _start_counts(db: Session, form_ids: list[str]) -> dict[str, int]:
+    if not form_ids:
+        return {}
+    rows = db.execute(
+        select(ResponseSession.form_id, func.count())
+        .where(ResponseSession.form_id.in_(form_ids), ResponseSession.started_at.is_not(None))
+        .group_by(ResponseSession.form_id)
     )
     return dict(rows.all())
 
@@ -49,6 +60,7 @@ def list_forms(db: Session, creator: Creator, *, query: str | None, sort: FormSo
         stmt = stmt.where(Form.title.ilike(f"%{query.strip()}%"))
     forms = list(db.scalars(stmt))
     counts = _response_counts(db, [f.id for f in forms])
+    starts = _start_counts(db, [f.id for f in forms])
 
     sort_keys = {
         "updated": (lambda f: f.updated_at, True),
@@ -66,6 +78,9 @@ def list_forms(db: Session, creator: Creator, *, query: str | None, sort: FormSo
             status=f.status,
             slug=f.slug,
             response_count=counts.get(f.id, 0),
+            completion_rate=(
+                round(min(100.0, 100 * counts.get(f.id, 0) / starts[f.id]), 1) if starts.get(f.id) else None
+            ),
             question_count=len(f.questions),
             has_unpublished_changes=has_unpublished_changes(f),
             theme=read_settings(f).theme,

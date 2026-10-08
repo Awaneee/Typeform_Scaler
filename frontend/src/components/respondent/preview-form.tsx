@@ -23,7 +23,10 @@ export function PreviewFormView({ formId }: { formId: string }) {
   return (
     <div className="relative">
       <div className="fixed top-3 left-1/2 z-20 flex -translate-x-1/2 items-center gap-3 rounded-full bg-[#191919] py-1.5 pr-1.5 pl-4 text-xs whitespace-nowrap text-white shadow-lg">
-        <Eye size={14} /> Preview<span className="hidden sm:inline"> mode · responses aren&apos;t saved</span>
+        <Eye size={14} />
+        <span>
+          Preview<span className="hidden sm:inline"> mode · responses aren&apos;t saved</span>
+        </span>
         <button onClick={() => window.close()} className="rounded-full p-1 hover:bg-white/20" aria-label="Close preview">
           <X size={14} />
         </button>

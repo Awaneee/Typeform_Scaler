@@ -1,8 +1,8 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
 import { AnswerField } from "@/components/questions/answers/answer-field";
 import { OkButton } from "@/components/questions/ok-button";
+import { QuestionNumber } from "@/components/questions/question-number";
 import { withAlpha } from "@/lib/color";
 import { getTheme, type Theme } from "@/lib/themes";
 import { cn } from "@/lib/utils";
@@ -24,7 +24,7 @@ export function Canvas({ device, onAdd }: { device: Device; onAdd: () => void })
   const question = index === -1 ? null : questions[index];
 
   return (
-    <div className="flex min-h-0 flex-1 items-stretch justify-center overflow-hidden p-4 sm:p-6">
+    <div className="flex min-h-0 flex-1 items-stretch justify-center overflow-hidden">
       <div
         className={cn(
           "relative flex w-full overflow-y-auto rounded-xl border border-line shadow-sm transition-[max-width] duration-300",
@@ -62,10 +62,7 @@ function QuestionEditor({ question, number, theme }: { question: Question; numbe
   return (
     <div>
       <div className="flex gap-2">
-        <span className="mt-[7px] flex shrink-0 items-center gap-1 self-start text-base" style={{ color: theme.answer }}>
-          {number}
-          <ArrowRight size={14} strokeWidth={2.5} />
-        </span>
+        <QuestionNumber number={number} theme={theme} />
         <div className="min-w-0 flex-1">
           {/* The hidden copy underneath has the same text and wrapping as the textarea, so the
               required asterisk lands right after the last word, like on the public form. */}
@@ -80,7 +77,7 @@ function QuestionEditor({ question, number, theme }: { question: Question; numbe
               placeholder="Your question here."
               aria-label="Question title"
               autoFocus={!question.title}
-              className="col-start-1 row-start-1 break-words placeholder:text-[var(--ph)]"
+              className="col-start-1 row-start-1 break-words placeholder:text-[var(--ph)] placeholder:italic"
               style={{ color: theme.question, ["--ph" as string]: withAlpha(theme.question, 0.35) }}
             />
             {question.required && <span className="sr-only" aria-label="required" />}
@@ -90,7 +87,7 @@ function QuestionEditor({ question, number, theme }: { question: Question; numbe
             onChange={(e) => update(question.id, { description: e.target.value })}
             placeholder="Description (optional)"
             aria-label="Question description"
-            className="mt-2 text-base leading-snug sm:text-lg placeholder:text-[var(--ph)]"
+            className="mt-2 text-base leading-snug sm:text-lg placeholder:text-[var(--ph)] placeholder:italic"
             style={{ color: withAlpha(theme.question, 0.7), ["--ph" as string]: withAlpha(theme.question, 0.3) }}
           />
           {error && <p className="mt-2 text-sm font-medium text-danger">{error}</p>}

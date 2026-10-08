@@ -89,3 +89,18 @@ def test_error_shape_for_unknown_form(client):
     res = client.get("/api/v1/forms/does-not-exist")
     assert res.status_code == 404
     assert res.json() == {"error": {"code": "not_found", "message": "Form not found.", "fields": None}}
+
+
+def test_list_includes_completion_rate(client):
+    q = qid()
+    form = make_form(client, [{"id": q, "type": "short_text", "title": "Name"}])
+    slug = publish(client, form["id"])["slug"]
+    sessions = [qid(), qid()]
+    for s in sessions:
+        client.post(f"/api/v1/public/forms/{slug}/sessions", json={"client_session_id": s, "event": "start"})
+    client.post(f"/api/v1/public/forms/{slug}/submissions",
+                json={"client_submission_id": qid(), "client_session_id": sessions[0], "answers": {q: "x"}})
+    row = next(f for f in client.get("/api/v1/forms").json() if f["id"] == form["id"])
+    assert row["completion_rate"] == 50.0
+    draft = client.post("/api/v1/forms", json={"title": "Fresh"}).json()
+    assert next(f for f in client.get("/api/v1/forms").json() if f["id"] == draft["id"])["completion_rate"] is None

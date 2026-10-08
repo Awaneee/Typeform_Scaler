@@ -175,15 +175,23 @@ export function useFormRunner(form: RunnerForm, modeProp: RunnerMode) {
     } else if (index === 0 && form.settings.welcome.enabled) go({ kind: "welcome" }, -1);
   }, [form.settings.welcome.enabled, go, history, index]);
 
-  /** Single-choice style answers advance on their own after a short pause, like Typeform. */
+  // "Submit" whenever OK would end the form (last question, or a jump to the end).
+  const isLast = !!current && nextIndex(questions, index, routingValue(questions, answers, current)) === null;
+
+  /** Single-choice style answers advance on their own after a short pause, like Typeform.
+   *  On the last question Typeform waits for an explicit Submit, so we do too. */
   const commit = useCallback(() => {
     clearTimeout(advanceTimer.current);
-    advanceTimer.current = setTimeout(() => nextRef.current(), AUTO_ADVANCE_MS);
+    advanceTimer.current = setTimeout(() => {
+      if (!isLastRef.current) nextRef.current();
+    }, AUTO_ADVANCE_MS);
   }, []);
   const nextRef = useRef(next);
+  const isLastRef = useRef(isLast);
   useEffect(() => {
     nextRef.current = next;
-  }, [next]);
+    isLastRef.current = isLast;
+  }, [next, isLast]);
 
   /** Upload controls for a file question. Preview mode keeps the file local and never uploads. */
   const uploadFor = useCallback(
@@ -228,8 +236,7 @@ export function useFormRunner(form: RunnerForm, modeProp: RunnerMode) {
     answeredCount,
     submitting,
     submitError,
-    // "Submit" whenever OK would end the form (last question, or a jump to the end).
-    isLast: !!current && nextIndex(questions, index, routingValue(questions, answers, current)) === null,
+    isLast,
     canGoBack: history.length > 0 || (index === 0 && form.settings.welcome.enabled),
     setAnswer,
     uploadFor,

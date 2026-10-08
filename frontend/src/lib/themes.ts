@@ -14,14 +14,37 @@ export interface Theme {
 }
 
 export const THEMES: Record<ThemeName, Theme> = {
+  // Typeform's current default look: near-white background, near-black text and buttons.
+  pearl: {
+    name: "pearl",
+    label: "Pearl White",
+    background: "#FAFAFA",
+    question: "#262627",
+    answer: "#262627",
+    button: "#29232B",
+    buttonText: "#FFFFFF",
+    font: "var(--font-inter), sans-serif",
+    fontLabel: "Inter",
+  },
   classic: {
     name: "classic",
-    label: "Classic",
+    label: "Classic Blue",
     background: "#FFFFFF",
     question: "#191919",
     answer: "#0445AF",
     button: "#0445AF",
     buttonText: "#FFFFFF",
+    font: "var(--font-inter), sans-serif",
+    fontLabel: "Inter",
+  },
+  inky: {
+    name: "inky",
+    label: "Inky Black",
+    background: "#29232B",
+    question: "#FFFFFF",
+    answer: "#FFFFFF",
+    button: "#FFFFFF",
+    buttonText: "#29232B",
     font: "var(--font-inter), sans-serif",
     fontLabel: "Inter",
   },
@@ -60,4 +83,4 @@ export const THEMES: Record<ThemeName, Theme> = {
   },
 };
 
-export const getTheme = (name: ThemeName | undefined) => THEMES[name ?? "classic"] ?? THEMES.classic;
+export const getTheme = (name: ThemeName | undefined) => THEMES[name ?? "pearl"] ?? THEMES.pearl;

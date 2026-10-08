@@ -21,7 +21,7 @@ export function initials(name: string) {
 export function AppHeader({ me }: { me: Me | null }) {
   const name = me?.name ?? "…";
   return (
-    <header className="flex h-14 items-center justify-between border-b border-line bg-surface px-4 sm:px-6">
+    <header className="flex h-12 shrink-0 items-center justify-between bg-surface px-3 sm:px-1">
       <div className="flex items-center gap-4">
         <Logo showText={false} />
         <Menu>

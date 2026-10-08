@@ -1,8 +1,7 @@
 "use client";
 
-import { Eye, Loader2 } from "lucide-react";
+import { ChevronRight, Loader2, PanelsTopLeft } from "lucide-react";
 import { ColorModeMenu } from "@/components/layout/color-mode-menu";
-import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useBuilder } from "@/store/builder-store";
@@ -15,12 +14,11 @@ interface TopBarProps {
   tab: BuilderTab;
   onTab: (tab: BuilderTab) => void;
   onBack: () => void;
-  onPreview: () => void;
   onPublish: () => void;
   publishing: boolean;
 }
 
-export function BuilderTopBar({ tab, onTab, onBack, onPreview, onPublish, publishing }: TopBarProps) {
+export function BuilderTopBar({ tab, onTab, onBack, onPublish, publishing }: TopBarProps) {
   const title = useBuilder((s) => s.title);
   const setTitle = useBuilder((s) => s.setTitle);
   const status = useBuilder((s) => s.status);
@@ -29,14 +27,12 @@ export function BuilderTopBar({ tab, onTab, onBack, onPreview, onPublish, publis
 
   return (
     <header className="grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-4 border-line bg-surface px-4">
-      <div className="flex min-w-0 items-center gap-2">
-        <span onClickCapture={(e) => { e.preventDefault(); onBack(); }}>
-          <Logo showText={false} />
-        </span>
-        <button onClick={onBack} className="hidden shrink-0 rounded-md px-1.5 py-1 text-sm text-muted hover:bg-selected hover:text-ink lg:block">
-          My workspace
+      {/* Breadcrumb like Typeform: "Forms › <title>" */}
+      <div className="flex min-w-0 items-center gap-1">
+        <button onClick={onBack} className="flex shrink-0 items-center gap-1.5 rounded-md px-1.5 py-1 text-sm text-muted hover:bg-selected hover:text-ink">
+          <PanelsTopLeft size={16} /> Forms
         </button>
-        <span className="hidden text-muted lg:inline">/</span>
+        <ChevronRight size={14} className="shrink-0 text-muted" aria-hidden />
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -71,9 +67,6 @@ export function BuilderTopBar({ tab, onTab, onBack, onPreview, onPublish, publis
           <SaveIndicator />
         </div>
         <ColorModeMenu />
-        <button onClick={onPreview} className="rounded-lg p-2 text-ink hover:bg-selected" aria-label="Preview" title="Preview">
-          <Eye size={18} />
-        </button>
         <Button size="sm" onClick={onPublish} disabled={publishing || upToDate}>
           {publishing && <Loader2 size={14} className="animate-spin" />}
           {upToDate ? "Published" : status === "published" ? "Publish changes" : "Publish"}

@@ -1,6 +1,8 @@
 "use client";
 
+import { Blocks } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { formatDate, plural } from "@/lib/format";
 import { getTheme } from "@/lib/themes";
 import type { FormSummary } from "@/types/form";
@@ -12,27 +14,31 @@ interface FormCollectionProps {
 }
 
 export function FormList({ forms, renderMenu }: FormCollectionProps) {
+  const cols = "sm:grid-cols-[minmax(0,1fr)_96px_96px_116px_96px_40px]";
   return (
-    <div className="overflow-hidden rounded-xl border border-line bg-surface">
-      <div className="hidden grid-cols-[minmax(0,1fr)_120px_140px_44px] gap-4 border-b border-line px-4 py-2.5 text-xs font-medium text-muted sm:grid">
-        <span>Name</span>
-        <span className="text-right">Responses</span>
-        <span>Updated</span>
+    <div>
+      <div className={`hidden gap-4 px-3 pb-2 text-sm text-muted sm:grid ${cols}`}>
+        <span aria-hidden />
+        <span className="text-center">Responses</span>
+        <span className="text-center">Completed</span>
+        <span className="text-center">Updated</span>
+        <span className="text-center">Integrations</span>
         <span />
       </div>
-      <ul className="divide-y divide-line">
+      {/* Each form is its own card, like Typeform's list. */}
+      <ul className="space-y-2">
         {forms.map((form) => (
           <li
             key={form.id}
-            className="group relative grid grid-cols-[minmax(0,1fr)_44px] items-center gap-4 px-4 py-3 hover:bg-bg sm:grid-cols-[minmax(0,1fr)_120px_140px_44px]"
+            className={`group relative grid grid-cols-[minmax(0,1fr)_44px] items-center gap-4 rounded-xl border border-line bg-surface p-2 pr-3 transition-shadow hover:shadow-sm ${cols}`}
           >
             <div className="flex min-w-0 items-center gap-3">
               <FormThumbnail theme={form.theme} title={form.title} />
               <div className="min-w-0">
-                {/* The stretched link makes the whole row clickable while keeping the menu separate. */}
+                {/* The stretched link makes the whole card clickable while keeping the menu separate. */}
                 <Link
                   href={`/forms/${form.id}/edit`}
-                  className="block truncate text-sm font-medium after:absolute after:inset-0 focus-visible:underline"
+                  className="block truncate text-sm font-semibold after:absolute after:inset-0 focus-visible:underline"
                 >
                   {form.title}
                 </Link>
@@ -42,8 +48,20 @@ export function FormList({ forms, renderMenu }: FormCollectionProps) {
                 </div>
               </div>
             </div>
-            <span className="hidden text-right text-sm tabular-nums sm:block">{form.response_count}</span>
-            <span className="hidden text-sm text-muted sm:block">{formatDate(form.updated_at)}</span>
+            <span className="hidden text-center text-sm tabular-nums sm:block">{form.response_count || "-"}</span>
+            <span className="hidden text-center text-sm tabular-nums sm:block">
+              {form.completion_rate === null ? "-" : `${Math.round(form.completion_rate)}%`}
+            </span>
+            <span className="hidden text-center text-sm text-muted sm:block">{formatDate(form.updated_at)}</span>
+            <span className="relative z-10 hidden justify-center sm:flex">
+              <button
+                onClick={() => toast("Integrations are coming soon")}
+                className="rounded-md border border-line p-1 text-muted hover:text-ink"
+                aria-label={`Add integrations: ${form.title}`}
+              >
+                <Blocks size={16} />
+              </button>
+            </span>
             <div className="relative z-10 flex justify-end">{renderMenu(form)}</div>
           </li>
         ))}

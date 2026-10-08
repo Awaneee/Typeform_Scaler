@@ -1,6 +1,6 @@
 "use client";
 
-import { Monitor, Plus, Smartphone } from "lucide-react";
+import { Monitor, Play, Plus, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -110,44 +110,46 @@ export function Builder({ formId }: { formId: string }) {
   if (!loaded) return <BuilderSkeleton />;
 
   return (
-    <div className="flex h-dvh flex-col bg-bg">
+    <div className="flex h-dvh flex-col bg-surface">
       <p className="bg-lavender px-4 py-2 text-center text-xs text-ink md:hidden">
         The builder works best on a larger screen. Your form itself works great on phones.
       </p>
-      <BuilderTopBar
-        tab={tab}
-        onTab={changeTab}
-        onBack={() => void withSaved(() => router.push("/workspace"))}
-        onPreview={() => void withSaved(() => window.open(`/forms/${formId}/preview`, "_blank"))}
-        onPublish={publish}
-        publishing={publishing}
-      />
+      <BuilderTopBar tab={tab} onTab={changeTab} onBack={() => void withSaved(() => router.push("/workspace"))} onPublish={publish} publishing={publishing} />
 
       {tab === "content" && (
-        <div className="flex min-h-0 flex-1">
-          <QuestionList onAdd={() => setPickerOpen(true)} />
-          <main className="flex min-w-0 flex-1 flex-col">
-            <div className="flex items-center justify-between gap-2 px-4 pt-4 sm:px-6">
-              <div className="flex items-center gap-2">
-                <button onClick={() => setPickerOpen(true)} className={cn(buttonStyles({ size: "sm" }), "h-8")}>
-                  <Plus size={15} /> Add content
-                </button>
-                <DesignPopover />
-                <SettingsDrawerButton onOpenLogic={() => setTab("workflow")} />
-              </div>
-              <div className="flex rounded-lg border border-line bg-surface p-0.5" role="group" aria-label="Preview device">
+        <div className="flex min-h-0 flex-1 gap-3 px-3 pb-3 sm:px-4 sm:pb-4">
+          <QuestionList onAdd={() => setPickerOpen(true)} onOpenLogic={() => setTab("workflow")} />
+          <main className="flex min-w-0 flex-1 flex-col gap-3">
+            {/* Toolbar card, like Typeform's: add content, design, then view tools. */}
+            <div className="flex items-center gap-1 rounded-xl bg-panel p-1.5">
+              <button onClick={() => setPickerOpen(true)} className={cn(buttonStyles({ size: "sm" }), "h-8")}>
+                <Plus size={15} /> Add content
+              </button>
+              <DesignPopover />
+              <SettingsDrawerButton onOpenLogic={() => setTab("workflow")} />
+              <span className="mx-1 h-5 w-px bg-line" aria-hidden />
+              <div className="flex" role="group" aria-label="Preview device">
                 {(["desktop", "mobile"] as const).map((d) => (
                   <button
                     key={d}
                     onClick={() => setDevice(d)}
                     aria-pressed={device === d}
                     aria-label={`${d} preview`}
-                    className={cn("rounded-md p-1.5", device === d ? "bg-selected text-ink" : "text-muted hover:text-ink")}
+                    title={d === "desktop" ? "Desktop view" : "Mobile view"}
+                    className={cn("rounded-md p-1.5", device === d ? "bg-hover-strong text-ink" : "text-muted hover:text-ink")}
                   >
-                    {d === "desktop" ? <Monitor size={15} /> : <Smartphone size={15} />}
+                    {d === "desktop" ? <Monitor size={16} /> : <Smartphone size={16} />}
                   </button>
                 ))}
               </div>
+              <button
+                onClick={() => void withSaved(() => window.open(`/forms/${formId}/preview`, "_blank"))}
+                className="rounded-md p-1.5 text-muted hover:text-ink"
+                aria-label="Preview"
+                title="Preview"
+              >
+                <Play size={16} />
+              </button>
             </div>
             <Canvas device={device} onAdd={() => setPickerOpen(true)} />
           </main>
