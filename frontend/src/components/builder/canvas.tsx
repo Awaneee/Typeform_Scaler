@@ -1,7 +1,8 @@
 "use client";
 
-import { ArrowRight, Check, CornerDownLeft } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { AnswerField } from "@/components/questions/answers/answer-field";
+import { OkButton } from "@/components/questions/ok-button";
 import { withAlpha } from "@/lib/color";
 import { getTheme, type Theme } from "@/lib/themes";
 import { cn } from "@/lib/utils";
@@ -105,25 +106,6 @@ function QuestionEditor({ question, number, theme }: { question: Question; numbe
           <OkButton theme={theme} />
         </div>
       </div>
-    </div>
-  );
-}
-
-export function OkButton({ theme, label = "OK", onClick }: { theme: Theme; label?: string; onClick?: () => void }) {
-  return (
-    <div className="mt-6 flex items-center gap-3">
-      <button
-        type="button"
-        onClick={onClick}
-        tabIndex={onClick ? undefined : -1}
-        className="flex items-center gap-1.5 rounded-[4px] px-4 py-2 text-lg font-bold shadow-sm transition-opacity hover:opacity-90"
-        style={{ background: theme.button, color: theme.buttonText }}
-      >
-        {label} <Check size={18} strokeWidth={3} />
-      </button>
-      <span className="hidden items-center gap-1 text-xs sm:flex" style={{ color: withAlpha(theme.question, 0.7) }}>
-        press <strong>Enter</strong> <CornerDownLeft size={12} />
-      </span>
     </div>
   );
 }

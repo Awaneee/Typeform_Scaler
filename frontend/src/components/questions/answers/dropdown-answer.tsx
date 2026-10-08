@@ -6,7 +6,7 @@ import { withAlpha } from "@/lib/color";
 import type { AnswerProps } from "./types";
 
 /** Typeform's dropdown is a type-to-filter combobox with an inline list. */
-export function DropdownAnswer({ question, value, onChange, theme, preview, active, onCommit }: AnswerProps) {
+export function DropdownAnswer({ question, value, onChange, theme, preview, active, onSubmit, onCommit }: AnswerProps) {
   const selected = question.options.find((o) => o.id === value);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -42,6 +42,11 @@ export function DropdownAnswer({ question, value, onChange, theme, preview, acti
       e.preventDefault();
       e.stopPropagation();
       choose(matches[highlight].id);
+    } else if (e.key === "Enter") {
+      // List closed (or nothing matches): Enter means "OK", like other questions.
+      e.preventDefault();
+      setOpen(false);
+      onSubmit?.();
     } else if (e.key === "Escape" && open) {
       e.stopPropagation();
       setOpen(false);
