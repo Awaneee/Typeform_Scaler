@@ -109,7 +109,7 @@ test("Shareable public link generated (`/to/<slug>`, copy link in workspace + bu
   await page.getByRole("menuitem", { name: "Copy link" }).click();
   await expect(page.getByText("Link copied to clipboard")).toBeVisible();
   const copied = await page.evaluate(() => navigator.clipboard.readText());
-  expect(copied).toBe(`http://localhost:3000/to/${form.slug}`);
+  expect(copied).toBe(`${new URL(page.url()).origin}/to/${form.slug}`); // built from the site's own origin
 
   await page.goto(`/forms/${form.id}/edit`);
   await page.getByRole("button", { name: "share" }).click();

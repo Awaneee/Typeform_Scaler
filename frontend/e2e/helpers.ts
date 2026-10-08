@@ -63,7 +63,9 @@ export async function waitSaved(page: Page) {
 /** Deletes every form created by the tests (titles start with PREFIX). */
 export async function cleanup(request: APIRequestContext) {
   const forms: { id: string; title: string }[] = await (await request.get(`${API}/forms`)).json();
-  for (const f of forms.filter((f) => f.title.startsWith(PREFIX) || f.title === "My new form")) {
+  // "My new form" is what "Start from scratch" creates; only clean those up locally, never on a live site.
+  const local = !process.env.E2E_BASE_URL;
+  for (const f of forms.filter((f) => f.title.startsWith(PREFIX) || (local && f.title === "My new form"))) {
     await request.delete(`${API}/forms/${f.id}`);
   }
 }

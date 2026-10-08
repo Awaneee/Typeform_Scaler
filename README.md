@@ -3,7 +3,7 @@
 A full-stack clone of Typeform: build forms with a drag-and-drop builder, publish them as a shareable link,
 collect answers through the one-question-at-a-time conversational flow, and analyse the results.
 
-- **Live demo:** _added after deployment_
+- **Live demo:** <https://typeform-scaler.vercel.app> (API: <https://backend-production-4bd9.up.railway.app/docs>)
 - **Stack:** Next.js 16 (TypeScript) · FastAPI (Python) · SQLite · SQLAlchemy 2 · Alembic
 - **Tests:** 51 backend tests (pytest) and 46 end-to-end browser tests (Playwright), one per feature
 
@@ -411,9 +411,14 @@ Live: `https://backend-production-4bd9.up.railway.app` (health: `/api/v1/health`
 
 ### Frontend on Vercel
 
-1. *Add new project* → this repo, **Root directory** `frontend` (framework: Next.js).
-2. Environment variable: `BACKEND_URL=https://<your-backend>.up.railway.app`.
-3. Deploy. Share links are built from the page's own origin, so they automatically use the Vercel domain.
+Live: <https://typeform-scaler.vercel.app>
+
+1. *Add new project* → this repo, **Root directory** `frontend` (framework: Next.js). Every push to `main` redeploys.
+2. Environment variable: `BACKEND_URL=https://backend-production-4bd9.up.railway.app`.
+3. Share links are built from the page's own origin, so they automatically use the Vercel domain.
+
+The live deployment passes the full end-to-end suite: `set E2E_BASE_URL=https://typeform-scaler.vercel.app&& npm run test:e2e`
+(each test creates and deletes its own "E2E" forms).
 
 ---
 
