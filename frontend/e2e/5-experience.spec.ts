@@ -1,4 +1,4 @@
-import { createForm, expect, onQuestion, opts, q, test } from "./helpers";
+import { createForm, expect, onQuestion, opts, PREFIX, q, submit, test } from "./helpers";
 
 /** 5. Typeform Experience + placeholders */
 
@@ -116,4 +116,30 @@ test.describe("Mocked / placeholder sections", () => {
     await page.waitForLoadState("networkidle"); // let React hydrate before clicking
     await expect(page.getByRole("button", { name: `${me.name}'s account` })).toBeVisible();
   });
+});
+
+test("Responsive: every main screen fits a phone without sideways scrolling", async ({ page, request }) => {
+  const form = await createForm(
+    request,
+    "Mobile",
+    [q("multiple_choice", "Pick a colour", { options: opts("Red", "Blue") })],
+    { publish: true },
+  );
+  await submit(request, form.slug!, {});
+  await page.setViewportSize({ width: 390, height: 844 });
+  const fits = async () =>
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
+
+  await page.goto("/workspace");
+  await expect(page.getByRole("link", { name: PREFIX + "Mobile" }).first()).toBeVisible();
+  await fits();
+  await page.goto(`/forms/${form.id}/edit`);
+  await expect(page.getByRole("button", { name: "Add content" }).first()).toBeVisible();
+  await fits();
+  await page.goto(`/forms/${form.id}/results`);
+  await expect(page.getByText("At a glance")).toBeVisible();
+  await fits();
+  await page.goto(`/to/${form.slug}`);
+  await onQuestion(page, "Pick a colour");
+  await fits();
 });

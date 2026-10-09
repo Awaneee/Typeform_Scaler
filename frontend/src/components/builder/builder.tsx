@@ -126,11 +126,11 @@ export function Builder({ formId }: { formId: string }) {
       />
 
       {tab === "content" && (
-        <div className="flex min-h-0 flex-1 gap-3 px-3 pb-3 sm:px-4 sm:pb-4">
+        <div className="flex min-h-0 flex-1 flex-col gap-3 px-3 pb-3 sm:px-4 sm:pb-4 md:flex-row">
           <QuestionList onAdd={() => setPickerOpen(true)} onOpenLogic={() => setTab("workflow")} />
-          <main className="flex min-w-0 flex-1 flex-col gap-3">
+          <main className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
             {/* Toolbar card, like Typeform's: add content, design, then view tools. */}
-            <div className="bg-panel flex items-center gap-1 rounded-xl p-1.5">
+            <div className="bg-panel flex shrink-0 items-center gap-1 overflow-x-auto rounded-xl p-1.5 [&>*]:shrink-0">
               <button onClick={() => setPickerOpen(true)} className={cn(buttonStyles({ size: "sm" }), "h-8")}>
                 <Plus size={15} /> Add content
               </button>

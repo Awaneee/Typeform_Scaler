@@ -45,7 +45,7 @@ export function QuestionList({ onAdd, onOpenLogic }: { onAdd: () => void; onOpen
   }
 
   return (
-    <aside className="flex w-[256px] shrink-0 flex-col gap-3">
+    <aside className="flex w-full shrink-0 flex-col gap-3 max-md:max-h-[38vh] md:w-[256px]">
       <section className="bg-panel flex min-h-0 flex-1 flex-col rounded-xl p-3" aria-label="Questions panel">
         <h2 className="px-2 pt-1 pb-3 text-sm font-semibold">Questions</h2>
         <div className="min-h-0 flex-1 overflow-y-auto">
@@ -83,7 +83,7 @@ export function QuestionList({ onAdd, onOpenLogic }: { onAdd: () => void; onOpen
         </div>
         <button
           onClick={onOpenLogic}
-          className="border-line hover:bg-surface mt-3 flex items-center justify-between gap-2 rounded-lg border border-dashed px-3 py-2.5 text-left text-sm font-medium"
+          className="border-line hover:bg-surface mt-3 flex items-center justify-between gap-2 rounded-lg border border-dashed px-3 py-2.5 text-left text-sm font-medium max-md:hidden"
         >
           <span className="flex items-center gap-2">
             <Lightbulb size={16} className="shrink-0" /> Personalize with branching

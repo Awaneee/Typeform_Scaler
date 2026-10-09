@@ -4,14 +4,14 @@ import Link from "next/link";
 import { ColorModeMenu } from "@/components/layout/color-mode-menu";
 import { HelpButton, ProfileMenu, useMe } from "@/components/layout/profile-menu";
 import { ChevronRight, PanelsTopLeft } from "lucide-react";
-import { BUILDER_TABS } from "@/components/builder/builder-top-bar";
+import { BUILDER_TABS, topBar } from "@/components/builder/builder-top-bar";
 import { cn } from "@/lib/utils";
 
 /** Same chrome as the builder, with "Results" active; the other tabs live in the builder. */
 export function ResultsTopBar({ formId, title }: { formId: string; title: string }) {
   const me = useMe();
   return (
-    <header className="border-line bg-surface grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b px-4 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-4">
+    <header className={topBar.header}>
       <div className="flex min-w-0 items-center gap-2">
         <Link
           href="/workspace"
@@ -22,7 +22,7 @@ export function ResultsTopBar({ formId, title }: { formId: string; title: string
         <ChevronRight size={14} className="text-muted shrink-0" aria-hidden />
         <span className="truncate px-1.5 text-sm font-medium">{title}</span>
       </div>
-      <nav className="flex gap-0.5 lg:gap-1" aria-label="Form sections">
+      <nav className={topBar.nav} aria-label="Form sections">
         {BUILDER_TABS.map((t) => {
           const active = t === "results";
           return (
@@ -31,12 +31,12 @@ export function ResultsTopBar({ formId, title }: { formId: string; title: string
               href={active ? `/forms/${formId}/results` : `/forms/${formId}/edit`}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "relative rounded-md px-2 py-1.5 text-sm capitalize lg:px-3",
+                topBar.tab,
                 active ? "text-ink font-medium" : "text-muted hover:bg-selected hover:text-ink",
               )}
             >
               {t}
-              {active && <span className="bg-ink absolute inset-x-2 -bottom-[11px] h-0.5 rounded-full" />}
+              {active && <span className={topBar.underline} />}
             </Link>
           );
         })}

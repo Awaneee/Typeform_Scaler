@@ -19,6 +19,18 @@ interface TopBarProps {
   publishing: boolean;
 }
 
+/**
+ * Header styles shared with the results page. One row on desktop; on phones the section tabs
+ * move to a second, horizontally scrollable row so nothing overlaps.
+ */
+export const topBar = {
+  header:
+    "border-line bg-surface grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 border-b px-4 pt-2 md:h-14 md:grid-cols-[minmax(0,1fr)_auto_auto] md:pt-0 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-4",
+  nav: "col-span-2 row-start-2 -mx-2 flex gap-0.5 overflow-x-auto md:col-span-1 md:row-start-auto md:mx-0 md:overflow-visible lg:gap-1",
+  tab: "relative shrink-0 rounded-md px-2 py-1.5 text-sm whitespace-nowrap capitalize lg:px-3",
+  underline: "bg-ink absolute inset-x-2 bottom-0 h-0.5 rounded-full md:-bottom-[11px]",
+};
+
 export function BuilderTopBar({ tab, onTab, onBack, onPublish, publishing }: TopBarProps) {
   const title = useBuilder((s) => s.title);
   const setTitle = useBuilder((s) => s.setTitle);
@@ -28,7 +40,7 @@ export function BuilderTopBar({ tab, onTab, onBack, onPublish, publishing }: Top
   const me = useMe();
 
   return (
-    <header className="border-line bg-surface grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b px-4 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-4">
+    <header className={topBar.header}>
       {/* Breadcrumb like Typeform: "Forms › <title>" */}
       <div className="flex min-w-0 items-center gap-1">
         <button
@@ -50,19 +62,19 @@ export function BuilderTopBar({ tab, onTab, onBack, onPublish, publishing }: Top
         />
       </div>
 
-      <nav className="flex gap-0.5 lg:gap-1" aria-label="Builder sections">
+      <nav className={topBar.nav} aria-label="Builder sections">
         {BUILDER_TABS.map((t) => (
           <button
             key={t}
             onClick={() => onTab(t)}
             aria-current={tab === t ? "page" : undefined}
             className={cn(
-              "relative rounded-md px-2 py-1.5 text-sm capitalize lg:px-3",
+              topBar.tab,
               tab === t ? "text-ink font-medium" : "text-muted hover:bg-selected hover:text-ink",
             )}
           >
             {t}
-            {tab === t && <span className="bg-ink absolute inset-x-2 -bottom-[11px] h-0.5 rounded-full" />}
+            {tab === t && <span className={topBar.underline} />}
           </button>
         ))}
       </nav>

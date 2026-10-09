@@ -7,7 +7,7 @@ collect answers through the one-question-at-a-time conversational flow, and anal
 
 - **Live demo:** <https://typeform-scaler.vercel.app> (API: <https://backend-production-4bd9.up.railway.app/docs>)
 - **Stack:** Next.js 16 (TypeScript) · FastAPI (Python) · SQLite · SQLAlchemy 2 · Alembic
-- **Tests:** 57 backend tests (pytest) and 47 end-to-end browser tests (Playwright), one per feature, run in CI on every push
+- **Tests:** 57 backend tests (pytest) and 48 end-to-end browser tests (Playwright), one per feature, run in CI on every push
 - **Requirements map:** [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md) links every line of the assignment to its code and the test that proves it
 - **Interview notes:** [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md)
 
@@ -397,7 +397,7 @@ cd backend; .\.venv\Scripts\Activate.ps1; ruff check .; ruff format --check .; p
 # Frontend: formatting (Prettier), lint (ESLint), types, production build
 cd frontend; npm run format:check; npm run lint; npm run typecheck; npm run build
 
-# End-to-end: 47 browser tests, one per requirement in docs/REQUIREMENTS.md
+# End-to-end: 48 browser tests, one per requirement in docs/REQUIREMENTS.md
 # (starts or reuses the backend on :8000 and frontend on :3000; uses the installed Chrome)
 cd frontend; npm run test:e2e
 ```

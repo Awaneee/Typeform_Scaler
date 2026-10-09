@@ -73,6 +73,7 @@ Paths: `fe/` = `frontend/src/`, `be/` = `backend/app/`.
 | Forms, modals, inline editing | Radix dialogs/menus (`fe/components/ui/*`), inline canvas editing | E2E "Forms, modals and inline editing" |
 | Notifications / toasts | Sonner toasts on every action | E2E "Notifications / toasts" |
 | Settings placeholders (theme, thank-you screen) | Design popover with 6 themes; editable thank-you screen | E2E "Settings placeholders (…)" |
+| (extra) Works on phones | Respondent flow is mobile-first; builder and results stack panels and scroll tabs below 768 px | E2E "Responsive: every main screen fits a phone without sideways scrolling" |
 
 ## Mocked / placeholder sections
 
