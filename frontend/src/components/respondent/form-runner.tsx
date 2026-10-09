@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertTriangle, ChevronDown, ChevronUp, CircleCheck } from "lucide-react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react";
 import Link from "next/link";
 import { useEffect } from "react";
 import { AnswerField } from "@/components/questions/answers/answer-field";
@@ -47,11 +47,17 @@ export function FormRunner({ form, mode }: FormRunnerProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, [next, previous, screen.kind]);
 
-  const offset = reduceMotion ? 0 : 60;
-  const variants = {
-    enter: (dir: number) => ({ opacity: 0, y: dir * offset }),
-    center: { opacity: 1, y: 0 },
-    exit: (dir: number) => ({ opacity: 0, y: -dir * offset }),
+  // Timings measured on Typeform: the old question shoots ~150px away and is gone in ~0.15s,
+  // then the next one settles the last ~40px while fading in. Reduced motion: fade only.
+  const motionScale = reduceMotion ? 0 : 1;
+  const variants: Variants = {
+    enter: (dir: number) => ({ opacity: 0, y: dir * 40 * motionScale }),
+    center: { opacity: 1, y: 0, transition: { duration: reduceMotion ? 0.15 : 0.5, ease: [0.22, 1, 0.36, 1] } },
+    exit: (dir: number) => ({
+      opacity: 0,
+      y: -dir * 150 * motionScale,
+      transition: { y: { duration: 0.3, ease: [0.33, 1, 0.68, 1] }, opacity: { duration: 0.15, ease: "easeOut" } },
+    }),
   };
   const key = screen.kind === "question" ? current!.id : screen.kind;
   const progress = total ? runner.answeredCount / total : 0;
@@ -87,7 +93,6 @@ export function FormRunner({ form, mode }: FormRunnerProps) {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ duration: reduceMotion ? 0.15 : 0.35, ease: [0.22, 1, 0.36, 1] }}
           className="flex min-h-0 flex-1 overflow-y-auto"
         >
           <div className="m-auto w-full max-w-[720px] px-6 py-16 sm:px-10">

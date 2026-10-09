@@ -19,7 +19,8 @@ export type RunnerMode = { kind: "live"; slug: string } | { kind: "preview" };
 
 type Screen = { kind: "welcome" } | { kind: "question"; index: number } | { kind: "thankyou" };
 
-const AUTO_ADVANCE_MS = 350;
+/** Typeform keeps a picked choice on screen for about 0.8s before moving on. */
+const AUTO_ADVANCE_MS = 750;
 const PARTIAL_SAVE_MS = 1000;
 
 /** All respondent-flow logic: navigation, validation, auto-advance, submission, session tracking. */

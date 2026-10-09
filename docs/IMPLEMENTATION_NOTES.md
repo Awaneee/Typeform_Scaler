@@ -111,10 +111,12 @@ Files: `frontend/src/hooks/use-form-runner.ts` (logic) and `frontend/src/compone
 - **Next:** validate the current answer (`lib/validation.ts`) → work out the next question with the logic rules
   (`lib/logic.ts`) → animate to it, or submit if the form ends.
 - **Transitions:** Motion's `AnimatePresence` with `mode="wait"`; the direction decides whether the question slides
-  up or down; with "reduce motion" it only fades.
+  up or down; with "reduce motion" it only fades. The timings were measured on a real Typeform form: the old
+  question shoots ~150 px away and is invisible within ~0.15 s, then the next one fades in while settling ~40 px.
 - **Keyboard:** Enter / ↓ next, ↑ back (single-line fields too), letter keys for choices, Y/N, number keys for ratings,
   Shift+Enter for a new line in long text. Arrow keys are left alone inside long text and the dropdown.
-- **Auto-advance:** picking a single choice / yes-no / rating / dropdown option moves on after 350 ms.
+- **Auto-advance:** picking a single choice / yes-no / rating / dropdown option moves on after 750 ms, so the
+  respondent sees their pick (Typeform holds about 0.8 s).
 
 **Q: What if someone double-clicks Submit or the network retries?** The browser creates a `client_submission_id`
 once per fill. The column is unique; the server returns the existing submission when the id repeats.
