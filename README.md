@@ -10,7 +10,6 @@ collect answers through the one-question-at-a-time conversational flow, and anal
 - **Stack:** Next.js 16 (TypeScript) · FastAPI (Python) · SQLite · SQLAlchemy 2 · Alembic
 - **Tests:** 58 backend tests (pytest) and 48 end-to-end browser tests (Playwright), one per feature, run in CI on every push
 - **Requirements map:** [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md) links every line of the assignment to its code and the test that proves it
-- **Interview notes:** [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md)
 
 **Try it in two minutes:** open the [live demo](https://typeform-scaler.vercel.app) → **Create form** → *Start from
 scratch* → add a few questions, drag one to reorder it, toggle *Required* → **Publish** and copy the share link → fill
@@ -33,12 +32,11 @@ data. No login is needed anywhere.
 | Criterion | Where to look |
 |---|---|
 | **Functionality** | [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md) maps every core and bonus requirement to its code and a passing test. 48 Playwright tests ([`frontend/e2e/`](frontend/e2e)) drive the real app, locally, in CI and against the live deployment. Builder: [`components/builder/`](frontend/src/components/builder); respondent flow: [`form-runner.tsx`](frontend/src/components/respondent/form-runner.tsx) + [`use-form-runner.ts`](frontend/src/hooks/use-form-runner.ts) |
-| **UI/UX** | Screenshots above. Workspace, builder, respondent flow, share and results screens follow Typeform's current layout; the question transition timing was measured on a real Typeform form ([`IMPLEMENTATION_NOTES.md` §6](docs/IMPLEMENTATION_NOTES.md#6-respondent-flow)). Phone layouts are covered by an end-to-end test |
+| **UI/UX** | Screenshots above. Workspace, builder, respondent flow, share and results screens follow Typeform's current layout; the question transition timing was measured on a real Typeform form. Phone layouts are covered by an end-to-end test |
 | **Database design** | [Database schema](#database-schema) below: 10 tables, foreign keys with cascade / set-null rules, unique constraints, Alembic migrations ([`backend/alembic/versions/`](backend/alembic/versions)). Constraints are tested in [`test_schema.py`](backend/tests/test_schema.py); migrations keeping existing data in [`test_migrations.py`](backend/tests/test_migrations.py) |
 | **Backend / API design** | [API overview](#api-overview) below. Routes → services → models ([`api/v1`](backend/app/api/v1), [`services`](backend/app/services), [`models`](backend/app/models)); one error format; idempotent submissions; `409` on a stale autosave; OpenAPI docs at [`/docs`](https://backend-production-4bd9.up.railway.app/docs) |
 | **Code quality** | TypeScript strict, ESLint, Prettier and ruff, all enforced in [CI](.github/workflows/ci.yml) together with 58 backend tests and the end-to-end suite |
 | **Code modularity** | One question-type registry per side ([`question_types.py`](backend/app/validators/question_types.py), [`registry.ts`](frontend/src/components/questions/registry.ts)); the builder canvas and the public form share the same [answer components](frontend/src/components/questions/answers); UI primitives in [`components/ui/`](frontend/src/components/ui) |
-| **Code understanding** | [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) walks through each part and answers likely interview questions |
 
 ---
 
