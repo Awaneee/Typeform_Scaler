@@ -23,7 +23,7 @@ import {
 import type { LogicOp, Question, QuestionType } from "@/types/form";
 
 /** Front-end half of the question-type registry (the backend has the authoritative validators). */
-export interface QuestionTypeMeta {
+interface QuestionTypeMeta {
   type: QuestionType;
   label: string;
   icon: LucideIcon;
@@ -34,7 +34,7 @@ export interface QuestionTypeMeta {
   defaults: () => Pick<Question, "settings" | "options">;
 }
 
-export type Category = "Contact info" | "Choice" | "Rating & ranking" | "Text & Video" | "Other";
+type Category = "Contact info" | "Choice" | "Rating & ranking" | "Text & Video" | "Other";
 
 export const newId = () => crypto.randomUUID();
 
@@ -48,40 +48,76 @@ const options = (...labels: string[]) => labels.map((label) => ({ id: newId(), l
 
 export const QUESTION_REGISTRY: Record<QuestionType, QuestionTypeMeta> = {
   short_text: {
-    type: "short_text", label: "Short Text", icon: TextCursorInput, ...TEXT, category: "Text & Video",
+    type: "short_text",
+    label: "Short Text",
+    icon: TextCursorInput,
+    ...TEXT,
+    category: "Text & Video",
     defaults: () => ({ settings: {}, options: [] }),
   },
   long_text: {
-    type: "long_text", label: "Long Text", icon: AlignLeft, ...TEXT, category: "Text & Video",
+    type: "long_text",
+    label: "Long Text",
+    icon: AlignLeft,
+    ...TEXT,
+    category: "Text & Video",
     defaults: () => ({ settings: {}, options: [] }),
   },
   email: {
-    type: "email", label: "Email", icon: Mail, ...CONTACT, category: "Contact info",
+    type: "email",
+    label: "Email",
+    icon: Mail,
+    ...CONTACT,
+    category: "Contact info",
     defaults: () => ({ settings: { placeholder: "name@example.com" }, options: [] }),
   },
   number: {
-    type: "number", label: "Number", icon: Hash, ...OTHER, category: "Other",
+    type: "number",
+    label: "Number",
+    icon: Hash,
+    ...OTHER,
+    category: "Other",
     defaults: () => ({ settings: {}, options: [] }),
   },
   multiple_choice: {
-    type: "multiple_choice", label: "Multiple Choice", icon: ListChecks, ...CHOICE, category: "Choice",
+    type: "multiple_choice",
+    label: "Multiple Choice",
+    icon: ListChecks,
+    ...CHOICE,
+    category: "Choice",
     defaults: () => ({ settings: { allow_multiple: false }, options: options("Choice 1", "Choice 2") }),
   },
   dropdown: {
-    type: "dropdown", label: "Dropdown", icon: ChevronDown, ...CHOICE, category: "Choice",
+    type: "dropdown",
+    label: "Dropdown",
+    icon: ChevronDown,
+    ...CHOICE,
+    category: "Choice",
     defaults: () => ({ settings: {}, options: options("Option 1", "Option 2", "Option 3") }),
   },
   yes_no: {
-    type: "yes_no", label: "Yes/No", icon: ToggleRight, ...CHOICE, category: "Choice",
+    type: "yes_no",
+    label: "Yes/No",
+    icon: ToggleRight,
+    ...CHOICE,
+    category: "Choice",
     defaults: () => ({ settings: {}, options: [] }),
   },
   rating: {
-    type: "rating", label: "Rating", icon: Star, ...RATING, category: "Rating & ranking",
+    type: "rating",
+    label: "Rating",
+    icon: Star,
+    ...RATING,
+    category: "Rating & ranking",
     defaults: () => ({ settings: { steps: 5, shape: "star" }, options: [] }),
   },
   file_upload: {
-    type: "file_upload", label: "File Upload", icon: Upload, ...OTHER, category: "Other",
-    defaults: () => ({ settings: { max_size_mb: 10 }, options: [] }),
+    type: "file_upload",
+    label: "File Upload",
+    icon: Upload,
+    ...OTHER,
+    category: "Other",
+    defaults: () => ({ settings: { max_size_mb: 5 }, options: [] }),
   },
 };
 
@@ -97,11 +133,19 @@ export const LOGIC_OPS: Partial<Record<QuestionType, LogicOp[]>> = {
 export const hasOptions = (type: QuestionType) => type === "multiple_choice" || type === "dropdown";
 
 export function createQuestion(type: QuestionType): Question {
-  return { id: newId(), type, title: "", description: "", required: false, logic: [], ...QUESTION_REGISTRY[type].defaults() };
+  return {
+    id: newId(),
+    type,
+    title: "",
+    description: "",
+    required: false,
+    logic: [],
+    ...QUESTION_REGISTRY[type].defaults(),
+  };
 }
 
 /** Types shown in the picker but not implemented (assignment allows "Coming soon"). */
-export interface ComingSoonType {
+interface ComingSoonType {
   label: string;
   icon: LucideIcon;
   bg: string;

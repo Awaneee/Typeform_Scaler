@@ -13,7 +13,7 @@ export function q(type: string, title: string, extra: Record<string, unknown> = 
 
 export const opts = (...labels: string[]) => labels.map((label) => ({ id: uid(), label }));
 
-export interface TestForm {
+interface TestForm {
   id: string;
   slug: string | null;
   questions: Q[];
@@ -61,7 +61,7 @@ export async function waitSaved(page: Page) {
 }
 
 /** Deletes every form created by the tests (titles start with PREFIX). */
-export async function cleanup(request: APIRequestContext) {
+async function cleanup(request: APIRequestContext) {
   const forms: { id: string; title: string }[] = await (await request.get(`${API}/forms`)).json();
   // "My new form" is what "Start from scratch" creates; only clean those up locally, never on a live site.
   const local = !process.env.E2E_BASE_URL;

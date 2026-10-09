@@ -22,7 +22,10 @@ async function formWithResponses(request: Parameters<typeof createForm>[0], coun
   return form;
 }
 
-test("Per-form responses view (paginated table, newest first, answers resolved to labels)", async ({ page, request }) => {
+test("Per-form responses view (paginated table, newest first, answers resolved to labels)", async ({
+  page,
+  request,
+}) => {
   const form = await formWithResponses(request);
   await page.goto(`/forms/${form.id}/results`);
   await page.getByRole("button", { name: /^responses/i }).click();
@@ -36,7 +39,10 @@ test("Per-form responses view (paginated table, newest first, answers resolved t
   expect(page2.items).toHaveLength(1);
 });
 
-test("View an individual response in full (side panel, questions as that respondent saw them + form version)", async ({ page, request }) => {
+test("View an individual response in full (side panel, questions as that respondent saw them + form version)", async ({
+  page,
+  request,
+}) => {
   const form = await formWithResponses(request, 1);
   await page.goto(`/forms/${form.id}/results`);
   await page.getByRole("button", { name: /^responses/i }).click();
@@ -44,14 +50,19 @@ test("View an individual response in full (side panel, questions as that respond
   const panel = page.getByRole("dialog");
   await expect(panel.getByRole("heading", { name: "Response #1" })).toBeVisible();
   await expect(panel).toContainText("form version 1");
-  for (const text of ["Name", "Ada", "Colour", "Red", "Coming?", "Yes", "Rate", "5/5", "Age", "36"]) await expect(panel).toContainText(text);
+  for (const text of ["Name", "Ada", "Colour", "Red", "Coming?", "Yes", "Rate", "5/5", "Age", "36"])
+    await expect(panel).toContainText(text);
 });
 
-test("Basic summary stats per question (choice/yes-no bars with % and counts, rating average + distribution, number avg/min/max, recent text answers)", async ({ page, request }) => {
+test("Basic summary stats per question (choice/yes-no bars with % and counts, rating average + distribution, number avg/min/max, recent text answers)", async ({
+  page,
+  request,
+}) => {
   const form = await formWithResponses(request);
   await page.goto(`/forms/${form.id}/results`);
   await page.getByRole("button", { name: "Response summary" }).click();
-  const card = (title: string) => page.locator("section", { has: page.getByRole("heading", { name: title, exact: true }) });
+  const card = (title: string) =>
+    page.locator("section", { has: page.getByRole("heading", { name: title, exact: true }) });
   await expect(card("Colour")).toContainText("66.7% (2)"); // Red
   await expect(card("Colour")).toContainText("33.3% (1)"); // Green
   await expect(card("Coming?")).toContainText("66.7% (2)");

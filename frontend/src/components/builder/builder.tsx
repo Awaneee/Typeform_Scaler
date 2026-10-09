@@ -35,7 +35,9 @@ export function Builder({ formId }: { formId: string }) {
   const [justPublished, setJustPublished] = useState(false);
 
   useEffect(() => {
-    formsApi.get(formId).then(hydrate, (e) => setLoadError(e instanceof ApiError ? e.message : "Couldn't load this form."));
+    formsApi
+      .get(formId)
+      .then(hydrate, (e) => setLoadError(e instanceof ApiError ? e.message : "Couldn't load this form."));
   }, [formId, hydrate]);
 
   // Warn before closing the tab with unsaved edits.
@@ -110,24 +112,30 @@ export function Builder({ formId }: { formId: string }) {
   if (!loaded) return <BuilderSkeleton />;
 
   return (
-    <div className="flex h-dvh flex-col bg-surface">
-      <p className="bg-lavender px-4 py-2 text-center text-xs text-ink md:hidden">
+    <div className="bg-surface flex h-dvh flex-col">
+      <p className="bg-lavender text-ink px-4 py-2 text-center text-xs md:hidden">
         The builder works best on a larger screen. Your form itself works great on phones.
       </p>
-      <BuilderTopBar tab={tab} onTab={changeTab} onBack={() => void withSaved(() => router.push("/workspace"))} onPublish={publish} publishing={publishing} />
+      <BuilderTopBar
+        tab={tab}
+        onTab={changeTab}
+        onBack={() => void withSaved(() => router.push("/workspace"))}
+        onPublish={publish}
+        publishing={publishing}
+      />
 
       {tab === "content" && (
         <div className="flex min-h-0 flex-1 gap-3 px-3 pb-3 sm:px-4 sm:pb-4">
           <QuestionList onAdd={() => setPickerOpen(true)} onOpenLogic={() => setTab("workflow")} />
           <main className="flex min-w-0 flex-1 flex-col gap-3">
             {/* Toolbar card, like Typeform's: add content, design, then view tools. */}
-            <div className="flex items-center gap-1 rounded-xl bg-panel p-1.5">
+            <div className="bg-panel flex items-center gap-1 rounded-xl p-1.5">
               <button onClick={() => setPickerOpen(true)} className={cn(buttonStyles({ size: "sm" }), "h-8")}>
                 <Plus size={15} /> Add content
               </button>
               <DesignPopover />
               <SettingsDrawerButton onOpenLogic={() => setTab("workflow")} />
-              <span className="mx-1 h-5 w-px bg-line" aria-hidden />
+              <span className="bg-line mx-1 h-5 w-px" aria-hidden />
               <div className="flex" role="group" aria-label="Preview device">
                 {(["desktop", "mobile"] as const).map((d) => (
                   <button
@@ -136,7 +144,10 @@ export function Builder({ formId }: { formId: string }) {
                     aria-pressed={device === d}
                     aria-label={`${d} preview`}
                     title={d === "desktop" ? "Desktop view" : "Mobile view"}
-                    className={cn("rounded-md p-1.5", device === d ? "bg-hover-strong text-ink" : "text-muted hover:text-ink")}
+                    className={cn(
+                      "rounded-md p-1.5",
+                      device === d ? "bg-hover-strong text-ink" : "text-muted hover:text-ink",
+                    )}
                   >
                     {d === "desktop" ? <Monitor size={16} /> : <Smartphone size={16} />}
                   </button>
@@ -144,7 +155,7 @@ export function Builder({ formId }: { formId: string }) {
               </div>
               <button
                 onClick={() => void withSaved(() => window.open(`/forms/${formId}/preview`, "_blank"))}
-                className="rounded-md p-1.5 text-muted hover:text-ink"
+                className="text-muted hover:text-ink rounded-md p-1.5"
                 aria-label="Preview"
                 title="Preview"
               >
@@ -158,7 +169,9 @@ export function Builder({ formId }: { formId: string }) {
       )}
       {tab === "share" && <SharePanel publishing={publishing} onPublish={publish} onUnpublish={unpublish} />}
       {tab === "workflow" && <LogicEditor />}
-      {tab === "connect" && <ComingSoon title="Integrations" description="Webhooks and app integrations are on the way." />}
+      {tab === "connect" && (
+        <ComingSoon title="Integrations" description="Webhooks and app integrations are on the way." />
+      )}
 
       <QuestionPicker open={pickerOpen} onOpenChange={setPickerOpen} />
       <PublishedDialog open={justPublished} onOpenChange={setJustPublished} onShare={() => setTab("share")} />
@@ -166,18 +179,32 @@ export function Builder({ formId }: { formId: string }) {
   );
 }
 
-function PublishedDialog({ open, onOpenChange, onShare }: { open: boolean; onOpenChange: (o: boolean) => void; onShare: () => void }) {
+function PublishedDialog({
+  open,
+  onOpenChange,
+  onShare,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  onShare: () => void;
+}) {
   const slug = useBuilder((s) => s.slug);
   if (!slug) return null;
   return (
-    <Modal open={open} onOpenChange={onOpenChange} title="Your form is live! 🎉" description="Share this link to start collecting responses." className="max-w-lg">
+    <Modal
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Your form is live! 🎉"
+      description="Share this link to start collecting responses."
+      className="max-w-lg"
+    >
       <ShareLinkBox slug={slug} />
       <button
         onClick={() => {
           onOpenChange(false);
           onShare();
         }}
-        className="mt-4 text-sm font-medium text-teal hover:underline"
+        className="text-teal mt-4 text-sm font-medium hover:underline"
       >
         More sharing options
       </button>
@@ -188,9 +215,9 @@ function PublishedDialog({ open, onOpenChange, onShare }: { open: boolean; onOpe
 function BuilderSkeleton() {
   return (
     <div className="flex h-dvh flex-col" aria-busy="true" aria-label="Loading builder">
-      <div className="h-14 border-b border-line bg-surface" />
+      <div className="border-line bg-surface h-14 border-b" />
       <div className="flex flex-1">
-        <div className="w-[280px] space-y-2 border-r border-line bg-surface p-4">
+        <div className="border-line bg-surface w-[280px] space-y-2 border-r p-4">
           {[0, 1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-9 w-full" />
           ))}

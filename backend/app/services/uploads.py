@@ -11,7 +11,7 @@ import secrets
 from pathlib import Path
 
 from fastapi import UploadFile
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -25,6 +25,11 @@ CHUNK = 1024 * 1024
 class FileTooLargeError(AppError):
     status_code = 413
     code = "file_too_large"
+
+
+class StorageFullError(AppError):
+    status_code = 507
+    code = "storage_full"
 
 
 def upload_dir() -> Path:
@@ -41,9 +46,15 @@ def _safe_name(name: str | None) -> str:
 async def store_upload(db: Session, form: Form, version: FormVersion, question_id: str, file: UploadFile) -> FileUpload:
     question = next((q for q in version_definition(version).questions if q.id == question_id), None)
     if question is None or question.type != "file_upload":
-        raise ValidationFailedError("This question doesn't accept files.", fields={"question_id": "Not a file question."})
+        raise ValidationFailedError(
+            "This question doesn't accept files.", fields={"question_id": "Not a file question."}
+        )
 
-    limit = question.settings.get("max_size_mb", 10) * 1024 * 1024
+    used = db.scalar(select(func.coalesce(func.sum(FileUpload.size_bytes), 0))) or 0
+    if used >= get_settings().upload_storage_limit_mb * 1024 * 1024:
+        raise StorageFullError("File uploads are temporarily unavailable. Please try again later.")
+
+    limit = question.settings.get("max_size_mb", 5) * 1024 * 1024
     key = secrets.token_hex(16)
     target = upload_dir() / key
     size = 0
@@ -81,7 +92,12 @@ def claim_uploads(db: Session, form_id: str, questions, clean: dict, submission_
         if q.type != "file_upload" or q.id not in clean:
             continue
         upload = db.get(FileUpload, clean[q.id])
-        if upload is None or upload.form_id != form_id or upload.question_id != q.id or upload.submission_id not in (None, submission_id):
+        if (
+            upload is None
+            or upload.form_id != form_id
+            or upload.question_id != q.id
+            or upload.submission_id not in (None, submission_id)
+        ):
             errors[q.id] = "Please upload the file again."
         else:
             upload.submission_id = submission_id

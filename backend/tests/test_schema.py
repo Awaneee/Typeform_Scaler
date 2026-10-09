@@ -5,8 +5,17 @@ from sqlalchemy import inspect, text
 from app.core.db import engine
 
 EXPECTED_TABLES = {
-    "alembic_version", "creators", "workspaces", "forms", "questions", "question_options",
-    "form_versions", "submissions", "answers", "response_sessions", "file_uploads",
+    "alembic_version",
+    "creators",
+    "workspaces",
+    "forms",
+    "questions",
+    "question_options",
+    "form_versions",
+    "submissions",
+    "answers",
+    "response_sessions",
+    "file_uploads",
 }
 
 
@@ -33,7 +42,10 @@ def test_foreign_keys_and_delete_rules():
     assert _fks("submissions") == {"form_id": ("forms", "CASCADE"), "form_version_id": ("form_versions", "CASCADE")}
     # answers.question_id is deliberately NOT a foreign key (answers outlive deleted draft questions).
     assert _fks("answers") == {"submission_id": ("submissions", "CASCADE")}
-    assert _fks("response_sessions") == {"form_id": ("forms", "CASCADE"), "form_version_id": ("form_versions", "CASCADE")}
+    assert _fks("response_sessions") == {
+        "form_id": ("forms", "CASCADE"),
+        "form_version_id": ("form_versions", "CASCADE"),
+    }
     assert _fks("file_uploads") == {"form_id": ("forms", "CASCADE"), "submission_id": ("submissions", "SET NULL")}
 
 

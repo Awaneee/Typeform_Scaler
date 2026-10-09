@@ -23,18 +23,18 @@ export function Modal({ open, onOpenChange, title, description, children, classN
         <Dialog.Content
           className={cn(
             "fixed top-1/2 left-1/2 z-50 w-[calc(100vw-32px)] max-w-md -translate-x-1/2 -translate-y-1/2",
-            "rounded-xl bg-surface p-6 shadow-xl outline-none data-[state=open]:animate-[pop-in_150ms_ease-out]",
+            "bg-surface rounded-xl p-6 shadow-xl outline-none data-[state=open]:animate-[pop-in_150ms_ease-out]",
             className,
           )}
         >
           <Dialog.Title className="pr-8 text-lg font-semibold">{title}</Dialog.Title>
           {description ? (
-            <Dialog.Description className="mt-1 text-sm text-muted">{description}</Dialog.Description>
+            <Dialog.Description className="text-muted mt-1 text-sm">{description}</Dialog.Description>
           ) : (
             <Dialog.Description className="sr-only">{title}</Dialog.Description>
           )}
           <Dialog.Close
-            className="absolute top-4 right-4 rounded-md p-1 text-muted hover:bg-selected hover:text-ink"
+            className="text-muted hover:bg-selected hover:text-ink absolute top-4 right-4 rounded-md p-1"
             aria-label="Close"
           >
             <X size={18} />

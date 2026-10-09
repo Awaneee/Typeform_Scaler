@@ -6,14 +6,19 @@ from tests.conftest import make_form, publish, qid, submit
 
 def _file_form(client, max_mb=1):
     q = qid()
-    form = make_form(client, [{"id": q, "type": "file_upload", "title": "Your CV", "required": True,
-                               "settings": {"max_size_mb": max_mb}}])
+    form = make_form(
+        client,
+        [{"id": q, "type": "file_upload", "title": "Your CV", "required": True, "settings": {"max_size_mb": max_mb}}],
+    )
     return form, publish(client, form["id"])["slug"], q
 
 
 def _upload(client, slug, question_id, content=b"hello", name="cv.pdf"):
-    return client.post(f"/api/v1/public/forms/{slug}/uploads", data={"question_id": question_id},
-                       files={"file": (name, content, "application/pdf")})
+    return client.post(
+        f"/api/v1/public/forms/{slug}/uploads",
+        data={"question_id": question_id},
+        files={"file": (name, content, "application/pdf")},
+    )
 
 
 def test_upload_submit_and_download(client):

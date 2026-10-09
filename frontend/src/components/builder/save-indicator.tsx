@@ -9,27 +9,35 @@ export function SaveIndicator() {
 
   if (status === "saving" || status === "unsaved") {
     return (
-      <span className="flex items-center gap-1.5 text-xs text-muted" role="status">
+      <span className="text-muted flex items-center gap-1.5 text-xs" role="status">
         <Loader2 size={14} className="animate-spin" /> Saving…
       </span>
     );
   }
   if (status === "error") {
     return (
-      <button onClick={() => void flushSave()} className="flex items-center gap-1.5 text-xs text-danger" title={error ?? undefined}>
+      <button
+        onClick={() => void flushSave()}
+        className="text-danger flex items-center gap-1.5 text-xs"
+        title={error ?? undefined}
+      >
         <AlertCircle size={14} /> Couldn&apos;t save · Retry
       </button>
     );
   }
   if (status === "conflict") {
     return (
-      <button onClick={() => window.location.reload()} className="flex items-center gap-1.5 text-xs text-danger" title={error ?? undefined}>
+      <button
+        onClick={() => window.location.reload()}
+        className="text-danger flex items-center gap-1.5 text-xs"
+        title={error ?? undefined}
+      >
         <AlertCircle size={14} /> Changed elsewhere · Reload
       </button>
     );
   }
   return (
-    <span className="flex items-center gap-1.5 text-xs text-muted" role="status">
+    <span className="text-muted flex items-center gap-1.5 text-xs" role="status">
       <Check size={14} /> All changes saved
     </span>
   );

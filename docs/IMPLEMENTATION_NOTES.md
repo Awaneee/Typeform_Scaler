@@ -186,11 +186,22 @@ no providers, and works well with the autosave logic outside React.
 the form belongs to the current creator.
 
 **How would you scale it?** PostgreSQL instead of SQLite, S3 for uploads, several API instances behind a load balancer,
-caching published versions, background jobs for CSV export, rate limiting on public endpoints.
+caching published versions, background jobs for CSV export, and moving rate-limit counters to Redis.
 
 **What happens when two tabs edit the same form?** The second save has an old revision → 409 → that tab asks to reload.
 
 **How are old responses kept correct after edits?** They point at the version they answered; the builder edits only the draft.
 
-**What did you test?** 51 pytest tests (CRUD, autosave conflicts, publishing, every validation rule, logic paths,
-uploads, partial responses, analytics, schema) and 46 Playwright tests that drive the real app in Chrome, one per feature.
+**What did you test?** 57 pytest tests (CRUD, autosave conflicts, publishing, every validation rule, logic paths,
+uploads, partial responses, analytics, rate limits, demo restore, schema, migrations) and 47 Playwright tests that drive
+the real app in a browser, one per requirement. CI runs everything, plus lint and formatting, on every push.
+
+**How do you stop visitors from breaking the public demo?** Deleting and unpublishing are features being evaluated,
+so they're never blocked. Instead the seeded forms carry a `demo_key`, and a background task (startup + every 30 min)
+re-creates deleted demo forms and republishes unpublished ones (`backend/app/services/seed.py:restore_demo`).
+Public endpoints are rate limited per IP (`backend/app/core/rate_limit.py`), and uploads have per-file and total caps.
+
+**A bug you found and fixed?** SQLite can't alter tables in place, so Alembic rebuilds them (copy, drop old, rename).
+With foreign keys switched on, dropping the old `forms` table cascade-deleted every question and response. The fix
+switches foreign-key enforcement off while migrating and checks integrity afterwards (`backend/alembic/env.py`), and
+`backend/tests/test_migrations.py` migrates a database with data and asserts nothing is lost.

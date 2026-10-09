@@ -38,3 +38,8 @@ markdown.md
 
 # Typeform reference screenshots (local only)
 references/
+
+# Local tooling / personal notes (not part of the submission)
+.mcp.json
+frontend/AGENTS.md
+corefeatures.md

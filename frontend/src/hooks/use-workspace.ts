@@ -41,7 +41,7 @@ export function useWorkspace() {
 
   /** Runs an API call, toasts the outcome and refreshes the list. */
   const run = useCallback(
-    async <T,>(action: () => Promise<T>, success: string): Promise<T | undefined> => {
+    async <T>(action: () => Promise<T>, success: string): Promise<T | undefined> => {
       try {
         const result = await action();
         toast.success(success);

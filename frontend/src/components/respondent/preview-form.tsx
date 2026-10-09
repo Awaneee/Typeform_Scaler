@@ -14,7 +14,9 @@ export function PreviewFormView({ formId }: { formId: string }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    formsApi.get(formId).then(setForm, (e) => setError(e instanceof ApiError ? e.message : "Couldn't load the preview."));
+    formsApi
+      .get(formId)
+      .then(setForm, (e) => setError(e instanceof ApiError ? e.message : "Couldn't load the preview."));
   }, [formId]);
 
   if (error) return <StatusScreen title="Preview unavailable" text={error} />;
@@ -27,7 +29,11 @@ export function PreviewFormView({ formId }: { formId: string }) {
         <span>
           Preview<span className="hidden sm:inline"> mode · responses aren&apos;t saved</span>
         </span>
-        <button onClick={() => window.close()} className="rounded-full p-1 hover:bg-white/20" aria-label="Close preview">
+        <button
+          onClick={() => window.close()}
+          className="rounded-full p-1 hover:bg-white/20"
+          aria-label="Close preview"
+        >
           <X size={14} />
         </button>
       </div>

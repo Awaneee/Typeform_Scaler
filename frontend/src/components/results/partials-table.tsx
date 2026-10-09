@@ -7,15 +7,15 @@ import type { PartialPage } from "@/types/results";
 export function PartialsTable({ page }: { page: PartialPage }) {
   if (page.total === 0) {
     return (
-      <p className="rounded-xl border border-dashed border-line bg-surface p-10 text-center text-sm text-muted">
+      <p className="border-line bg-surface text-muted rounded-xl border border-dashed p-10 text-center text-sm">
         No partial responses. Everyone who started this form finished it.
       </p>
     );
   }
   return (
-    <div className="overflow-x-auto rounded-xl border border-line bg-surface">
+    <div className="border-line bg-surface overflow-x-auto rounded-xl border">
       <table className="w-full min-w-max text-left text-sm">
-        <thead className="border-b border-line bg-bg text-xs text-muted">
+        <thead className="border-line bg-bg text-muted border-b text-xs">
           <tr>
             <th className="px-4 py-2.5 font-medium">Last active</th>
             <th className="px-4 py-2.5 font-medium">Answered</th>
@@ -26,11 +26,11 @@ export function PartialsTable({ page }: { page: PartialPage }) {
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-line">
+        <tbody className="divide-line divide-y">
           {page.items.map((row) => (
             <tr key={row.id} aria-label="Partial response">
-              <td className="px-4 py-2.5 whitespace-nowrap text-muted">{formatDateTime(row.last_activity_at)}</td>
-              <td className="px-4 py-2.5 text-muted tabular-nums">
+              <td className="text-muted px-4 py-2.5 whitespace-nowrap">{formatDateTime(row.last_activity_at)}</td>
+              <td className="text-muted px-4 py-2.5 tabular-nums">
                 {row.answered} of {page.columns.filter((c) => !c.removed).length}
               </td>
               {page.columns.map((c) => (

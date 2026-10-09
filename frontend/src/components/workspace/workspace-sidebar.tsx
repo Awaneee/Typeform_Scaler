@@ -22,19 +22,19 @@ export function WorkspaceSidebar({ me, query, onQueryChange }: SidebarProps) {
   const [privateOpen, setPrivateOpen] = useState(true);
 
   return (
-    <aside className="hidden w-[256px] shrink-0 flex-col border-r border-line md:flex">
-      <div className="space-y-1 border-b border-line p-4">
+    <aside className="border-line hidden w-[256px] shrink-0 flex-col border-r md:flex">
+      <div className="border-line space-y-1 border-b p-4">
         <Link href="/forms/new" className={cn(buttonStyles(), "w-full")}>
           <Plus size={16} /> Create form
         </Link>
         <label className="relative mt-3 block">
-          <Search size={16} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted" />
+          <Search size={16} className="text-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2" />
           <input
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
             placeholder="Search"
             aria-label="Search forms"
-            className="h-9 w-full rounded-lg bg-transparent pr-3 pl-9 text-sm outline-none placeholder:text-ink hover:bg-hover-strong focus:bg-surface focus:ring-1 focus:ring-plum"
+            className="placeholder:text-ink hover:bg-hover-strong focus:bg-surface focus:ring-plum h-9 w-full rounded-lg bg-transparent pr-3 pl-9 text-sm outline-none focus:ring-1"
           />
         </label>
       </div>
@@ -46,7 +46,7 @@ export function WorkspaceSidebar({ me, query, onQueryChange }: SidebarProps) {
           </span>
           <button
             onClick={() => toast("Multiple workspaces are coming soon")}
-            className="flex h-7 w-7 items-center justify-center rounded-md border border-line bg-surface text-muted hover:text-ink"
+            className="border-line bg-surface text-muted hover:text-ink flex h-7 w-7 items-center justify-center rounded-md border"
             aria-label="New workspace"
           >
             <Plus size={14} />
@@ -61,30 +61,39 @@ export function WorkspaceSidebar({ me, query, onQueryChange }: SidebarProps) {
           <ChevronUp size={14} className={cn("transition-transform", !privateOpen && "rotate-180")} />
         </button>
         {privateOpen && (
-          <div className="mt-1 flex items-center justify-between rounded-md bg-hover-strong px-3 py-2 text-sm" aria-current="true">
+          <div
+            className="bg-hover-strong mt-1 flex items-center justify-between rounded-md px-3 py-2 text-sm"
+            aria-current="true"
+          >
             <span>{workspace?.name ?? "My workspace"}</span>
-            <span className="text-xs text-muted">{workspace?.form_count ?? ""}</span>
+            <span className="text-muted text-xs">{workspace?.form_count ?? ""}</span>
           </div>
         )}
         <button
           onClick={() => toast("Team collaboration is coming soon")}
-          className="mt-3 flex w-full items-center gap-2 rounded-md px-1 py-1.5 text-sm text-muted hover:text-ink"
+          className="text-muted hover:text-ink mt-3 flex w-full items-center gap-2 rounded-md px-1 py-1.5 text-sm"
         >
           <Plus size={14} /> Invite your team
         </button>
       </div>
 
-      <div className="space-y-3 border-t border-line p-4">
+      <div className="border-line space-y-3 border-t p-4">
         <div>
           <p className="mb-2 text-sm">Responses collected</p>
-          <div className="h-1.5 overflow-hidden rounded-full bg-line">
-            <div className="h-full rounded-full bg-ink" style={{ width: `${Math.min(100, (used / RESPONSE_LIMIT) * 100)}%` }} />
+          <div className="bg-line h-1.5 overflow-hidden rounded-full">
+            <div
+              className="bg-ink h-full rounded-full"
+              style={{ width: `${Math.min(100, (used / RESPONSE_LIMIT) * 100)}%` }}
+            />
           </div>
           <p className="mt-2 text-sm">
             <strong className="font-semibold">{used}</strong> <span className="text-muted">/ {RESPONSE_LIMIT}</span>
           </p>
         </div>
-        <button onClick={() => toast("Plans are coming soon")} className={cn(buttonStyles({ variant: "secondary", size: "sm" }))}>
+        <button
+          onClick={() => toast("Plans are coming soon")}
+          className={cn(buttonStyles({ variant: "secondary", size: "sm" }))}
+        >
           Increase response limit
         </button>
       </div>

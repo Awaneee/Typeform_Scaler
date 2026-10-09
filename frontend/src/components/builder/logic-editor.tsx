@@ -25,13 +25,13 @@ export function LogicEditor() {
           <h2 className="flex items-center gap-2 text-lg font-semibold">
             <GitBranch size={18} /> Logic
           </h2>
-          <p className="mt-1 text-sm text-muted">
-            Send people to different questions based on their answers. Rules are checked top to bottom; jumps can only go
-            forward. Without a matching rule, people continue to the next question.
+          <p className="text-muted mt-1 text-sm">
+            Send people to different questions based on their answers. Rules are checked top to bottom; jumps can only
+            go forward. Without a matching rule, people continue to the next question.
           </p>
         </div>
         {withLogic.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-line bg-surface p-8 text-center text-sm text-muted">
+          <p className="border-line bg-surface text-muted rounded-xl border border-dashed p-8 text-center text-sm">
             Add a multiple choice, dropdown, yes/no, rating or number question to use logic jumps.
           </p>
         ) : (
@@ -54,22 +54,31 @@ function QuestionLogic({ question, questions, error }: { question: Question; que
   const later = questions.slice(index + 1);
   const ops = LOGIC_OPS[question.type] ?? [];
   const rules = question.logic;
-  const update = (i: number, patch: Partial<LogicRule>) => setLogic(question.id, rules.map((r, j) => (j === i ? { ...r, ...patch } : r)));
+  const update = (i: number, patch: Partial<LogicRule>) =>
+    setLogic(
+      question.id,
+      rules.map((r, j) => (j === i ? { ...r, ...patch } : r)),
+    );
   const nextTitle = later[0] ? `${index + 2}. ${later[0].title || "Untitled"}` : "End of form";
 
   return (
-    <section className={cn("rounded-xl border bg-surface p-5", error ? "border-danger" : "border-line")}>
+    <section className={cn("bg-surface rounded-xl border p-5", error ? "border-danger" : "border-line")}>
       <div className="mb-4 flex items-center gap-2.5">
         <QuestionTypeBadge type={question.type} number={index + 1} />
         <h3 className="truncate font-medium">{question.title || "Untitled question"}</h3>
       </div>
-      {error && <p className="mb-3 text-sm text-danger">{error}</p>}
+      {error && <p className="text-danger mb-3 text-sm">{error}</p>}
 
       <ul className="space-y-2">
         {rules.map((rule, i) => (
-          <li key={i} className="flex flex-wrap items-center gap-2 rounded-lg bg-bg p-2 text-sm">
+          <li key={i} className="bg-bg flex flex-wrap items-center gap-2 rounded-lg p-2 text-sm">
             <span className="px-1 font-medium">If answer</span>
-            <select aria-label="Condition" value={rule.op} onChange={(e) => update(i, { op: e.target.value as LogicOp })} className={selectClass}>
+            <select
+              aria-label="Condition"
+              value={rule.op}
+              onChange={(e) => update(i, { op: e.target.value as LogicOp })}
+              className={selectClass}
+            >
               {ops.map((op) => (
                 <option key={op} value={op}>
                   {OP_LABELS[op]}
@@ -78,7 +87,12 @@ function QuestionLogic({ question, questions, error }: { question: Question; que
             </select>
             <ValueInput question={question} value={rule.value} onChange={(value) => update(i, { value })} />
             <ArrowRight size={16} className="text-muted" />
-            <select aria-label="Go to" value={rule.goto} onChange={(e) => update(i, { goto: e.target.value })} className={cn(selectClass, "max-w-56")}>
+            <select
+              aria-label="Go to"
+              value={rule.goto}
+              onChange={(e) => update(i, { goto: e.target.value })}
+              className={cn(selectClass, "max-w-56")}
+            >
               {later.map((q, j) => (
                 <option key={q.id} value={q.id}>
                   {index + j + 2}. {q.title || "Untitled"}
@@ -87,8 +101,13 @@ function QuestionLogic({ question, questions, error }: { question: Question; que
               <option value="end">End of form</option>
             </select>
             <button
-              onClick={() => setLogic(question.id, rules.filter((_, j) => j !== i))}
-              className="ml-auto rounded p-1.5 text-muted hover:bg-selected hover:text-ink"
+              onClick={() =>
+                setLogic(
+                  question.id,
+                  rules.filter((_, j) => j !== i),
+                )
+              }
+              className="text-muted hover:bg-selected hover:text-ink ml-auto rounded p-1.5"
               aria-label="Remove rule"
             >
               <X size={15} />
@@ -99,23 +118,41 @@ function QuestionLogic({ question, questions, error }: { question: Question; que
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm">
         <button
-          onClick={() => setLogic(question.id, [...rules, { op: ops[0], value: defaultValue(question), goto: later[0]?.id ?? "end" }])}
-          className="flex items-center gap-1 font-medium text-teal hover:underline"
+          onClick={() =>
+            setLogic(question.id, [
+              ...rules,
+              { op: ops[0], value: defaultValue(question), goto: later[0]?.id ?? "end" },
+            ])
+          }
+          className="text-teal flex items-center gap-1 font-medium hover:underline"
         >
           <Plus size={15} /> Add rule
         </button>
         <span className="text-muted">
-          All other cases go to <strong className="font-medium text-ink">{nextTitle}</strong>
+          All other cases go to <strong className="text-ink font-medium">{nextTitle}</strong>
         </span>
       </div>
     </section>
   );
 }
 
-function ValueInput({ question, value, onChange }: { question: Question; value: LogicRule["value"]; onChange: (v: LogicRule["value"]) => void }) {
+function ValueInput({
+  question,
+  value,
+  onChange,
+}: {
+  question: Question;
+  value: LogicRule["value"];
+  onChange: (v: LogicRule["value"]) => void;
+}) {
   if (question.type === "yes_no") {
     return (
-      <select aria-label="Value" value={String(value)} onChange={(e) => onChange(e.target.value === "true")} className={selectClass}>
+      <select
+        aria-label="Value"
+        value={String(value)}
+        onChange={(e) => onChange(e.target.value === "true")}
+        className={selectClass}
+      >
         <option value="true">Yes</option>
         <option value="false">No</option>
       </select>
@@ -135,7 +172,12 @@ function ValueInput({ question, value, onChange }: { question: Question; value: 
     );
   }
   return (
-    <select aria-label="Value" value={String(value)} onChange={(e) => onChange(e.target.value)} className={cn(selectClass, "max-w-48")}>
+    <select
+      aria-label="Value"
+      value={String(value)}
+      onChange={(e) => onChange(e.target.value)}
+      className={cn(selectClass, "max-w-48")}
+    >
       {question.options.map((o, i) => (
         <option key={o.id} value={o.id}>
           {o.label || `Choice ${i + 1}`}

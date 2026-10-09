@@ -11,7 +11,7 @@ Adding a new question type means adding one entry here and one validator.
 from dataclasses import dataclass
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 QuestionType = Literal[
     "short_text", "long_text", "multiple_choice", "dropdown", "email", "number", "yes_no", "rating", "file_upload"
@@ -62,7 +62,13 @@ class RatingSettings(_Settings):
 
 
 class FileUploadSettings(_Settings):
-    max_size_mb: int = Field(10, ge=1, le=10)
+    max_size_mb: int = Field(5, ge=1, le=5)
+
+    @field_validator("max_size_mb", mode="before")
+    @classmethod
+    def _clamp(cls, value):
+        # Forms saved before the 5 MB cap may say 10; cap them instead of failing to load.
+        return min(int(value), 5) if isinstance(value, int | float) else value
 
 
 @dataclass(frozen=True)

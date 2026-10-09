@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from "react";
 
 export type ColorMode = "light" | "dark" | "system";
-export const COLOR_MODE_KEY = "ff:color-mode";
+const COLOR_MODE_KEY = "ff:color-mode";
 
 /** Runs inline in <head> before first paint (see app/layout.tsx), so there is no light flash. */
 export const COLOR_MODE_SCRIPT = `(function(){try{var p=localStorage.getItem("${COLOR_MODE_KEY}")||"system";var d=p==="dark"||(p==="system"&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.setAttribute("data-theme",d?"dark":"light")}catch(e){}})()`;

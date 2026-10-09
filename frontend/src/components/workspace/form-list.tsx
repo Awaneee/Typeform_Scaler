@@ -17,7 +17,7 @@ export function FormList({ forms, renderMenu }: FormCollectionProps) {
   const cols = "sm:grid-cols-[minmax(0,1fr)_96px_96px_116px_96px_40px]";
   return (
     <div>
-      <div className={`hidden gap-4 px-3 pb-2 text-sm text-muted sm:grid ${cols}`}>
+      <div className={`text-muted hidden gap-4 px-3 pb-2 text-sm sm:grid ${cols}`}>
         <span aria-hidden />
         <span className="text-center">Responses</span>
         <span className="text-center">Completed</span>
@@ -30,7 +30,7 @@ export function FormList({ forms, renderMenu }: FormCollectionProps) {
         {forms.map((form) => (
           <li
             key={form.id}
-            className={`group relative grid grid-cols-[minmax(0,1fr)_44px] items-center gap-4 rounded-xl border border-line bg-surface p-2 pr-3 transition-shadow hover:shadow-sm ${cols}`}
+            className={`group border-line bg-surface relative grid grid-cols-[minmax(0,1fr)_44px] items-center gap-4 rounded-xl border p-2 pr-3 transition-shadow hover:shadow-sm ${cols}`}
           >
             <div className="flex min-w-0 items-center gap-3">
               <FormThumbnail theme={form.theme} title={form.title} />
@@ -44,7 +44,7 @@ export function FormList({ forms, renderMenu }: FormCollectionProps) {
                 </Link>
                 <div className="mt-0.5 flex items-center gap-2">
                   <StatusBadge status={form.status} changed={form.has_unpublished_changes} />
-                  <span className="text-xs text-muted sm:hidden">· {plural(form.response_count, "response")}</span>
+                  <span className="text-muted text-xs sm:hidden">· {plural(form.response_count, "response")}</span>
                 </div>
               </div>
             </div>
@@ -52,11 +52,11 @@ export function FormList({ forms, renderMenu }: FormCollectionProps) {
             <span className="hidden text-center text-sm tabular-nums sm:block">
               {form.completion_rate === null ? "-" : `${Math.round(form.completion_rate)}%`}
             </span>
-            <span className="hidden text-center text-sm text-muted sm:block">{formatDate(form.updated_at)}</span>
+            <span className="text-muted hidden text-center text-sm sm:block">{formatDate(form.updated_at)}</span>
             <span className="relative z-10 hidden justify-center sm:flex">
               <button
                 onClick={() => toast("Integrations are coming soon")}
-                className="rounded-md border border-line p-1 text-muted hover:text-ink"
+                className="border-line text-muted hover:text-ink rounded-md border p-1"
                 aria-label={`Add integrations: ${form.title}`}
               >
                 <Blocks size={16} />
@@ -74,7 +74,10 @@ export function FormGrid({ forms, renderMenu }: FormCollectionProps) {
   return (
     <ul className="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-4">
       {forms.map((form) => (
-        <li key={form.id} className="group relative overflow-hidden rounded-xl border border-line bg-surface transition-shadow hover:shadow-md">
+        <li
+          key={form.id}
+          className="group border-line bg-surface relative overflow-hidden rounded-xl border transition-shadow hover:shadow-md"
+        >
           <GridPreview form={form} />
           <div className="flex items-start justify-between gap-2 p-3">
             <div className="min-w-0">
@@ -84,7 +87,7 @@ export function FormGrid({ forms, renderMenu }: FormCollectionProps) {
               >
                 {form.title}
               </Link>
-              <p className="mt-1 text-xs text-muted">{plural(form.response_count, "response")}</p>
+              <p className="text-muted mt-1 text-xs">{plural(form.response_count, "response")}</p>
             </div>
             <div className="relative z-10">{renderMenu(form)}</div>
           </div>
@@ -98,7 +101,10 @@ export function FormGrid({ forms, renderMenu }: FormCollectionProps) {
 function GridPreview({ form }: { form: FormSummary }) {
   const theme = getTheme(form.theme);
   return (
-    <div className="relative flex h-32 flex-col justify-center gap-2 border-b border-line px-5 pt-6" style={{ background: theme.background }}>
+    <div
+      className="border-line relative flex h-32 flex-col justify-center gap-2 border-b px-5 pt-6"
+      style={{ background: theme.background }}
+    >
       <p className="line-clamp-2 text-[15px] leading-snug font-medium" style={{ color: theme.question }}>
         {form.title}
       </p>

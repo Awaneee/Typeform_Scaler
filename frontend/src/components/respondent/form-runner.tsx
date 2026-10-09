@@ -57,7 +57,10 @@ export function FormRunner({ form, mode }: FormRunnerProps) {
   const progress = total ? runner.answeredCount / total : 0;
 
   return (
-    <div className="relative flex h-dvh flex-col overflow-hidden" style={{ background: theme.background, fontFamily: theme.font }}>
+    <div
+      className="relative flex h-dvh flex-col overflow-hidden"
+      style={{ background: theme.background, fontFamily: theme.font }}
+    >
       {/* Progress: thin bar along the top. */}
       {screen.kind !== "thankyou" && total > 0 && (
         <div
@@ -69,7 +72,10 @@ export function FormRunner({ form, mode }: FormRunnerProps) {
           aria-valuemin={0}
           aria-valuemax={total}
         >
-          <div className="h-full transition-[width] duration-500 ease-out" style={{ width: `${progress * 100}%`, background: theme.answer }} />
+          <div
+            className="h-full transition-[width] duration-500 ease-out"
+            style={{ width: `${progress * 100}%`, background: theme.answer }}
+          />
         </div>
       )}
 
@@ -103,7 +109,11 @@ export function FormRunner({ form, mode }: FormRunnerProps) {
               />
             )}
             {screen.kind === "thankyou" && (
-              <ThankYouScreen form={form} theme={theme} onRestart={mode.kind === "preview" ? runner.restart : undefined} />
+              <ThankYouScreen
+                form={form}
+                theme={theme}
+                onRestart={mode.kind === "preview" ? runner.restart : undefined}
+              />
             )}
           </div>
         </motion.main>
@@ -154,7 +164,20 @@ interface QuestionScreenProps {
   upload?: Parameters<typeof AnswerField>[0]["upload"];
 }
 
-function QuestionScreen({ question, number, theme, value, error, onChange, onSubmit, onCommit, okLabel, submitting, submitError, upload }: QuestionScreenProps) {
+function QuestionScreen({
+  question,
+  number,
+  theme,
+  value,
+  error,
+  onChange,
+  onSubmit,
+  onCommit,
+  okLabel,
+  submitting,
+  submitError,
+  upload,
+}: QuestionScreenProps) {
   const headingId = `q-${question.id}`;
   return (
     <section aria-labelledby={headingId} className="flex gap-2 sm:gap-3">
@@ -165,12 +188,24 @@ function QuestionScreen({ question, number, theme, value, error, onChange, onSub
           {question.required && <span aria-label="required"> *</span>}
         </h1>
         {question.description && (
-          <p className="mt-2 text-base leading-snug whitespace-pre-line sm:text-lg" style={{ color: withAlpha(theme.question, 0.7) }}>
+          <p
+            className="mt-2 text-base leading-snug whitespace-pre-line sm:text-lg"
+            style={{ color: withAlpha(theme.question, 0.7) }}
+          >
             {question.description}
           </p>
         )}
         <div className="mt-8">
-          <AnswerField question={question} value={value} onChange={onChange} theme={theme} active onSubmit={onSubmit} onCommit={onCommit} upload={upload} />
+          <AnswerField
+            question={question}
+            value={value}
+            onChange={onChange}
+            theme={theme}
+            active
+            onSubmit={onSubmit}
+            onCommit={onCommit}
+            upload={upload}
+          />
         </div>
 
         <div aria-live="assertive">
@@ -181,7 +216,15 @@ function QuestionScreen({ question, number, theme, value, error, onChange, onSub
           )}
         </div>
 
-        {!error && <OkButton theme={theme} label={submitting ? "Submitting…" : okLabel} onClick={onSubmit} disabled={submitting} showCheck={okLabel === "OK"} />}
+        {!error && (
+          <OkButton
+            theme={theme}
+            label={submitting ? "Submitting…" : okLabel}
+            onClick={onSubmit}
+            disabled={submitting}
+            showCheck={okLabel === "OK"}
+          />
+        )}
       </div>
     </section>
   );
@@ -211,7 +254,12 @@ function ThankYouScreen({ form, theme, onRestart }: { form: RunnerForm; theme: T
   return (
     <>
       <div className="text-center">
-        <CircleCheck className="mx-auto mb-6 h-20 w-20" strokeWidth={1.25} style={{ color: theme.question }} aria-hidden />
+        <CircleCheck
+          className="mx-auto mb-6 h-20 w-20"
+          strokeWidth={1.25}
+          style={{ color: theme.question }}
+          aria-hidden
+        />
         <h1 className="text-2xl leading-snug sm:text-3xl" style={{ color: theme.question }}>
           {t.title || "Thanks for completing this form"}
         </h1>

@@ -14,7 +14,15 @@ interface ConfirmDialogProps {
   onConfirm: () => Promise<void> | void;
 }
 
-export function ConfirmDialog({ open, onOpenChange, title, description, confirmLabel, destructive, onConfirm }: ConfirmDialogProps) {
+export function ConfirmDialog({
+  open,
+  onOpenChange,
+  title,
+  description,
+  confirmLabel,
+  destructive,
+  onConfirm,
+}: ConfirmDialogProps) {
   const [busy, setBusy] = useState(false);
 
   async function handleConfirm() {

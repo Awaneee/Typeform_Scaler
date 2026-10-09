@@ -7,11 +7,14 @@ def _save(client, slug, session_id, answers):
 
 def test_partial_answers_are_saved_and_listed(client):
     name, email, pick = qid(), qid(), qid()
-    form = make_form(client, [
-        {"id": name, "type": "short_text", "title": "Name", "required": True},
-        {"id": email, "type": "email", "title": "Email", "required": True},
-        {"id": pick, "type": "dropdown", "title": "City", "options": [{"id": "pune", "label": "Pune"}]},
-    ])
+    form = make_form(
+        client,
+        [
+            {"id": name, "type": "short_text", "title": "Name", "required": True},
+            {"id": email, "type": "email", "title": "Email", "required": True},
+            {"id": pick, "type": "dropdown", "title": "City", "options": [{"id": "pune", "label": "Pune"}]},
+        ],
+    )
     slug = publish(client, form["id"])["slug"]
     session = qid()
     # Invalid email and unknown question are dropped; nothing is "required" yet.
@@ -33,8 +36,10 @@ def test_submitting_clears_the_partial(client):
     slug = publish(client, form["id"])["slug"]
     session = qid()
     _save(client, slug, session, {name: "Ada"})
-    res = client.post(f"/api/v1/public/forms/{slug}/submissions",
-                      json={"client_submission_id": qid(), "client_session_id": session, "answers": {name: "Ada"}})
+    res = client.post(
+        f"/api/v1/public/forms/{slug}/submissions",
+        json={"client_submission_id": qid(), "client_session_id": session, "answers": {name: "Ada"}},
+    )
     assert res.status_code == 201
     assert client.get(f"/api/v1/forms/{form['id']}/partials").json()["total"] == 0
     # A late autosave after submitting must not resurrect it.

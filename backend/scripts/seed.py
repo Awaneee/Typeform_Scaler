@@ -1,7 +1,7 @@
 """Seed demo data.
 
-    python -m scripts.seed           # seeds only if the database is empty
-    python -m scripts.seed --reset   # DELETES all data, then seeds (local dev only)
+python -m scripts.seed           # seeds only if the database is empty
+python -m scripts.seed --reset   # DELETES all data, then seeds (local dev only)
 """
 
 import argparse

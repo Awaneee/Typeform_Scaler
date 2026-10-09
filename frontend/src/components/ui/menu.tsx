@@ -15,7 +15,7 @@ export function MenuContent({ className, align = "end", ...props }: ComponentPro
         align={align}
         sideOffset={6}
         className={cn(
-          "z-50 min-w-52 rounded-lg border border-line bg-surface p-1 shadow-lg",
+          "border-line bg-surface z-50 min-w-52 rounded-lg border p-1 shadow-lg",
           "data-[state=open]:animate-[pop-in_120ms_ease-out]",
           className,
         )}
@@ -35,7 +35,7 @@ export function MenuItem({ icon, destructive, className, children, ...props }: M
     <DropdownMenu.Item
       className={cn(
         "flex cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-2 text-sm outline-none select-none",
-        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-selected",
+        "data-[highlighted]:bg-selected data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         destructive ? "text-danger" : "text-ink",
         className,
       )}
@@ -48,11 +48,13 @@ export function MenuItem({ icon, destructive, className, children, ...props }: M
 }
 
 export function MenuSeparator() {
-  return <DropdownMenu.Separator className="my-1 h-px bg-line" />;
+  return <DropdownMenu.Separator className="bg-line my-1 h-px" />;
 }
 
 export function MenuLabel({ children }: { children: ReactNode }) {
-  return <DropdownMenu.Label className="px-2.5 pt-2 pb-1 text-xs font-medium text-muted">{children}</DropdownMenu.Label>;
+  return (
+    <DropdownMenu.Label className="text-muted px-2.5 pt-2 pb-1 text-xs font-medium">{children}</DropdownMenu.Label>
+  );
 }
 
 export const MenuRadioGroup = DropdownMenu.RadioGroup;

@@ -16,8 +16,10 @@ def test_draft_edits_do_not_change_public_form_until_republish(client):
     form = make_form(client, [{"id": qid(), "type": "short_text", "title": "Old title"}])
     published = publish(client, form["id"])
     edited = dict(form["questions"][0], title="New title")
-    client.put(f"/api/v1/forms/{form['id']}/draft", json={
-        "revision": published["revision"], "title": "Test form", "settings": {}, "questions": [edited]})
+    client.put(
+        f"/api/v1/forms/{form['id']}/draft",
+        json={"revision": published["revision"], "title": "Test form", "settings": {}, "questions": [edited]},
+    )
 
     detail = client.get(f"/api/v1/forms/{form['id']}").json()
     assert detail["has_unpublished_changes"] is True

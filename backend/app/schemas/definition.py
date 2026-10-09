@@ -17,7 +17,7 @@ class OptionDef(BaseModel):
 
 
 class LogicRule(BaseModel):
-    """"If this question's answer <op> <value>, jump to <goto>" (a later question id, or "end")."""
+    """ "If this question's answer <op> <value>, jump to <goto>" (a later question id, or "end")."""
 
     op: Literal["is", "is_not", "gt", "lt"]
     value: bool | int | float | str

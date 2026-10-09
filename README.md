@@ -1,11 +1,25 @@
 # Formflow: a Typeform clone
 
+[![CI](https://github.com/Awaneee/Typeform_Scaler/actions/workflows/ci.yml/badge.svg)](https://github.com/Awaneee/Typeform_Scaler/actions/workflows/ci.yml)
+
 A full-stack clone of Typeform: build forms with a drag-and-drop builder, publish them as a shareable link,
 collect answers through the one-question-at-a-time conversational flow, and analyse the results.
 
 - **Live demo:** <https://typeform-scaler.vercel.app> (API: <https://backend-production-4bd9.up.railway.app/docs>)
 - **Stack:** Next.js 16 (TypeScript) · FastAPI (Python) · SQLite · SQLAlchemy 2 · Alembic
-- **Tests:** 51 backend tests (pytest) and 46 end-to-end browser tests (Playwright), one per feature
+- **Tests:** 57 backend tests (pytest) and 47 end-to-end browser tests (Playwright), one per feature, run in CI on every push
+- **Requirements map:** [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md) links every line of the assignment to its code and the test that proves it
+- **Interview notes:** [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md)
+
+| Workspace | Builder | Form (respondent) |
+|---|---|---|
+| ![Workspace](docs/screenshots/01-workspace.png) | ![Builder](docs/screenshots/02-builder.png) | ![Respondent flow](docs/screenshots/05-respondent-flow.png) |
+| **Question picker** | **Logic jumps** | **Thank-you screen** |
+| ![Question picker](docs/screenshots/03-question-picker.png) | ![Logic jumps](docs/screenshots/04-logic-jumps.png) | ![Thank-you screen](docs/screenshots/06-thank-you.png) |
+| **Results: performance** | **Results: summary** | **Single response** |
+| ![Form performance](docs/screenshots/07-results-performance.png) | ![Response summary](docs/screenshots/08-results-summary.png) | ![Response detail](docs/screenshots/09-response-detail.png) |
+| **Dark mode** | | |
+| ![Dark mode](docs/screenshots/10-dark-mode.png) | | |
 
 ---
 
@@ -56,11 +70,17 @@ On first start the backend seeds one creator and three forms:
 
 | Form | Status | Highlights |
 |---|---|---|
-| Event Registration | Live, 24 responses | Text, email, dropdown, multi-select, yes/no with a logic jump, rating |
+| Event Registration | Live, 24 responses | Pearl White theme; text, email, dropdown, multi-select, yes/no with a logic jump, rating |
 | Product Feedback | Live, 18 responses | Lavender theme, rating, choice, long text, number 0–10, optional email |
 | Job Application | Draft | Ocean theme, welcome screen, number, dropdown, long text, CV upload |
 
-Each live form also has views, starts and partial responses, so the results look realistic straight away.
+Each live form also has views, starts, partial responses and completion times, so the results look realistic
+straight away.
+
+**Self-healing demo.** The public demo is shared by many visitors, and every form can be renamed, unpublished
+and deleted (those are features). So the seeded forms carry a `demo_key`: on startup and every 30 minutes the
+backend re-creates a demo form that was deleted and republishes one that was unpublished. Other forms are never
+touched (`be/services/seed.py:restore_demo`).
 
 ---
 
@@ -121,6 +141,9 @@ or `.env.local` (frontend).
 | backend | `UPLOAD_DIR` | `<backend>/data/uploads` | Where uploaded files are stored |
 | backend | `CORS_ORIGINS` | `http://localhost:3000` | Origins allowed to call the API directly |
 | backend | `SEED_ON_EMPTY` | `true` | Seed demo data on first start |
+| backend | `DEMO_RESTORE_MINUTES` | `30` | How often deleted/unpublished demo forms are restored (`0` = off) |
+| backend | `RATE_LIMIT_ENABLED` | `true` | Per-IP limits on the public endpoints |
+| backend | `UPLOAD_STORAGE_LIMIT_MB` | `200` | Total disk space uploads may use |
 | frontend | `BACKEND_URL` | `http://127.0.0.1:8000` | Where Next.js proxies `/api/*` |
 
 ---
@@ -165,7 +188,7 @@ backend/
     schemas/       definition.py (form content), forms, public, results
     services/      forms, definitions, publishing, submissions, sessions, uploads, results, seed
     validators/    question_types.py, answers.py, logic.py
-  alembic/versions/  0001 initial schema · 0002 logic + file uploads · 0003 partial responses
+  alembic/versions/  0001 initial schema · 0002 logic + file uploads · 0003 partial responses · 0004 demo keys
   scripts/seed.py    tests/
 frontend/src/
   app/             workspace · forms/new · forms/[id]/{edit,preview,results} · to/[slug]
@@ -367,19 +390,23 @@ with matching HTTP status codes (404, 409, 413, 422, 500).
 ## Testing
 
 ```powershell
-# Backend: API, validation, logic jumps, uploads, partial responses, analytics, schema (51 tests)
-cd backend; .\.venv\Scripts\Activate.ps1; python -m pytest
+# Backend: lint + format check (ruff) and 57 tests: API, validation, logic, uploads, partial
+# responses, analytics, rate limits, demo restore, schema, and migrations keeping existing data
+cd backend; .\.venv\Scripts\Activate.ps1; ruff check .; ruff format --check .; python -m pytest
 
-# Frontend: types, lint, production build
-cd frontend; npx tsc --noEmit; npm run lint; npm run build
+# Frontend: formatting (Prettier), lint (ESLint), types, production build
+cd frontend; npm run format:check; npm run lint; npx tsc --noEmit; npm run build
 
-# End-to-end: 46 browser tests, one per feature in corefeatures.md
+# End-to-end: 47 browser tests, one per requirement in docs/REQUIREMENTS.md
 # (starts or reuses the backend on :8000 and frontend on :3000; uses the installed Chrome)
 cd frontend; npm run test:e2e
 ```
 
-Each end-to-end test is named after the feature it proves (for example "Reorder questions (drag-and-drop…)"),
+Each end-to-end test is named after the requirement it proves (for example "Reorder questions (drag-and-drop…)"),
 creates its own forms through the API, and cleans up after itself.
+
+**CI** (`.github/workflows/ci.yml`) runs all of the above on every push: backend lint and tests, frontend format,
+lint, types and build, then the full end-to-end suite against freshly started servers.
 
 ---
 
@@ -455,8 +482,8 @@ The live deployment passes the full end-to-end suite: `set E2E_BASE_URL=https://
 
 - Anyone with the deployed URL can use the creator workspace (consequence of the default-creator assumption).
   Next step: real authentication (sessions or OAuth) and per-creator access.
-- No rate limiting on public endpoints; uploads are limited to 10 MB per file. Next step: per-IP limits and
-  virus scanning for uploads.
+- Public endpoints have simple in-memory per-IP rate limits, and uploads are capped at 5 MB per file and 200 MB
+  in total. On several servers the limits would move to Redis; uploads would get virus scanning.
 - SQLite fits a single server. For more traffic: PostgreSQL, object storage (S3) for uploads, and a queue for exports.
 - Possible additions: more question types (date, opinion scale, ranking), templates, webhooks, custom theme editor,
   multi-question pages.

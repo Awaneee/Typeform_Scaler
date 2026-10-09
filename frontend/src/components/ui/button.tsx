@@ -26,7 +26,7 @@ export function buttonStyles({ variant = "primary", size = "md" }: { variant?: V
   );
 }
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
 }
@@ -35,12 +35,5 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   { variant = "primary", size = "md", className, type = "button", ...props },
   ref,
 ) {
-  return (
-    <button
-      ref={ref}
-      type={type}
-      className={cn(buttonStyles({ variant, size }), className)}
-      {...props}
-    />
-  );
+  return <button ref={ref} type={type} className={cn(buttonStyles({ variant, size }), className)} {...props} />;
 });

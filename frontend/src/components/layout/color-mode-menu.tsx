@@ -15,7 +15,7 @@ export function ColorModeMenu() {
   const Icon = resolved === "dark" ? Moon : Sun;
   return (
     <Menu>
-      <MenuTrigger className="rounded-md p-2 hover:bg-selected" aria-label="Appearance">
+      <MenuTrigger className="hover:bg-selected rounded-md p-2" aria-label="Appearance">
         <Icon size={18} />
       </MenuTrigger>
       <MenuContent className="min-w-40">

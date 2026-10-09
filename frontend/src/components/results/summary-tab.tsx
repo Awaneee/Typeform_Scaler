@@ -17,9 +17,9 @@ const formatDuration = (seconds: number | null) => {
 
 function PageHeading({ title, subtitle }: { title: string; subtitle: string }) {
   return (
-    <div className="border-b border-line pb-6">
+    <div className="border-line border-b pb-6">
       <h1 className="text-2xl">{title}</h1>
-      <p className="mt-1 text-muted">{subtitle}</p>
+      <p className="text-muted mt-1">{subtitle}</p>
     </div>
   );
 }
@@ -38,7 +38,7 @@ export function PerformanceTab({ data }: { data: FormAnalytics }) {
         <Stat label="Time to complete" value={formatDuration(data.avg_completion_seconds)} />
       </section>
 
-      <section className="rounded-xl bg-surface p-5">
+      <section className="bg-surface rounded-xl p-5">
         <h2 className="mb-4 text-sm font-semibold">Responses over the last 14 days</h2>
         <div className="h-48">
           <ResponsiveContainer width="100%" height="100%">
@@ -50,8 +50,20 @@ export function PerformanceTab({ data }: { data: FormAnalytics }) {
                 </linearGradient>
               </defs>
               <CartesianGrid vertical={false} stroke="var(--tf-border)" />
-              <XAxis dataKey="date" tickFormatter={(d: string) => shortDate.format(new Date(d))} tick={{ fontSize: 12, fill: "var(--tf-muted)" }} tickLine={false} axisLine={false} minTickGap={24} />
-              <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: "var(--tf-muted)" }} tickLine={false} axisLine={false} />
+              <XAxis
+                dataKey="date"
+                tickFormatter={(d: string) => shortDate.format(new Date(d))}
+                tick={{ fontSize: 12, fill: "var(--tf-muted)" }}
+                tickLine={false}
+                axisLine={false}
+                minTickGap={24}
+              />
+              <YAxis
+                allowDecimals={false}
+                tick={{ fontSize: 12, fill: "var(--tf-muted)" }}
+                tickLine={false}
+                axisLine={false}
+              />
               <Tooltip
                 labelFormatter={(d) => shortDate.format(new Date(String(d)))}
                 formatter={(v) => [v, "Responses"]}
@@ -70,11 +82,14 @@ export function PerformanceTab({ data }: { data: FormAnalytics }) {
 export function SummaryTab({ data }: { data: FormAnalytics }) {
   return (
     <div className="space-y-6">
-      <PageHeading title="Response summary" subtitle="A breakdown of form responses and key takeaways for each question." />
+      <PageHeading
+        title="Response summary"
+        subtitle="A breakdown of form responses and key takeaways for each question."
+      />
       {data.questions.length === 0 ? (
-        <div className="rounded-xl bg-surface p-16 text-center">
+        <div className="bg-surface rounded-xl p-16 text-center">
           <p className="text-2xl">Waiting for responses</p>
-          <p className="mt-2 text-muted">Your data will appear here.</p>
+          <p className="text-muted mt-2">Your data will appear here.</p>
         </div>
       ) : (
         data.questions.map((q, i) => <QuestionSummary key={q.question_id} q={q} number={i + 1} />)
@@ -85,7 +100,7 @@ export function SummaryTab({ data }: { data: FormAnalytics }) {
 
 function Stat({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="flex h-28 flex-col justify-between rounded-xl bg-surface p-3">
+    <div className="bg-surface flex h-28 flex-col justify-between rounded-xl p-3">
       <p className="text-sm font-medium">{label}</p>
       <p className="text-3xl tabular-nums">{value}</p>
     </div>
@@ -98,15 +113,19 @@ function QuestionSummary({ q, number }: { q: QuestionAnalytics; number: number }
   const total = q.answered + q.skipped;
 
   return (
-    <section className="rounded-xl bg-surface p-6">
+    <section className="bg-surface rounded-xl p-6">
       <div className="flex items-start gap-3">
         <QuestionTypeBadge type={type} number={number} />
         <div className="min-w-0">
           <h3 className="text-xl">
             {q.title || "Untitled question"}
-            {q.removed && <span className="ml-2 rounded bg-selected px-1.5 py-0.5 text-[11px] font-medium text-muted">Removed from form</span>}
+            {q.removed && (
+              <span className="bg-selected text-muted ml-2 rounded px-1.5 py-0.5 text-[11px] font-medium">
+                Removed from form
+              </span>
+            )}
           </h3>
-          <p className="mt-0.5 text-xs text-muted">
+          <p className="text-muted mt-0.5 text-xs">
             {q.answered} out of {total} {total === 1 ? "person" : "people"} answered this question
           </p>
         </div>
@@ -118,9 +137,12 @@ function QuestionSummary({ q, number }: { q: QuestionAnalytics; number: number }
           <div className="space-y-4">
             <p className="text-3xl font-semibold tabular-nums">
               {q.average ?? "–"}
-              <span className="ml-1 text-sm font-normal text-muted">average rating</span>
+              <span className="text-muted ml-1 text-sm font-normal">average rating</span>
             </p>
-            <ChoiceBars choices={[...q.choices].reverse().map((c) => ({ ...c, label: `${c.label} ★` }))} color={color} />
+            <ChoiceBars
+              choices={[...q.choices].reverse().map((c) => ({ ...c, label: `${c.label} ★` }))}
+              color={color}
+            />
           </div>
         )}
         {q.kind === "number" && (
@@ -132,8 +154,8 @@ function QuestionSummary({ q, number }: { q: QuestionAnalytics; number: number }
                 ["Highest", q.maximum],
               ] as const
             ).map(([label, value]) => (
-              <div key={label} className="rounded-lg bg-bg px-4 py-3">
-                <p className="text-xs text-muted">{label}</p>
+              <div key={label} className="bg-bg rounded-lg px-4 py-3">
+                <p className="text-muted text-xs">{label}</p>
                 <p className="text-xl font-semibold tabular-nums">{value ?? "–"}</p>
               </div>
             ))}
@@ -141,7 +163,7 @@ function QuestionSummary({ q, number }: { q: QuestionAnalytics; number: number }
         )}
         {q.kind === "text" &&
           (q.recent?.length ? (
-            <ul className="divide-y divide-line rounded-lg border border-line">
+            <ul className="divide-line border-line divide-y rounded-lg border">
               {q.recent.map((text, i) => (
                 <li key={i} className="px-4 py-2.5 text-sm whitespace-pre-line">
                   {text}
@@ -149,24 +171,33 @@ function QuestionSummary({ q, number }: { q: QuestionAnalytics; number: number }
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-muted">No answers yet.</p>
+            <p className="text-muted text-sm">No answers yet.</p>
           ))}
       </div>
     </section>
   );
 }
 
-function ChoiceBars({ choices, color }: { choices: { label: string; count: number; percent: number }[]; color: string }) {
+function ChoiceBars({
+  choices,
+  color,
+}: {
+  choices: { label: string; count: number; percent: number }[];
+  color: string;
+}) {
   return (
     <ul className="space-y-2.5">
       {choices.map((c) => (
         <li key={c.label} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 text-sm">
           <span className="truncate">{c.label}</span>
-          <span className="text-right text-muted tabular-nums">
+          <span className="text-muted text-right tabular-nums">
             {c.percent}% <span className="text-xs">({c.count})</span>
           </span>
-          <div className="col-span-2 h-2.5 overflow-hidden rounded-full bg-selected">
-            <div className="h-full rounded-full transition-[width] duration-700" style={{ width: `${c.percent}%`, background: color }} />
+          <div className="bg-selected col-span-2 h-2.5 overflow-hidden rounded-full">
+            <div
+              className="h-full rounded-full transition-[width] duration-700"
+              style={{ width: `${c.percent}%`, background: color }}
+            />
           </div>
         </li>
       ))}

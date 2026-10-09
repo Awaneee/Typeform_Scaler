@@ -3,7 +3,9 @@ import { createForm, expect, onQuestion, opts, q, test } from "./helpers";
 /** 5. Typeform Experience + placeholders */
 
 test("Conversational, one-at-a-time fill UI with transitions", async ({ page, request }) => {
-  const form = await createForm(request, "Conversational", [q("short_text", "First?"), q("short_text", "Second?")], { publish: true });
+  const form = await createForm(request, "Conversational", [q("short_text", "First?"), q("short_text", "Second?")], {
+    publish: true,
+  });
   await page.goto(`/to/${form.slug}`);
   await onQuestion(page, "First?");
   await expect(page.getByText("Second?")).toHaveCount(0); // only one question on screen
@@ -18,7 +20,10 @@ test("Clean builder layout with live preview", async ({ page, request }) => {
   await expect(page.getByRole("list", { name: "Questions" })).toBeVisible(); // left: question list
   await expect(page.getByRole("textbox", { name: "Question title" })).toHaveValue("Hello?"); // centre: canvas
   await expect(page.getByRole("complementary", { name: "Question settings" })).toBeVisible(); // right: settings
-  for (const tab of ["content", "workflow", "connect", "share", "results"]) await expect(page.getByRole("button", { name: tab, exact: true }).or(page.getByRole("link", { name: tab, exact: true }))).toBeVisible();
+  for (const tab of ["content", "workflow", "connect", "share", "results"])
+    await expect(
+      page.getByRole("button", { name: tab, exact: true }).or(page.getByRole("link", { name: tab, exact: true })),
+    ).toBeVisible();
   // Live: typing on the canvas updates the question list immediately.
   await page.getByRole("textbox", { name: "Question title" }).fill("Hello world?");
   await expect(page.getByLabel("Question 1: Hello world?")).toBeVisible();
@@ -42,7 +47,7 @@ test("Forms, modals and inline editing", async ({ page, request }) => {
 test("Notifications / toasts", async ({ page, request }) => {
   await createForm(request, "Toast", [q("short_text", "Name")]);
   await page.goto("/workspace");
-    await page.waitForLoadState("networkidle"); // let React hydrate before clicking
+  await page.waitForLoadState("networkidle"); // let React hydrate before clicking
   await page.getByRole("button", { name: "Actions for E2E Toast", exact: true }).click();
   await page.getByRole("menuitem", { name: "Publish" }).click();
   await expect(page.getByText("Form published. It's live!")).toBeVisible();
@@ -52,7 +57,8 @@ test("Settings placeholders (theme picker + editable thank-you screen)", async (
   const form = await createForm(request, "Theme", [q("short_text", "Name")]);
   await page.goto(`/forms/${form.id}/edit`);
   await page.getByRole("button", { name: "Design" }).click();
-  for (const t of ["Classic", "Lavender", "Ocean", "Midnight"]) await expect(page.getByRole("button", { name: new RegExp(t) })).toBeVisible();
+  for (const t of ["Classic", "Lavender", "Ocean", "Midnight"])
+    await expect(page.getByRole("button", { name: new RegExp(t) })).toBeVisible();
   await page.getByRole("button", { name: /Lavender/ }).click();
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: /Thanks for completing this form/ }).click();
@@ -62,21 +68,24 @@ test("Settings placeholders (theme picker + editable thank-you screen)", async (
 });
 
 test.describe("Mocked / placeholder sections", () => {
-  test("Integrations / webhooks (\"Coming soon\" in workspace header)", async ({ page }) => {
+  test('Integrations / webhooks ("Coming soon" in workspace header)', async ({ page }) => {
     await page.goto("/workspace");
     await page.waitForLoadState("networkidle"); // let React hydrate before clicking
     await page.getByRole("button", { name: "Integrations", exact: true }).click();
     await expect(page.getByText("Integrations is coming soon")).toBeVisible();
   });
 
-  test("Team collaboration & sharing (\"Coming soon\" in sidebar)", async ({ page }) => {
+  test('Team collaboration & sharing ("Coming soon" in sidebar)', async ({ page }) => {
     await page.goto("/workspace");
     await page.waitForLoadState("networkidle"); // let React hydrate before clicking
     await page.getByRole("button", { name: "Invite your team" }).click();
     await expect(page.getByText("Team collaboration is coming soon")).toBeVisible();
   });
 
-  test("Payment / file-upload question types (Payment is \"Coming soon\" in the picker; file upload implemented as a bonus)", async ({ page, request }) => {
+  test('Payment / file-upload question types (Payment is "Coming soon" in the picker; file upload implemented as a bonus)', async ({
+    page,
+    request,
+  }) => {
     const form = await createForm(request, "Picker", []);
     await page.goto(`/forms/${form.id}/edit`);
     await page.getByRole("button", { name: "Add content" }).first().click();
@@ -85,7 +94,7 @@ test.describe("Mocked / placeholder sections", () => {
     await expect(picker.getByRole("button", { name: "File Upload", exact: true })).toBeEnabled();
   });
 
-  test("AI form generation (\"Coming soon\" on the create screen and AI panel)", async ({ page }) => {
+  test('AI form generation ("Coming soon" on the create screen and AI panel)', async ({ page }) => {
     await page.goto("/forms/new");
     await page.waitForLoadState("networkidle"); // let React hydrate before clicking
     await page.getByRole("textbox", { name: /Explain the goal/ }).click();

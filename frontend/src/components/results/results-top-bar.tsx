@@ -9,12 +9,15 @@ import { cn } from "@/lib/utils";
 /** Same chrome as the builder, with "Results" active; the other tabs live in the builder. */
 export function ResultsTopBar({ formId, title }: { formId: string; title: string }) {
   return (
-    <header className="grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-4 border-line bg-surface px-4">
+    <header className="border-line bg-surface grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b px-4 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-4">
       <div className="flex min-w-0 items-center gap-2">
-        <Link href="/workspace" className="flex shrink-0 items-center gap-1.5 rounded-md px-1.5 py-1 text-sm text-muted hover:bg-selected hover:text-ink">
+        <Link
+          href="/workspace"
+          className="text-muted hover:bg-selected hover:text-ink flex shrink-0 items-center gap-1.5 rounded-md px-1.5 py-1 text-sm"
+        >
           <PanelsTopLeft size={16} /> Forms
         </Link>
-        <ChevronRight size={14} className="shrink-0 text-muted" aria-hidden />
+        <ChevronRight size={14} className="text-muted shrink-0" aria-hidden />
         <span className="truncate px-1.5 text-sm font-medium">{title}</span>
       </div>
       <nav className="flex gap-0.5 lg:gap-1" aria-label="Form sections">
@@ -27,11 +30,11 @@ export function ResultsTopBar({ formId, title }: { formId: string; title: string
               aria-current={active ? "page" : undefined}
               className={cn(
                 "relative rounded-md px-2 py-1.5 text-sm capitalize lg:px-3",
-                active ? "font-medium text-ink" : "text-muted hover:bg-selected hover:text-ink",
+                active ? "text-ink font-medium" : "text-muted hover:bg-selected hover:text-ink",
               )}
             >
               {t}
-              {active && <span className="absolute inset-x-2 -bottom-[11px] h-0.5 rounded-full bg-ink" />}
+              {active && <span className="bg-ink absolute inset-x-2 -bottom-[11px] h-0.5 rounded-full" />}
             </Link>
           );
         })}

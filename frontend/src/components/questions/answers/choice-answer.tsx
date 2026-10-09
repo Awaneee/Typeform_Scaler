@@ -15,7 +15,7 @@ interface ChoiceButtonProps {
 }
 
 /** One Typeform-style choice: tinted box, letter key on the left, check when selected. */
-export function ChoiceButton({ label, keyHint, selected, theme, preview, onClick }: ChoiceButtonProps) {
+function ChoiceButton({ label, keyHint, selected, theme, preview, onClick }: ChoiceButtonProps) {
   return (
     <button
       type="button"
@@ -24,7 +24,7 @@ export function ChoiceButton({ label, keyHint, selected, theme, preview, onClick
       onClick={onClick}
       disabled={preview}
       tabIndex={preview ? -1 : undefined}
-      className="group flex w-full min-w-0 items-center gap-2.5 rounded-md py-2 pr-6 pl-2.5 text-left text-base transition-[background-color,box-shadow] sm:text-lg disabled:cursor-default"
+      className="group flex w-full min-w-0 items-center gap-2.5 rounded-md py-2 pr-6 pl-2.5 text-left text-base transition-[background-color,box-shadow] disabled:cursor-default sm:text-lg"
       style={{
         color: theme.question,
         background: selected ? theme.background : withAlpha(theme.answer, 0.08),
@@ -49,7 +49,7 @@ export function ChoiceButton({ label, keyHint, selected, theme, preview, onClick
 }
 
 /** Press a choice's letter key to toggle it (only while this question is on screen). */
-export function useLetterKeys(enabled: boolean, count: number, onPick: (index: number) => void) {
+function useLetterKeys(enabled: boolean, count: number, onPick: (index: number) => void) {
   useEffect(() => {
     if (!enabled) return;
     function onKey(e: KeyboardEvent) {
@@ -126,8 +126,22 @@ export function YesNoAnswer({ value, onChange, theme, preview, active, onCommit 
 
   return (
     <div className="inline-flex min-w-[160px] flex-col gap-2">
-      <ChoiceButton label="Yes" keyHint="Y" selected={value === true} theme={theme} preview={preview} onClick={() => pick(true)} />
-      <ChoiceButton label="No" keyHint="N" selected={value === false} theme={theme} preview={preview} onClick={() => pick(false)} />
+      <ChoiceButton
+        label="Yes"
+        keyHint="Y"
+        selected={value === true}
+        theme={theme}
+        preview={preview}
+        onClick={() => pick(true)}
+      />
+      <ChoiceButton
+        label="No"
+        keyHint="N"
+        selected={value === false}
+        theme={theme}
+        preview={preview}
+        onClick={() => pick(false)}
+      />
     </div>
   );
 }

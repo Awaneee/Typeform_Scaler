@@ -22,7 +22,10 @@ export function FormActionsMenu({ form, actions, onRename, onDelete, className }
   return (
     <Menu>
       <MenuTrigger
-        className={cn("rounded-md p-1.5 text-muted hover:bg-selected hover:text-ink data-[state=open]:bg-selected", className)}
+        className={cn(
+          "text-muted hover:bg-selected hover:text-ink data-[state=open]:bg-selected rounded-md p-1.5",
+          className,
+        )}
         aria-label={`Actions for ${form.title}`}
         onClick={(e) => e.stopPropagation()}
       >

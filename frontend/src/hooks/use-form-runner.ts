@@ -17,7 +17,7 @@ export interface RunnerForm {
 /** "live" submits to the API; "preview" runs the same flow but never saves anything. */
 export type RunnerMode = { kind: "live"; slug: string } | { kind: "preview" };
 
-export type Screen = { kind: "welcome" } | { kind: "question"; index: number } | { kind: "thankyou" };
+type Screen = { kind: "welcome" } | { kind: "question"; index: number } | { kind: "thankyou" };
 
 const AUTO_ADVANCE_MS = 350;
 const PARTIAL_SAVE_MS = 1000;
@@ -29,7 +29,11 @@ export function useFormRunner(form: RunnerForm, modeProp: RunnerMode) {
   const slug = modeProp.kind === "live" ? modeProp.slug : null;
   const mode = useMemo<RunnerMode>(() => (slug ? { kind: "live", slug } : { kind: "preview" }), [slug]);
   const [screen, setScreen] = useState<Screen>(
-    form.settings.welcome.enabled ? { kind: "welcome" } : questions.length ? { kind: "question", index: 0 } : { kind: "thankyou" },
+    form.settings.welcome.enabled
+      ? { kind: "welcome" }
+      : questions.length
+        ? { kind: "question", index: 0 }
+        : { kind: "thankyou" },
   );
   const [direction, setDirection] = useState<1 | -1>(1);
   // Indexes visited before the current one, so "back" retraces the path logic jumps took.
@@ -153,7 +157,8 @@ export function useFormRunner(form: RunnerForm, modeProp: RunnerMode) {
 
   /** OK / Enter / ↓ : validate the current question, then move on (or submit on the last one). */
   const next = useCallback(() => {
-    if (screen.kind === "welcome") return go(questions.length ? { kind: "question", index: 0 } : { kind: "thankyou" }, 1);
+    if (screen.kind === "welcome")
+      return go(questions.length ? { kind: "question", index: 0 } : { kind: "thankyou" }, 1);
     if (!current || submitting) return;
     const err = validateAnswer(current, answers[current.id]);
     if (err) {

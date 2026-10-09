@@ -4,7 +4,7 @@ import { toPayload } from "./validation";
 /** Logic jumps. Same algorithm as backend/app/validators/logic.py:
  *  first matching rule wins, jumps only go forward, otherwise go to the next question. */
 
-export function ruleMatches(q: Question, rule: LogicRule, value: AnswerValue | undefined): boolean {
+function ruleMatches(q: Question, rule: LogicRule, value: AnswerValue | undefined): boolean {
   if (value === null || value === undefined) return false;
   if (q.type === "multiple_choice") {
     const hit = Array.isArray(value) && value.includes(rule.value as string);

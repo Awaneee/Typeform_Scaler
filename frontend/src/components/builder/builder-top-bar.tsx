@@ -26,13 +26,16 @@ export function BuilderTopBar({ tab, onTab, onBack, onPublish, publishing }: Top
   const upToDate = status === "published" && !changed;
 
   return (
-    <header className="grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-4 border-line bg-surface px-4">
+    <header className="border-line bg-surface grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b px-4 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-4">
       {/* Breadcrumb like Typeform: "Forms › <title>" */}
       <div className="flex min-w-0 items-center gap-1">
-        <button onClick={onBack} className="flex shrink-0 items-center gap-1.5 rounded-md px-1.5 py-1 text-sm text-muted hover:bg-selected hover:text-ink">
+        <button
+          onClick={onBack}
+          className="text-muted hover:bg-selected hover:text-ink flex shrink-0 items-center gap-1.5 rounded-md px-1.5 py-1 text-sm"
+        >
           <PanelsTopLeft size={16} /> Forms
         </button>
-        <ChevronRight size={14} className="shrink-0 text-muted" aria-hidden />
+        <ChevronRight size={14} className="text-muted shrink-0" aria-hidden />
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -41,7 +44,7 @@ export function BuilderTopBar({ tab, onTab, onBack, onPublish, publishing }: Top
           maxLength={255}
           aria-label="Form title"
           size={Math.min(Math.max(title.length, 8), 40)}
-          className="min-w-0 truncate rounded-md px-1.5 py-1 text-sm font-medium outline-none hover:bg-selected focus:bg-surface focus:ring-1 focus:ring-plum"
+          className="hover:bg-selected focus:bg-surface focus:ring-plum min-w-0 truncate rounded-md px-1.5 py-1 text-sm font-medium outline-none focus:ring-1"
         />
       </div>
 
@@ -53,11 +56,11 @@ export function BuilderTopBar({ tab, onTab, onBack, onPublish, publishing }: Top
             aria-current={tab === t ? "page" : undefined}
             className={cn(
               "relative rounded-md px-2 py-1.5 text-sm capitalize lg:px-3",
-              tab === t ? "font-medium text-ink" : "text-muted hover:bg-selected hover:text-ink",
+              tab === t ? "text-ink font-medium" : "text-muted hover:bg-selected hover:text-ink",
             )}
           >
             {t}
-            {tab === t && <span className="absolute inset-x-2 -bottom-[11px] h-0.5 rounded-full bg-ink" />}
+            {tab === t && <span className="bg-ink absolute inset-x-2 -bottom-[11px] h-0.5 rounded-full" />}
           </button>
         ))}
       </nav>

@@ -10,7 +10,12 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ArrowRight, CircleCheckBig, Copy, Ellipsis, GripVertical, Lightbulb, Plus, Trash2 } from "lucide-react";
 import { QuestionTypeBadge } from "@/components/questions/question-icon";
@@ -41,16 +46,27 @@ export function QuestionList({ onAdd, onOpenLogic }: { onAdd: () => void; onOpen
 
   return (
     <aside className="flex w-[256px] shrink-0 flex-col gap-3">
-      <section className="flex min-h-0 flex-1 flex-col rounded-xl bg-panel p-3" aria-label="Questions panel">
+      <section className="bg-panel flex min-h-0 flex-1 flex-col rounded-xl p-3" aria-label="Questions panel">
         <h2 className="px-2 pt-1 pb-3 text-sm font-semibold">Questions</h2>
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <div className="rounded-lg border border-line bg-surface p-1">
+          <div className="border-line bg-surface rounded-lg border p-1">
             {questions.length > 0 && (
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd} modifiers={[restrictToVerticalAxis]}>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={onDragEnd}
+                modifiers={[restrictToVerticalAxis]}
+              >
                 <SortableContext items={questions.map((q) => q.id)} strategy={verticalListSortingStrategy}>
                   <ol className="space-y-0.5" aria-label="Questions">
                     {questions.map((q, i) => (
-                      <SortableQuestion key={q.id} question={q} index={i} selected={selected === q.id} onSelect={() => select(q.id)} />
+                      <SortableQuestion
+                        key={q.id}
+                        question={q}
+                        index={i}
+                        selected={selected === q.id}
+                        onSelect={() => select(q.id)}
+                      />
                     ))}
                   </ol>
                 </SortableContext>
@@ -58,7 +74,7 @@ export function QuestionList({ onAdd, onOpenLogic }: { onAdd: () => void; onOpen
             )}
             <button
               onClick={onAdd}
-              className="flex w-full items-center justify-center gap-1.5 rounded-md py-2 text-sm text-muted hover:bg-panel hover:text-ink"
+              className="text-muted hover:bg-panel hover:text-ink flex w-full items-center justify-center gap-1.5 rounded-md py-2 text-sm"
               aria-label="Add content"
             >
               <Plus size={15} /> Add content
@@ -67,7 +83,7 @@ export function QuestionList({ onAdd, onOpenLogic }: { onAdd: () => void; onOpen
         </div>
         <button
           onClick={onOpenLogic}
-          className="mt-3 flex items-center justify-between gap-2 rounded-lg border border-dashed border-line px-3 py-2.5 text-left text-sm font-medium hover:bg-surface"
+          className="border-line hover:bg-surface mt-3 flex items-center justify-between gap-2 rounded-lg border border-dashed px-3 py-2.5 text-left text-sm font-medium"
         >
           <span className="flex items-center gap-2">
             <Lightbulb size={16} className="shrink-0" /> Personalize with branching
@@ -76,7 +92,7 @@ export function QuestionList({ onAdd, onOpenLogic }: { onAdd: () => void; onOpen
         </button>
       </section>
 
-      <section className="rounded-xl bg-panel p-3" aria-label="Endings">
+      <section className="bg-panel rounded-xl p-3" aria-label="Endings">
         <h2 className="px-2 pt-1 pb-2 text-sm font-semibold">Endings</h2>
         <button
           onClick={() => select("ending")}
@@ -85,7 +101,7 @@ export function QuestionList({ onAdd, onOpenLogic }: { onAdd: () => void; onOpen
             selected === "ending" ? "bg-hover-strong" : "hover:bg-surface",
           )}
         >
-          <span className="inline-flex h-6 items-center rounded-md bg-surface px-1.5 text-muted">
+          <span className="bg-surface text-muted inline-flex h-6 items-center rounded-md px-1.5">
             <CircleCheckBig size={14} />
           </span>
           <span className="truncate">{thankYouTitle || "Thank you screen"}</span>
@@ -122,19 +138,21 @@ function SortableQuestion({ question, index, selected, onSelect }: SortableQuest
         aria-current={selected ? "true" : undefined}
         className={cn(
           "flex cursor-pointer items-center gap-2.5 rounded-lg py-2 pr-9 pl-2 text-sm outline-none select-none",
-          "focus-visible:ring-2 focus-visible:ring-plum",
+          "focus-visible:ring-plum focus-visible:ring-2",
           selected ? "bg-hover-strong" : "hover:bg-panel",
-          isDragging && "bg-surface shadow-lg ring-1 ring-line",
+          isDragging && "bg-surface ring-line shadow-lg ring-1",
         )}
       >
-        <GripVertical size={14} className="-ml-1 shrink-0 text-muted/0 group-hover:text-muted" aria-hidden />
+        <GripVertical size={14} className="text-muted/0 group-hover:text-muted -ml-1 shrink-0" aria-hidden />
         <QuestionTypeBadge type={question.type} number={index + 1} />
-        <span className={cn("min-w-0 flex-1 truncate", !question.title && "text-muted")}>{question.title || "..."}</span>
-        {error && <span className="h-2 w-2 shrink-0 rounded-full bg-danger" title={error} />}
+        <span className={cn("min-w-0 flex-1 truncate", !question.title && "text-muted")}>
+          {question.title || "..."}
+        </span>
+        {error && <span className="bg-danger h-2 w-2 shrink-0 rounded-full" title={error} />}
       </div>
       <Menu>
         <MenuTrigger
-          className="absolute top-1/2 right-1.5 -translate-y-1/2 rounded-md p-1 text-muted opacity-0 group-hover:opacity-100 hover:bg-hover-strong focus-visible:opacity-100 data-[state=open]:opacity-100"
+          className="text-muted hover:bg-hover-strong absolute top-1/2 right-1.5 -translate-y-1/2 rounded-md p-1 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100"
           aria-label={`Question ${index + 1} actions`}
         >
           <Ellipsis size={16} />

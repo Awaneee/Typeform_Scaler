@@ -29,7 +29,13 @@ export function RenameDialog({ initialTitle, onOpenChange, onSubmit }: RenameDia
   return (
     <Modal open onOpenChange={onOpenChange} title="Rename form">
       <form onSubmit={submit} className="space-y-5">
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} autoFocus aria-label="Form name" />
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          maxLength={255}
+          autoFocus
+          aria-label="Form name"
+        />
         <div className="flex justify-end gap-2">
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
             Cancel

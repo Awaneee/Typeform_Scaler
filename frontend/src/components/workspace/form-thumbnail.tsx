@@ -7,7 +7,10 @@ export function FormThumbnail({ theme, title, className }: { theme: ThemeName; t
   const t = getTheme(theme);
   return (
     <div
-      className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-black/5 text-sm font-semibold", className)}
+      className={cn(
+        "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-black/5 text-sm font-semibold",
+        className,
+      )}
       style={{ background: t.background, color: t.answer }}
       aria-hidden
     >
@@ -19,15 +22,15 @@ export function FormThumbnail({ theme, title, className }: { theme: ThemeName; t
 export function StatusBadge({ status, changed }: { status: "draft" | "published"; changed?: boolean }) {
   if (status === "published") {
     return (
-      <span className="inline-flex items-center gap-1.5 text-xs text-teal">
-        <span className="h-1.5 w-1.5 rounded-full bg-teal" />
+      <span className="text-teal inline-flex items-center gap-1.5 text-xs">
+        <span className="bg-teal h-1.5 w-1.5 rounded-full" />
         {changed ? "Live · unpublished changes" : "Live"}
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs text-muted">
-      <span className="h-1.5 w-1.5 rounded-full bg-muted/60" />
+    <span className="text-muted inline-flex items-center gap-1.5 text-xs">
+      <span className="bg-muted/60 h-1.5 w-1.5 rounded-full" />
       Draft
     </span>
   );

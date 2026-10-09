@@ -1,12 +1,16 @@
 import type { Page } from "@playwright/test";
-import { createForm, getForm, PREFIX, q, waitSaved , expect, test } from "./helpers";
+import { createForm, getForm, PREFIX, q, waitSaved, expect, test } from "./helpers";
 
 /** 1. Form Builder */
 
 const listTitles = (page: Page) =>
-  page.locator('ol[aria-label="Questions"] > li').evaluateAll((items) =>
-    items.map((li) => (li.querySelector("[aria-label^='Question']")?.getAttribute("aria-label") ?? "").replace(/^Question \d+: /, "")),
-  );
+  page
+    .locator('ol[aria-label="Questions"] > li')
+    .evaluateAll((items) =>
+      items.map((li) =>
+        (li.querySelector("[aria-label^='Question']")?.getAttribute("aria-label") ?? "").replace(/^Question \d+: /, ""),
+      ),
+    );
 
 async function openPicker(page: Page) {
   await page.getByRole("button", { name: "Add content" }).first().click();
@@ -59,7 +63,11 @@ test("Edit questions (inline on the canvas + settings panel)", async ({ page, re
 });
 
 test("Reorder questions (drag-and-drop with dnd-kit, keyboard sortable too)", async ({ page, request }) => {
-  const form = await createForm(request, "Builder reorder", [q("short_text", "One"), q("short_text", "Two"), q("short_text", "Three")]);
+  const form = await createForm(request, "Builder reorder", [
+    q("short_text", "One"),
+    q("short_text", "Two"),
+    q("short_text", "Three"),
+  ]);
   await page.goto(`/forms/${form.id}/edit`);
 
   // Mouse drag: "Three" to the top.
@@ -67,7 +75,8 @@ test("Reorder questions (drag-and-drop with dnd-kit, keyboard sortable too)", as
   const dst = (await page.getByLabel("Question 1: One").boundingBox())!;
   await page.mouse.move(src.x + 40, src.y + src.height / 2);
   await page.mouse.down();
-  for (let i = 1; i <= 12; i++) await page.mouse.move(src.x + 40, src.y + src.height / 2 + ((dst.y + 4 - src.y - src.height / 2) * i) / 12);
+  for (let i = 1; i <= 12; i++)
+    await page.mouse.move(src.x + 40, src.y + src.height / 2 + ((dst.y + 4 - src.y - src.height / 2) * i) / 12);
   await page.mouse.up();
   await expect.poll(() => listTitles(page)).toEqual(["Three", "One", "Two"]);
 
@@ -97,7 +106,10 @@ test("Delete questions (and duplicate)", async ({ page, request }) => {
   expect((await getForm(request, form.id)).questions).toHaveLength(2);
 });
 
-test("Question types in the builder: short text, long text, multiple choice, dropdown, email, number, yes/no, rating", async ({ page, request }) => {
+test("Question types in the builder: short text, long text, multiple choice, dropdown, email, number, yes/no, rating", async ({
+  page,
+  request,
+}) => {
   const form = await createForm(request, "Builder types", []);
   await page.goto(`/forms/${form.id}/edit`);
   const types = ["Short Text", "Long Text", "Multiple Choice", "Dropdown", "Email", "Number", "Yes/No", "Rating"];
@@ -105,7 +117,14 @@ test("Question types in the builder: short text, long text, multiple choice, dro
   await waitSaved(page);
   const saved = await getForm(request, form.id);
   expect(saved.questions.map((x: { type: string }) => x.type)).toEqual([
-    "short_text", "long_text", "multiple_choice", "dropdown", "email", "number", "yes_no", "rating",
+    "short_text",
+    "long_text",
+    "multiple_choice",
+    "dropdown",
+    "email",
+    "number",
+    "yes_no",
+    "rating",
   ]);
 });
 
@@ -128,7 +147,11 @@ test("Per-question settings: description / help text", async ({ page, request })
   await expect(page.getByText("As written on your ID")).toBeVisible();
 });
 
-test("Live preview of the form (canvas is a live WYSIWYG preview with desktop/mobile toggle + full Preview page that never saves)", async ({ page, request, context }) => {
+test("Live preview of the form (canvas is a live WYSIWYG preview with desktop/mobile toggle + full Preview page that never saves)", async ({
+  page,
+  request,
+  context,
+}) => {
   const form = await createForm(request, "Builder preview", [q("short_text", "Your name?", { required: true })]);
   await page.goto(`/forms/${form.id}/edit`);
 
@@ -144,7 +167,10 @@ test("Live preview of the form (canvas is a live WYSIWYG preview with desktop/mo
   expect(desktopWidth).toBeGreaterThan(375);
 
   // Preview opens the real respondent flow on the draft, and submitting saves nothing.
-  const [preview] = await Promise.all([context.waitForEvent("page"), page.getByRole("button", { name: "Preview", exact: true }).click()]);
+  const [preview] = await Promise.all([
+    context.waitForEvent("page"),
+    page.getByRole("button", { name: "Preview", exact: true }).click(),
+  ]);
   await expect(preview.getByText("Preview")).toBeVisible();
   await expect(preview.locator("main h1")).toContainText("Your name?");
   await preview.keyboard.type("Ada");

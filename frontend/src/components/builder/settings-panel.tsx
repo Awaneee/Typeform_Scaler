@@ -24,18 +24,21 @@ export function SettingsPanel({ onOpenLogic }: { onOpenLogic: () => void }) {
 export function SettingsDrawerButton({ onOpenLogic }: { onOpenLogic: () => void }) {
   return (
     <Dialog.Root>
-      <Dialog.Trigger className="flex h-8 items-center gap-1.5 rounded-lg px-3 text-sm hover:bg-hover-strong lg:hidden">
+      <Dialog.Trigger className="hover:bg-hover-strong flex h-8 items-center gap-1.5 rounded-lg px-3 text-sm lg:hidden">
         <SlidersHorizontal size={15} /> Settings
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/20 data-[state=open]:animate-[fade-in_150ms_ease-out]" />
         <Dialog.Content
-          className="fixed inset-y-0 right-0 z-50 w-[320px] max-w-[90vw] overflow-y-auto bg-surface shadow-2xl outline-none data-[state=open]:animate-[slide-in_200ms_ease-out]"
+          className="bg-surface fixed inset-y-0 right-0 z-50 w-[320px] max-w-[90vw] overflow-y-auto shadow-2xl outline-none data-[state=open]:animate-[slide-in_200ms_ease-out]"
           aria-describedby={undefined}
         >
-          <div className="flex items-center justify-between border-b border-line px-5 py-3">
+          <div className="border-line flex items-center justify-between border-b px-5 py-3">
             <Dialog.Title className="text-sm font-semibold">Settings</Dialog.Title>
-            <Dialog.Close className="rounded-md p-1 text-muted hover:bg-selected hover:text-ink" aria-label="Close settings">
+            <Dialog.Close
+              className="text-muted hover:bg-selected hover:text-ink rounded-md p-1"
+              aria-label="Close settings"
+            >
               <X size={16} />
             </Dialog.Close>
           </div>
@@ -57,7 +60,7 @@ function SettingsContent({ onOpenLogic }: { onOpenLogic: () => void }) {
 
 function Section({ title, children }: { title?: string; children: ReactNode }) {
   return (
-    <section className="space-y-3 rounded-xl bg-panel p-4">
+    <section className="bg-panel space-y-3 rounded-xl p-4">
       {title && <h3 className="text-sm font-semibold">{title}</h3>}
       {children}
     </section>
@@ -81,8 +84,18 @@ const fieldClass =
 
 /** Optional number setting: a toggle that reveals an input. */
 function OptionalNumber({
-  label, value, onChange, min, placeholder,
-}: { label: string; value: number | undefined; onChange: (v: number | undefined) => void; min?: number; placeholder: string }) {
+  label,
+  value,
+  onChange,
+  min,
+  placeholder,
+}: {
+  label: string;
+  value: number | undefined;
+  onChange: (v: number | undefined) => void;
+  min?: number;
+  placeholder: string;
+}) {
   return (
     <div className="space-y-2">
       <ToggleRow label={label} checked={value !== undefined} onChange={(on) => onChange(on ? (min ?? 0) : undefined)} />
@@ -113,7 +126,7 @@ function QuestionSettings({ question, onOpenLogic }: { question: Question; onOpe
     <>
       <Section title="Answer">
         <Menu>
-          <MenuTrigger className="flex h-10 w-full items-center gap-2.5 rounded-lg border border-line bg-surface px-3 text-sm hover:bg-selected">
+          <MenuTrigger className="border-line bg-surface hover:bg-selected flex h-10 w-full items-center gap-2.5 rounded-lg border px-3 text-sm">
             <QuestionTypeBadge type={question.type} />
             <span className="flex-1 text-left font-medium">{meta.label}</span>
             <ChevronDown size={16} className="text-muted" />
@@ -130,7 +143,11 @@ function QuestionSettings({ question, onOpenLogic }: { question: Question; onOpe
       </Section>
 
       <Section title="Settings">
-        <ToggleRow label="Required" checked={question.required} onChange={(required) => updateQuestion(question.id, { required })} />
+        <ToggleRow
+          label="Required"
+          checked={question.required}
+          onChange={(required) => updateQuestion(question.id, { required })}
+        />
 
         {(question.type === "short_text" || question.type === "long_text") && (
           <OptionalNumber
@@ -147,24 +164,28 @@ function QuestionSettings({ question, onOpenLogic }: { question: Question; onOpe
             <OptionalNumber label="Min number" value={s.min} placeholder="0" onChange={(min) => set({ min })} />
             <OptionalNumber label="Max number" value={s.max} placeholder="100" onChange={(max) => set({ max })} />
             {s.min !== undefined && s.max !== undefined && s.min > s.max && (
-              <p className="text-xs text-danger">Min must be less than or equal to max.</p>
+              <p className="text-danger text-xs">Min must be less than or equal to max.</p>
             )}
           </>
         )}
 
         {question.type === "multiple_choice" && (
-          <ToggleRow label="Multiple selection" checked={!!s.allow_multiple} onChange={(allow_multiple) => set({ allow_multiple })} />
+          <ToggleRow
+            label="Multiple selection"
+            checked={!!s.allow_multiple}
+            onChange={(allow_multiple) => set({ allow_multiple })}
+          />
         )}
 
         {question.type === "file_upload" && (
           <label className="flex items-center justify-between gap-3 text-sm">
             Max file size
             <select
-              value={s.max_size_mb ?? 10}
+              value={s.max_size_mb ?? 5}
               onChange={(e) => set({ max_size_mb: Number(e.target.value) })}
-              className="h-9 rounded-lg border border-line bg-surface px-2 text-sm outline-none focus:border-plum"
+              className="border-line bg-surface focus:border-plum h-9 rounded-lg border px-2 text-sm outline-none"
             >
-              {[1, 2, 5, 10].map((n) => (
+              {[1, 2, 5].map((n) => (
                 <option key={n} value={n}>
                   {n} MB
                 </option>
@@ -179,7 +200,7 @@ function QuestionSettings({ question, onOpenLogic }: { question: Question; onOpe
             <select
               value={s.steps ?? 5}
               onChange={(e) => set({ steps: Number(e.target.value) })}
-              className="h-9 rounded-lg border border-line bg-surface px-2 text-sm outline-none focus:border-plum"
+              className="border-line bg-surface focus:border-plum h-9 rounded-lg border px-2 text-sm outline-none"
             >
               {Array.from({ length: 8 }, (_, i) => i + 3).map((n) => (
                 <option key={n} value={n}>
@@ -209,7 +230,7 @@ function QuestionSettings({ question, onOpenLogic }: { question: Question; onOpe
       <Section title="Image or video">
         <button
           onClick={() => toast("Images and videos are coming soon")}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-line bg-surface py-3 text-sm text-muted hover:text-ink"
+          className="border-line bg-surface text-muted hover:text-ink flex w-full items-center justify-center gap-2 rounded-lg border border-dashed py-3 text-sm"
         >
           <ImagePlus size={16} /> Add image or video
         </button>
@@ -217,13 +238,18 @@ function QuestionSettings({ question, onOpenLogic }: { question: Question; onOpe
 
       <Section title="Logic">
         {LOGIC_OPS[question.type] ? (
-          <button onClick={onOpenLogic} className="flex w-full items-center gap-2 rounded-lg px-1 py-1 text-sm hover:text-teal">
+          <button
+            onClick={onOpenLogic}
+            className="hover:text-teal flex w-full items-center gap-2 rounded-lg px-1 py-1 text-sm"
+          >
             <GitBranch size={16} />
-            {question.logic.length ? `${question.logic.length} logic jump${question.logic.length > 1 ? "s" : ""}` : "Add logic jump"}
-            <span className="ml-auto text-xs text-muted">Workflow →</span>
+            {question.logic.length
+              ? `${question.logic.length} logic jump${question.logic.length > 1 ? "s" : ""}`
+              : "Add logic jump"}
+            <span className="text-muted ml-auto text-xs">Workflow →</span>
           </button>
         ) : (
-          <p className="text-xs text-muted">Logic jumps work with choice, yes/no, rating and number questions.</p>
+          <p className="text-muted text-xs">Logic jumps work with choice, yes/no, rating and number questions.</p>
         )}
       </Section>
     </>
@@ -251,7 +277,7 @@ function DropdownOptions({ question }: { question: Question }) {
             <button
               onClick={() => removeOption(question.id, o.id)}
               disabled={question.options.length <= 1}
-              className="rounded p-1.5 text-muted hover:bg-selected hover:text-ink disabled:opacity-30"
+              className="text-muted hover:bg-selected hover:text-ink rounded p-1.5 disabled:opacity-30"
               aria-label={`Remove option ${i + 1}`}
             >
               <X size={14} />
@@ -259,7 +285,10 @@ function DropdownOptions({ question }: { question: Question }) {
           </li>
         ))}
       </ul>
-      <button onClick={() => addOption(question.id)} className="flex items-center gap-1 text-sm font-medium text-teal hover:underline">
+      <button
+        onClick={() => addOption(question.id)}
+        className="text-teal flex items-center gap-1 text-sm font-medium hover:underline"
+      >
         <Plus size={14} /> Add option
       </button>
     </Section>
@@ -274,7 +303,7 @@ function EndingSettings() {
     <>
       <Section>
         <p className="text-sm font-semibold">Thank you screen</p>
-        <p className="text-xs text-muted">Shown after a respondent submits. Edit the text right on the canvas.</p>
+        <p className="text-muted text-xs">Shown after a respondent submits. Edit the text right on the canvas.</p>
       </Section>
       <Section title="Button">
         <label className="block space-y-1.5 text-sm">

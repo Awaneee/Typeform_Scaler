@@ -7,7 +7,12 @@ import type { AnswerValue, Answers, Question } from "@/types/form";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export function isEmptyAnswer(value: AnswerValue | undefined) {
-  return value === undefined || value === null || (typeof value === "string" && value.trim() === "") || (Array.isArray(value) && value.length === 0);
+  return (
+    value === undefined ||
+    value === null ||
+    (typeof value === "string" && value.trim() === "") ||
+    (Array.isArray(value) && value.length === 0)
+  );
 }
 
 /** Returns an error message, or null when the answer is acceptable. */
@@ -43,7 +48,9 @@ export function validateAnswer(q: Question, value: AnswerValue | undefined): str
       return typeof value === "string" ? null : "Please upload a file.";
     case "rating": {
       const steps = s.steps ?? 5;
-      return typeof value === "number" && value >= 1 && value <= steps ? null : `Rating must be between 1 and ${steps}.`;
+      return typeof value === "number" && value >= 1 && value <= steps
+        ? null
+        : `Rating must be between 1 and ${steps}.`;
     }
   }
 }

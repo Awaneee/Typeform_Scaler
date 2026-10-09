@@ -24,7 +24,10 @@ export function OkButton({ theme, label = "OK", onClick, disabled, showCheck = t
       >
         {label} {showCheck && <Check size={18} strokeWidth={3} />}
       </button>
-      <span className={`items-center gap-1 text-xs ${label === "OK" ? "hidden sm:flex" : "hidden"}`} style={{ color: withAlpha(theme.question, 0.7) }}>
+      <span
+        className={`items-center gap-1 text-xs ${label === "OK" ? "hidden sm:flex" : "hidden"}`}
+        style={{ color: withAlpha(theme.question, 0.7) }}
+      >
         press <strong>Enter</strong> <CornerDownLeft size={12} />
       </span>
     </div>

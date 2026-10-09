@@ -24,7 +24,15 @@ export function TypeBadge({ icon: Icon, bg, fg, number, className }: BadgeProps)
   );
 }
 
-export function QuestionTypeBadge({ type, number, className }: { type: QuestionType; number?: number; className?: string }) {
+export function QuestionTypeBadge({
+  type,
+  number,
+  className,
+}: {
+  type: QuestionType;
+  number?: number;
+  className?: string;
+}) {
   const meta = QUESTION_REGISTRY[type];
   return <TypeBadge icon={meta.icon} bg={meta.bg} fg={meta.fg} number={number} className={className} />;
 }

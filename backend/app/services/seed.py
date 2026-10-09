@@ -2,6 +2,8 @@
 
 import logging
 import random
+from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import timedelta
 from typing import Any
 
@@ -9,6 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
+from app.core.errors import ValidationFailedError
 from app.core.types import new_id, utcnow
 from app.models import Creator, Form, ResponseSession
 from app.schemas.definition import FormDefinition
@@ -20,8 +23,16 @@ from app.services.submissions import create_submission
 logger = logging.getLogger(__name__)
 
 
-def _q(type_: str, title: str, *, required: bool = False, description: str = "", settings: dict | None = None,
-       options: list[str] | None = None, logic: list[dict] | None = None) -> dict[str, Any]:
+def _q(
+    type_: str,
+    title: str,
+    *,
+    required: bool = False,
+    description: str = "",
+    settings: dict | None = None,
+    options: list[str] | None = None,
+    logic: list[dict] | None = None,
+) -> dict[str, Any]:
     return {
         "logic": logic or [],
         "id": new_id(),
@@ -39,20 +50,45 @@ def _event_registration() -> dict:
         "title": "Event Registration",
         "settings": {
             "theme": "pearl",
-            "thank_you": {"title": "You're on the list! 🎉", "description": "We'll email your ticket a week before the event."},
+            "thank_you": {
+                "title": "You're on the list! 🎉",
+                "description": "We'll email your ticket a week before the event.",
+            },
         },
         "questions": [
-            _q("short_text", "Let's start with your full name", required=True, settings={"placeholder": "Type your answer here..."}),
-            _q("email", "What's your email address?", required=True, description="We'll send your ticket here.",
-               settings={"placeholder": "name@example.com"}),
-            _q("dropdown", "Which department are you in?", required=True,
-               options=["Engineering", "Design", "Product", "Marketing", "Sales", "Operations"]),
-            _q("multiple_choice", "Which sessions are you interested in?", description="Choose as many as you like.",
-               settings={"allow_multiple": True},
-               options=["Keynote talks", "Hands-on workshops", "Panel discussions", "Networking mixer"]),
+            _q(
+                "short_text",
+                "Let's start with your full name",
+                required=True,
+                settings={"placeholder": "Type your answer here..."},
+            ),
+            _q(
+                "email",
+                "What's your email address?",
+                required=True,
+                description="We'll send your ticket here.",
+                settings={"placeholder": "name@example.com"},
+            ),
+            _q(
+                "dropdown",
+                "Which department are you in?",
+                required=True,
+                options=["Engineering", "Design", "Product", "Marketing", "Sales", "Operations"],
+            ),
+            _q(
+                "multiple_choice",
+                "Which sessions are you interested in?",
+                description="We'll send you the full schedule.",
+                settings={"allow_multiple": True},
+                options=["Keynote talks", "Hands-on workshops", "Panel discussions", "Networking mixer"],
+            ),
             # Logic jump: people who won't attend skip the last question.
-            _q("yes_no", "Will you attend in person?", required=True,
-               logic=[{"op": "is", "value": False, "goto": "end"}]),
+            _q(
+                "yes_no",
+                "Will you attend in person?",
+                required=True,
+                logic=[{"op": "is", "value": False, "goto": "end"}],
+            ),
             _q("rating", "How excited are you about this event?", settings={"steps": 5}),
         ],
     }
@@ -67,13 +103,29 @@ def _product_feedback() -> dict:
         },
         "questions": [
             _q("rating", "Overall, how would you rate our product?", required=True, settings={"steps": 5}),
-            _q("multiple_choice", "Which feature do you use the most?", required=True,
-               options=["Dashboards", "Integrations", "Mobile app", "Reporting", "Automations"]),
-            _q("long_text", "What's one thing we could do better?", description="Be as honest as you like.",
-               settings={"placeholder": "Type your answer here..."}),
-            _q("number", "On a scale of 0 to 10, how likely are you to recommend us to a friend?", required=True,
-               settings={"min": 0, "max": 10}),
-            _q("email", "Can we follow up with you? Leave your email if so.", settings={"placeholder": "name@example.com"}),
+            _q(
+                "multiple_choice",
+                "Which feature do you use the most?",
+                required=True,
+                options=["Dashboards", "Integrations", "Mobile app", "Reporting", "Automations"],
+            ),
+            _q(
+                "long_text",
+                "What's one thing we could do better?",
+                description="Be as honest as you like.",
+                settings={"placeholder": "Type your answer here..."},
+            ),
+            _q(
+                "number",
+                "On a scale of 0 to 10, how likely are you to recommend us to a friend?",
+                required=True,
+                settings={"min": 0, "max": 10},
+            ),
+            _q(
+                "email",
+                "Can we follow up with you? Leave your email if so.",
+                settings={"placeholder": "name@example.com"},
+            ),
         ],
     }
 
@@ -81,22 +133,53 @@ def _product_feedback() -> dict:
 def _job_application() -> dict:
     return {
         "title": "Job Application",
-        "settings": {"theme": "ocean", "welcome": {"enabled": True, "title": "Join our team",
-                     "description": "This takes about 3 minutes.", "button_text": "Apply now"}},
+        "settings": {
+            "theme": "ocean",
+            "welcome": {
+                "enabled": True,
+                "title": "Join our team",
+                "description": "This takes about 3 minutes.",
+                "button_text": "Apply now",
+            },
+        },
         "questions": [
             _q("short_text", "What's your name?", required=True),
             _q("email", "And your email?", required=True),
             _q("number", "How many years of professional experience do you have?", settings={"min": 0, "max": 50}),
-            _q("dropdown", "Which role are you applying for?", required=True,
-               options=["Frontend Engineer", "Backend Engineer", "Product Designer", "Data Analyst"]),
+            _q(
+                "dropdown",
+                "Which role are you applying for?",
+                required=True,
+                options=["Frontend Engineer", "Backend Engineer", "Product Designer", "Data Analyst"],
+            ),
             _q("long_text", "Why do you want to work with us?", required=True),
-            _q("file_upload", "Upload your CV", description="PDF or Word, up to 10 MB.", settings={"max_size_mb": 10}),
+            _q("file_upload", "Upload your CV", description="PDF or Word, up to 5 MB.", settings={"max_size_mb": 5}),
         ],
     }
 
 
-FIRST = ["Aarav", "Diya", "Kabir", "Meera", "Rohan", "Ananya", "Ishaan", "Sara", "Vikram", "Priya", "Arjun", "Nisha",
-         "Leo", "Maya", "Noah", "Zara", "Dev", "Tara", "Omar", "Lina"]
+FIRST = [
+    "Aarav",
+    "Diya",
+    "Kabir",
+    "Meera",
+    "Rohan",
+    "Ananya",
+    "Ishaan",
+    "Sara",
+    "Vikram",
+    "Priya",
+    "Arjun",
+    "Nisha",
+    "Leo",
+    "Maya",
+    "Noah",
+    "Zara",
+    "Dev",
+    "Tara",
+    "Omar",
+    "Lina",
+]
 LAST = ["Sharma", "Patel", "Kapoor", "Iyer", "Singh", "Mehta", "Rao", "Khan", "Gupta", "Das", "Fernandes", "Nair"]
 IMPROVEMENTS = [
     "Faster load times on the dashboard would be great.",
@@ -147,8 +230,9 @@ def _seed_responses(db: Session, form: Form, definition: dict, count: int, rng: 
         session_id = new_id()
         started = when - timedelta(seconds=rng.randint(45, 300))  # time spent filling the form
         db.add(ResponseSession(form_id=form.id, client_session_id=session_id, viewed_at=started, started_at=started))
-        create_submission(db, form, form.published_version, answers, new_id(), client_session_id=session_id,
-                          submitted_at=when)
+        create_submission(
+            db, form, form.published_version, answers, new_id(), client_session_id=session_id, submitted_at=when
+        )
     # Visitors who looked but didn't finish, so the completion rate is realistic.
     # Those who started leave a partial response (their first answers).
     for _ in range(count // 2):
@@ -158,37 +242,53 @@ def _seed_responses(db: Session, form: Form, definition: dict, count: int, rng: 
             continue
         person = (rng.choice(FIRST), rng.choice(LAST))
         first = definition["questions"][: rng.randint(1, 2)]
-        db.add(ResponseSession(
-            form_id=form.id,
-            client_session_id=new_id(),
-            viewed_at=when,
-            started_at=when,
-            form_version_id=form.published_version_id,
-            partial_answers_json={q["id"]: _answer(q, rng, person) for q in first},
-            last_activity_at=when + timedelta(minutes=rng.randint(1, 5)),
-        ))
+        db.add(
+            ResponseSession(
+                form_id=form.id,
+                client_session_id=new_id(),
+                viewed_at=when,
+                started_at=when,
+                form_version_id=form.published_version_id,
+                partial_answers_json={q["id"]: _answer(q, rng, person) for q in first},
+                last_activity_at=when + timedelta(minutes=rng.randint(1, 5)),
+            )
+        )
     db.commit()
 
 
-def _create(db: Session, workspace_id: str, data: dict) -> Form:
-    form = Form(workspace_id=workspace_id, title=data["title"], settings_json={})
+@dataclass(frozen=True)
+class DemoForm:
+    key: str
+    build: Callable[[], dict]
+    publish: bool
+    responses: int
+
+
+DEMO_FORMS = (
+    DemoForm("event_registration", _event_registration, publish=True, responses=24),
+    DemoForm("product_feedback", _product_feedback, publish=True, responses=18),
+    DemoForm("job_application", _job_application, publish=False, responses=0),
+)
+
+
+def _create_demo(db: Session, workspace_id: str, demo: DemoForm) -> Form:
+    data = demo.build()
+    form = Form(workspace_id=workspace_id, title=data["title"], settings_json={}, demo_key=demo.key)
     db.add(form)
     apply_definition(form, FormDefinition.model_validate(data))
     db.commit()
+    if demo.publish:
+        publish(db, form)
+        # Seeded per form, so a restored form gets the same sample responses as the original.
+        _seed_responses(db, form, data, demo.responses, random.Random(demo.key))
     return form
 
 
 def seed(db: Session) -> None:
-    rng = random.Random(42)
     creator = ensure_creator(db, "Alex Morgan", get_settings().default_creator_email)
     workspace = get_default_workspace(db, creator)
-
-    for data, responses in ((_event_registration(), 24), (_product_feedback(), 18)):
-        form = _create(db, workspace.id, data)
-        publish(db, form)
-        _seed_responses(db, form, data, responses, rng)
-
-    _create(db, workspace.id, _job_application())
+    for demo in DEMO_FORMS:
+        _create_demo(db, workspace.id, demo)
     logger.info("Seeded demo data")
 
 
@@ -197,3 +297,28 @@ def seed_if_empty(db: Session) -> bool:
         return False
     seed(db)
     return True
+
+
+def restore_demo(db: Session) -> list[str]:
+    """Bring the demo forms back if visitors deleted or unpublished them.
+
+    Deleting and unpublishing stay fully allowed (they are features being evaluated);
+    this only repairs the shared public demo afterwards. Other forms are never touched.
+    """
+    creator = ensure_creator(db, "Alex Morgan", get_settings().default_creator_email)
+    workspace = get_default_workspace(db, creator)
+    actions: list[str] = []
+    for demo in DEMO_FORMS:
+        form = db.scalar(select(Form).where(Form.demo_key == demo.key))
+        if form is None:
+            _create_demo(db, workspace.id, demo)
+            actions.append(f"recreated {demo.key}")
+        elif demo.publish and form.status != "published":
+            try:
+                publish(db, form)
+                actions.append(f"republished {demo.key}")
+            except ValidationFailedError:
+                db.rollback()  # edited into an unpublishable state; leave it for the next run
+    if actions:
+        logger.info("Demo restore: %s", ", ".join(actions))
+    return actions

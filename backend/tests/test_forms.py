@@ -30,18 +30,26 @@ def test_search_and_sort(client):
 
 def test_draft_save_adds_reorders_and_removes_questions(client):
     a, b, c = qid(), qid(), qid()
-    form = make_form(client, [
-        {"id": a, "type": "short_text", "title": "A"},
-        {"id": b, "type": "multiple_choice", "title": "B", "options": [{"id": "o1", "label": "One"}]},
-        {"id": c, "type": "rating", "title": "C"},
-    ])
+    form = make_form(
+        client,
+        [
+            {"id": a, "type": "short_text", "title": "A"},
+            {"id": b, "type": "multiple_choice", "title": "B", "options": [{"id": "o1", "label": "One"}]},
+            {"id": c, "type": "rating", "title": "C"},
+        ],
+    )
     assert [q["id"] for q in form["questions"]] == [a, b, c]
     assert form["questions"][2]["settings"] == {"steps": 5, "shape": "star"}  # defaults applied
 
-    res = client.put(f"/api/v1/forms/{form['id']}/draft", json={
-        "revision": form["revision"], "title": "T", "settings": {"theme": "ocean"},
-        "questions": [form["questions"][2], form["questions"][0]],
-    })
+    res = client.put(
+        f"/api/v1/forms/{form['id']}/draft",
+        json={
+            "revision": form["revision"],
+            "title": "T",
+            "settings": {"theme": "ocean"},
+            "questions": [form["questions"][2], form["questions"][0]],
+        },
+    )
     assert res.status_code == 200
     after = client.get(f"/api/v1/forms/{form['id']}").json()
     assert [q["id"] for q in after["questions"]] == [c, a]
@@ -60,22 +68,38 @@ def test_stale_draft_revision_is_rejected(client):
 
 def test_invalid_question_config_is_rejected(client):
     form = client.post("/api/v1/forms", json={"title": "x"}).json()
-    res = client.put(f"/api/v1/forms/{form['id']}/draft", json={
-        "revision": form["revision"], "title": "x", "settings": {},
-        "questions": [{"id": qid(), "type": "number", "title": "N", "settings": {"min": 5, "max": 1}}],
-    })
+    res = client.put(
+        f"/api/v1/forms/{form['id']}/draft",
+        json={
+            "revision": form["revision"],
+            "title": "x",
+            "settings": {},
+            "questions": [{"id": qid(), "type": "number", "title": "N", "settings": {"min": 5, "max": 1}}],
+        },
+    )
     assert res.status_code == 422
     assert res.json()["error"]["code"] == "invalid_request"
 
 
 def test_duplicate_copies_structure_not_responses(client):
-    form = make_form(client, [
-        {"id": qid(), "type": "dropdown", "title": "Pick", "required": True, "options": [{"id": "x", "label": "X"}]},
-    ])
+    form = make_form(
+        client,
+        [
+            {
+                "id": qid(),
+                "type": "dropdown",
+                "title": "Pick",
+                "required": True,
+                "options": [{"id": "x", "label": "X"}],
+            },
+        ],
+    )
     publish(client, form["id"])
     slug = client.get(f"/api/v1/forms/{form['id']}").json()["slug"]
-    client.post(f"/api/v1/public/forms/{slug}/submissions", json={"client_submission_id": qid(), "answers": {
-        form["questions"][0]["id"]: "x"}})
+    client.post(
+        f"/api/v1/public/forms/{slug}/submissions",
+        json={"client_submission_id": qid(), "answers": {form["questions"][0]["id"]: "x"}},
+    )
 
     copy = client.post(f"/api/v1/forms/{form['id']}/duplicate").json()
     assert copy["title"] == "Test form (copy)"
@@ -98,8 +122,10 @@ def test_list_includes_completion_rate(client):
     sessions = [qid(), qid()]
     for s in sessions:
         client.post(f"/api/v1/public/forms/{slug}/sessions", json={"client_session_id": s, "event": "start"})
-    client.post(f"/api/v1/public/forms/{slug}/submissions",
-                json={"client_submission_id": qid(), "client_session_id": sessions[0], "answers": {q: "x"}})
+    client.post(
+        f"/api/v1/public/forms/{slug}/submissions",
+        json={"client_submission_id": qid(), "client_session_id": sessions[0], "answers": {q: "x"}},
+    )
     row = next(f for f in client.get("/api/v1/forms").json() if f["id"] == form["id"])
     assert row["completion_rate"] == 50.0
     draft = client.post("/api/v1/forms", json={"title": "Fresh"}).json()

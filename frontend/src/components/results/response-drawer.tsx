@@ -40,21 +40,23 @@ export function ResponseDrawer({ formId, submissionId, onClose }: ResponseDrawer
     <Dialog.Root open={submissionId !== null} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/20 data-[state=open]:animate-[fade-in_150ms_ease-out]" />
-        <Dialog.Content className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-surface shadow-2xl outline-none data-[state=open]:animate-[slide-in_200ms_ease-out]">
-          <div className="flex items-start justify-between border-b border-line px-6 py-4">
+        <Dialog.Content className="bg-surface fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col shadow-2xl outline-none data-[state=open]:animate-[slide-in_200ms_ease-out]">
+          <div className="border-line flex items-start justify-between border-b px-6 py-4">
             <div>
-              <Dialog.Title className="text-lg font-semibold">{detail ? `Response #${detail.number}` : "Response"}</Dialog.Title>
-              <Dialog.Description className="text-xs text-muted">
+              <Dialog.Title className="text-lg font-semibold">
+                {detail ? `Response #${detail.number}` : "Response"}
+              </Dialog.Title>
+              <Dialog.Description className="text-muted text-xs">
                 {detail ? `${formatDateTime(detail.submitted_at)} · form version ${detail.version_number}` : "Loading…"}
               </Dialog.Description>
             </div>
-            <Dialog.Close className="rounded-md p-1.5 text-muted hover:bg-selected hover:text-ink" aria-label="Close">
+            <Dialog.Close className="text-muted hover:bg-selected hover:text-ink rounded-md p-1.5" aria-label="Close">
               <X size={18} />
             </Dialog.Close>
           </div>
           <div className="flex-1 overflow-y-auto px-6 py-5">
             {error ? (
-              <p className="text-sm text-danger">{error}</p>
+              <p className="text-danger text-sm">{error}</p>
             ) : !detail ? (
               <div className="space-y-5">
                 {[0, 1, 2].map((i) => (
@@ -70,13 +72,19 @@ export function ResponseDrawer({ formId, submissionId, onClose }: ResponseDrawer
                   <li key={a.question_id} className="flex gap-3">
                     <QuestionTypeBadge type={a.type as QuestionType} number={i + 1} />
                     <div className="min-w-0">
-                      <p className="text-sm text-muted">{a.title || "Untitled question"}</p>
+                      <p className="text-muted text-sm">{a.title || "Untitled question"}</p>
                       {a.file_url ? (
-                        <a href={a.file_url} download className="mt-1 inline-flex items-center gap-1.5 font-medium text-teal hover:underline">
+                        <a
+                          href={a.file_url}
+                          download
+                          className="text-teal mt-1 inline-flex items-center gap-1.5 font-medium hover:underline"
+                        >
                           <Download size={15} /> {a.display}
                         </a>
                       ) : (
-                        <p className={`mt-1 whitespace-pre-line ${a.display ? "" : "text-sm text-muted italic"}`}>{a.display ?? "No answer"}</p>
+                        <p className={`mt-1 whitespace-pre-line ${a.display ? "" : "text-muted text-sm italic"}`}>
+                          {a.display ?? "No answer"}
+                        </p>
                       )}
                     </div>
                   </li>

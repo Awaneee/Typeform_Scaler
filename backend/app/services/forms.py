@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.core.errors import ConflictError, NotFoundError
 from app.core.types import new_id, utcnow
-from app.models import Creator, Form, FormVersion, Question, QuestionOption, ResponseSession, Submission, Workspace
+from app.models import Creator, Form, Question, QuestionOption, ResponseSession, Submission, Workspace
 from app.schemas.forms import DraftSaved, DraftUpdate, FormDetail, FormSort, FormSummary
 from app.services.creators import get_default_workspace
 from app.services.definitions import apply_definition, draft_definition, read_settings
@@ -166,12 +166,16 @@ def duplicate_form(db: Session, form: Form) -> Form:
             )
         )
     # Copy logic jumps, pointing them at the new question and option ids.
-    id_map = {old.id: new.id for old, new in zip(form.questions, copy.questions)}
-    for old, new in zip(form.questions, copy.questions):
-        id_map.update({o.id: n.id for o, n in zip(old.options, new.options)})
-    for old, new in zip(form.questions, copy.questions):
+    id_map = {old.id: new.id for old, new in zip(form.questions, copy.questions, strict=False)}
+    for old, new in zip(form.questions, copy.questions, strict=False):
+        id_map.update({o.id: n.id for o, n in zip(old.options, new.options, strict=False)})
+    for old, new in zip(form.questions, copy.questions, strict=False):
         new.logic_json = [
-            {**r, "goto": id_map.get(r["goto"], r["goto"]), "value": id_map.get(r["value"], r["value"]) if isinstance(r["value"], str) else r["value"]}
+            {
+                **r,
+                "goto": id_map.get(r["goto"], r["goto"]),
+                "value": id_map.get(r["value"], r["value"]) if isinstance(r["value"], str) else r["value"],
+            }
             for r in old.logic_json or []
         ]
     db.add(copy)
@@ -188,9 +192,3 @@ def delete_form(db: Session, form: Form) -> None:
     db.commit()
     for path in files:  # only after the commit succeeded
         path.unlink(missing_ok=True)
-
-
-def latest_version(db: Session, form_id: str) -> FormVersion | None:
-    return db.scalar(
-        select(FormVersion).where(FormVersion.form_id == form_id).order_by(FormVersion.version_number.desc()).limit(1)
-    )

@@ -12,7 +12,7 @@ interface SharePanelProps {
   onUnpublish: () => void;
 }
 
-export async function copyLink(slug: string) {
+async function copyLink(slug: string) {
   try {
     await navigator.clipboard.writeText(publicFormUrl(slug));
     toast.success("Link copied to clipboard");
@@ -33,13 +33,13 @@ export function ShareLinkBox({ slug }: { slug: string }) {
         value={url}
         onFocus={(e) => e.target.select()}
         aria-label="Public link"
-        className="h-10 min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 text-sm outline-none"
+        className="border-line bg-surface h-10 min-w-0 flex-1 rounded-lg border px-3 text-sm outline-none"
       />
       <a
         href={url}
         target="_blank"
         rel="noreferrer"
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-line hover:bg-selected"
+        className="border-line hover:bg-selected flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border"
         aria-label="Open form in a new tab"
       >
         <ExternalLink size={16} />
@@ -58,44 +58,50 @@ export function SharePanel({ publishing, onPublish, onUnpublish }: SharePanelPro
   const live = status === "published" && slug;
 
   return (
-    <div className="mx-3 mb-3 flex-1 overflow-y-auto rounded-2xl bg-panel px-4 py-14 sm:mx-4 sm:mb-4">
+    <div className="bg-panel mx-3 mb-3 flex-1 overflow-y-auto rounded-2xl px-4 py-14 sm:mx-4 sm:mb-4">
       <div className="mx-auto max-w-2xl space-y-8">
         <h2 className="text-center text-2xl">Choose how you&apos;d like to share your form</h2>
 
-        <section className="space-y-5 rounded-2xl bg-surface p-6">
+        <section className="bg-surface space-y-5 rounded-2xl p-6">
           {live ? (
             <>
               <ShareLinkBox slug={slug} />
-              <div className="border-t border-line pt-5">
-                <p className="mb-2 flex items-center justify-between text-sm text-muted">
+              <div className="border-line border-t pt-5">
+                <p className="text-muted mb-2 flex items-center justify-between text-sm">
                   Link preview
-                  <span className="rounded-full bg-teal/15 px-2 py-0.5 text-xs font-medium text-teal">Live · v{version}</span>
+                  <span className="bg-teal/15 text-teal rounded-full px-2 py-0.5 text-xs font-medium">
+                    Live · v{version}
+                  </span>
                 </p>
-                <div className="flex items-center gap-4 rounded-xl border border-line p-3">
-                  <span className="flex h-16 w-24 shrink-0 items-center justify-center rounded-lg bg-panel text-sm font-semibold">formflow</span>
+                <div className="border-line flex items-center gap-4 rounded-xl border p-3">
+                  <span className="bg-panel flex h-16 w-24 shrink-0 items-center justify-center rounded-lg text-sm font-semibold">
+                    formflow
+                  </span>
                   <div className="min-w-0">
                     <p className="truncate font-medium">{title}</p>
-                    <p className="truncate text-sm text-muted">Turn data collection into an experience with Formflow.</p>
-                    <p className="truncate text-xs text-muted">{new URL(publicFormUrl(slug), "http://x").host}</p>
+                    <p className="text-muted truncate text-sm">
+                      Turn data collection into an experience with Formflow.
+                    </p>
+                    <p className="text-muted truncate text-xs">{new URL(publicFormUrl(slug), "http://x").host}</p>
                   </div>
                 </div>
               </div>
               {changed && (
-                <div className="flex items-center justify-between gap-3 rounded-lg bg-lavender/60 px-4 py-3 text-sm">
+                <div className="bg-lavender/60 flex items-center justify-between gap-3 rounded-lg px-4 py-3 text-sm">
                   You have changes that aren&apos;t live yet.
                   <Button size="sm" onClick={onPublish} disabled={publishing}>
                     Publish changes
                   </Button>
                 </div>
               )}
-              <button onClick={onUnpublish} className="flex items-center gap-1.5 text-sm text-muted hover:text-danger">
+              <button onClick={onUnpublish} className="text-muted hover:text-danger flex items-center gap-1.5 text-sm">
                 <Undo2 size={15} /> Unpublish (stop accepting responses)
               </button>
             </>
           ) : (
             <div className="flex flex-col items-center gap-4 py-4 text-center">
               <Globe size={22} />
-              <p className="text-sm text-muted">Publish your form to get a shareable link.</p>
+              <p className="text-muted text-sm">Publish your form to get a shareable link.</p>
               <Button onClick={onPublish} disabled={publishing}>
                 {publishing ? "Publishing…" : "Publish"}
               </Button>
@@ -113,7 +119,7 @@ export function SharePanel({ publishing, onPublish, onUnpublish }: SharePanelPro
               <button
                 key={label}
                 onClick={() => toast(`${label}: coming soon`)}
-                className="flex overflow-hidden rounded-xl border border-line bg-surface text-left text-sm hover:shadow-sm"
+                className="border-line bg-surface flex overflow-hidden rounded-xl border text-left text-sm hover:shadow-sm"
               >
                 <span className={`flex h-24 w-28 shrink-0 items-center justify-center ${color}`}>
                   <Code2 size={20} className="text-ink/60" />
@@ -126,7 +132,7 @@ export function SharePanel({ publishing, onPublish, onUnpublish }: SharePanelPro
         <div className="text-center">
           <button
             onClick={() => toast("More sharing options are coming soon")}
-            className="rounded-lg border border-line bg-surface px-3 py-1.5 text-sm font-medium hover:bg-selected"
+            className="border-line bg-surface hover:bg-selected rounded-lg border px-3 py-1.5 text-sm font-medium"
           >
             Explore other ways to share
           </button>

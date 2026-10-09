@@ -40,7 +40,9 @@ def _logic_errors(definition: FormDefinition) -> dict[str, str]:
                 errors[q.id] = "A logic rule refers to a choice that no longer exists."
             elif q.type == "yes_no" and not isinstance(rule.value, bool):
                 errors[q.id] = "A logic rule needs Yes or No."
-            elif q.type in ("rating", "number") and (isinstance(rule.value, bool) or not isinstance(rule.value, int | float)):
+            elif q.type in ("rating", "number") and (
+                isinstance(rule.value, bool) or not isinstance(rule.value, int | float)
+            ):
                 errors[q.id] = "A logic rule needs a number."
     return errors
 

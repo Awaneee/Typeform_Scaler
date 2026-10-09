@@ -7,13 +7,15 @@ from pathlib import Path
 _tmp = Path(tempfile.mkdtemp()) / "test.db"
 os.environ["DATABASE_URL"] = f"sqlite:///{_tmp.as_posix()}"
 os.environ["SEED_ON_EMPTY"] = "false"
+os.environ["DEMO_RESTORE_MINUTES"] = "0"
+os.environ["RATE_LIMIT_ENABLED"] = "false"
 os.environ["UPLOAD_DIR"] = str(_tmp.parent / "uploads")
 
 import pytest  # noqa: E402
-from alembic import command  # noqa: E402
-from alembic.config import Config  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
 
+from alembic import command  # noqa: E402
+from alembic.config import Config  # noqa: E402
 from app.core.config import get_settings  # noqa: E402
 from app.core.db import SessionLocal  # noqa: E402
 from app.main import app  # noqa: E402

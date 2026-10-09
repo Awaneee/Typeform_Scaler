@@ -3,12 +3,12 @@
 import { create } from "zustand";
 import { ApiError } from "@/lib/api/client";
 import { formsApi } from "@/lib/api/forms";
-import { createQuestion, hasOptions, newId, QUESTION_REGISTRY } from "@/components/questions/registry";
+import { createQuestion, hasOptions, newId } from "@/components/questions/registry";
 import type { FormDetail, FormSettings, LogicRule, Question, QuestionSettings, QuestionType } from "@/types/form";
 
-export type SaveStatus = "saved" | "unsaved" | "saving" | "error" | "conflict";
+type SaveStatus = "saved" | "unsaved" | "saving" | "error" | "conflict";
 /** A question id, or "ending" for the thank-you screen. */
-export type Selection = string | "ending" | null;
+type Selection = string | "ending" | null;
 
 interface BuilderState {
   formId: string;
@@ -53,7 +53,7 @@ interface BuilderActions {
   setLogic: (questionId: string, logic: LogicRule[]) => void;
 }
 
-export type BuilderStore = BuilderState & BuilderActions;
+type BuilderStore = BuilderState & BuilderActions;
 
 const DEFAULT_SETTINGS: FormSettings = {
   theme: "pearl",
@@ -64,7 +64,11 @@ const DEFAULT_SETTINGS: FormSettings = {
 export const useBuilder = create<BuilderStore>()((set, get) => {
   /** Every content change goes through here: apply it, mark dirty, schedule a save. */
   function edit(updater: (s: BuilderState) => Partial<BuilderState>) {
-    set((s) => ({ ...updater(s), editVersion: s.editVersion + 1, saveStatus: s.saveStatus === "conflict" ? "conflict" : "unsaved" }));
+    set((s) => ({
+      ...updater(s),
+      editVersion: s.editVersion + 1,
+      saveStatus: s.saveStatus === "conflict" ? "conflict" : "unsaved",
+    }));
     scheduleSave();
   }
 
@@ -305,5 +309,3 @@ export async function flushSave(): Promise<boolean> {
 }
 
 export const hasUnsavedChanges = isDirty;
-
-export const questionMeta = (type: QuestionType) => QUESTION_REGISTRY[type];

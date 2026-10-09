@@ -16,11 +16,14 @@ function sampleQuestions() {
 async function publishedSample(request: Parameters<typeof createForm>[0], title = "Respondent") {
   return createForm(request, title, sampleQuestions(), {
     publish: true,
-    settings: { thank_you: { title: "Thanks, you rock!", description: "See you soon.", button_text: "Create a typeform" } },
+    settings: {
+      thank_you: { title: "Thanks, you rock!", description: "See you soon.", button_text: "Create a typeform" },
+    },
   });
 }
 
-const responseCount = async (page: Page, id: string) => (await (await page.request.get(`/api/v1/forms/${id}`)).json()).response_count;
+const responseCount = async (page: Page, id: string) =>
+  (await (await page.request.get(`/api/v1/forms/${id}`)).json()).response_count;
 
 test("One question at a time, full-screen", async ({ page, request }) => {
   const form = await publishedSample(request);
@@ -32,7 +35,10 @@ test("One question at a time, full-screen", async ({ page, request }) => {
   expect(box.height).toBeGreaterThan(850);
 });
 
-test("Smooth transitions between questions (fade + slide, direction-aware, reduced-motion aware)", async ({ page, request }) => {
+test("Smooth transitions between questions (fade + slide, direction-aware, reduced-motion aware)", async ({
+  page,
+  request,
+}) => {
   const form = await publishedSample(request);
   await page.goto(`/to/${form.slug}`);
   await onQuestion(page, "What's your name?");
@@ -40,7 +46,12 @@ test("Smooth transitions between questions (fade + slide, direction-aware, reduc
   await page.keyboard.press("Enter");
   // Mid-transition the outgoing question is partly faded (an animation, not an instant swap).
   await page.waitForTimeout(120);
-  const opacity = Number(await page.locator("main").first().evaluate((el) => getComputedStyle(el).opacity));
+  const opacity = Number(
+    await page
+      .locator("main")
+      .first()
+      .evaluate((el) => getComputedStyle(el).opacity),
+  );
   expect(opacity).toBeLessThan(1);
   await onQuestion(page, "What's your email?");
 
@@ -55,7 +66,10 @@ test("Smooth transitions between questions (fade + slide, direction-aware, reduc
   expect(transforms.every((t) => t === "none" || t === "matrix(1, 0, 0, 1, 0, 0)")).toBe(true);
 });
 
-test("Keyboard navigation (Enter / ↓ next, ↑ back, letter keys for choices, Y/N, number keys for rating)", async ({ page, request }) => {
+test("Keyboard navigation (Enter / ↓ next, ↑ back, letter keys for choices, Y/N, number keys for rating)", async ({
+  page,
+  request,
+}) => {
   const form = await publishedSample(request);
   await page.goto(`/to/${form.slug}`);
   await onQuestion(page, "What's your name?");
@@ -115,16 +129,27 @@ test("Validation: server side (required, email, number, choices, rating)", async
   const fields = (await res.json()).error.fields;
   expect(Object.keys(fields).sort()).toEqual([age, email, name, pick, rate].sort());
   expect(fields[name]).toBe("Please fill this in.");
-  const ok = await submit(request, form.slug!, { [name]: "Ada", [email]: "a@b.co", [age]: 30, [pick]: [choice[0].id], [rate]: 5 });
+  const ok = await submit(request, form.slug!, {
+    [name]: "Ada",
+    [email]: "a@b.co",
+    [age]: 30,
+    [pick]: [choice[0].id],
+    [rate]: 5,
+  });
   expect(ok.status()).toBe(201);
 });
 
 test("Validation: client side (same rules and messages as the server)", async ({ page, request }) => {
-  const form = await createForm(request, "Client validation", [
-    q("short_text", "Name", { required: true }),
-    q("email", "Email", { required: true }),
-    q("number", "Age", { settings: { min: 18 } }),
-  ], { publish: true });
+  const form = await createForm(
+    request,
+    "Client validation",
+    [
+      q("short_text", "Name", { required: true }),
+      q("email", "Email", { required: true }),
+      q("number", "Age", { settings: { min: 18 } }),
+    ],
+    { publish: true },
+  );
   let submitted = false;
   await page.route("**/submissions", (route) => ((submitted = true), route.continue()));
   await page.goto(`/to/${form.slug}`);
@@ -198,7 +223,10 @@ test("No login required to fill a published form", async ({ browser, request }) 
   await page.goto(`/to/${form.slug}`);
   await onQuestion(page, "What's your name?");
   const res = await page.request.post(`/api/v1/public/forms/${form.slug}/submissions`, {
-    data: { client_submission_id: uid(), answers: { [form.questions[0].id]: "Anon", [form.questions[1].id]: "anon@example.com" } },
+    data: {
+      client_submission_id: uid(),
+      answers: { [form.questions[0].id]: "Anon", [form.questions[1].id]: "anon@example.com" },
+    },
   });
   expect(res.status()).toBe(201);
   await anonymous.close();

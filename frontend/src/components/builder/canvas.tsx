@@ -27,7 +27,7 @@ export function Canvas({ device, onAdd }: { device: Device; onAdd: () => void })
     <div className="flex min-h-0 flex-1 items-stretch justify-center overflow-hidden">
       <div
         className={cn(
-          "relative flex w-full overflow-y-auto rounded-xl border border-line shadow-sm transition-[max-width] duration-300",
+          "border-line relative flex w-full overflow-y-auto rounded-xl border shadow-sm transition-[max-width] duration-300",
           device === "mobile" ? "max-w-[375px]" : "max-w-none",
         )}
         style={{ background: theme.background, fontFamily: theme.font }}
@@ -67,7 +67,10 @@ function QuestionEditor({ question, number, theme }: { question: Question; numbe
           {/* The hidden copy underneath has the same text and wrapping as the textarea, so the
               required asterisk lands right after the last word, like on the public form. */}
           <div className="grid text-xl leading-snug sm:text-2xl">
-            <div aria-hidden className="pointer-events-none col-start-1 row-start-1 break-words whitespace-pre-wrap text-transparent select-none">
+            <div
+              aria-hidden
+              className="pointer-events-none col-start-1 row-start-1 break-words whitespace-pre-wrap text-transparent select-none"
+            >
               {question.title || "Your question here."}
               {question.required && <span style={{ color: theme.question }}> *</span>}
             </div>
@@ -87,10 +90,10 @@ function QuestionEditor({ question, number, theme }: { question: Question; numbe
             onChange={(e) => update(question.id, { description: e.target.value })}
             placeholder="Description (optional)"
             aria-label="Question description"
-            className="mt-2 text-base leading-snug sm:text-lg placeholder:text-[var(--ph)] placeholder:italic"
+            className="mt-2 text-base leading-snug placeholder:text-[var(--ph)] placeholder:italic sm:text-lg"
             style={{ color: withAlpha(theme.question, 0.7), ["--ph" as string]: withAlpha(theme.question, 0.3) }}
           />
-          {error && <p className="mt-2 text-sm font-medium text-danger">{error}</p>}
+          {error && <p className="text-danger mt-2 text-sm font-medium">{error}</p>}
 
           <div className="mt-8">
             {question.type === "multiple_choice" ? (
@@ -121,7 +124,7 @@ function EndingEditor({ theme }: { theme: Theme }) {
         onChange={(e) => set({ title: e.target.value.replace(/\n/g, " ") })}
         placeholder="Thanks for completing this form"
         aria-label="Thank you title"
-        className="text-center text-2xl leading-snug sm:text-3xl placeholder:text-[var(--ph)]"
+        className="text-center text-2xl leading-snug placeholder:text-[var(--ph)] sm:text-3xl"
         style={{ color: theme.question, ["--ph" as string]: withAlpha(theme.question, 0.35) }}
       />
       <AutoTextarea

@@ -34,8 +34,12 @@ export async function request<T>(path: string, init: RequestInit & { json?: unkn
 
   const body = await res.json().catch(() => null);
   if (!res.ok) {
-    const { code = "http_error", message = `Request failed (${res.status})`, fields = null, ...extra } =
-      body?.error ?? {};
+    const {
+      code = "http_error",
+      message = `Request failed (${res.status})`,
+      fields = null,
+      ...extra
+    } = body?.error ?? {};
     throw new ApiError(res.status, code, message, fields, extra);
   }
   return body as T;

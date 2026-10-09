@@ -18,19 +18,19 @@ from app.core.errors import NotFoundError
 from app.core.types import utcnow
 from app.models import Form, FormVersion, ResponseSession, Submission
 from app.schemas.definition import FormDefinition, QuestionDef
-from app.services.uploads import file_names
 from app.schemas.results import (
     AnswerDetail,
     ChoiceCount,
     FormAnalytics,
-    QuestionAnalytics,
-    ResultColumn,
     PartialPage,
     PartialRow,
+    QuestionAnalytics,
+    ResultColumn,
     SubmissionDetail,
     SubmissionPage,
     SubmissionRow,
 )
+from app.services.uploads import file_names
 
 
 @dataclass
@@ -138,9 +138,7 @@ def list_partials(db: Session, form: Form, *, page: int, page_size: int) -> Part
     catalog = build_catalog(db, form)
     by_id = {q.id: q for q in catalog.questions}
     sessions = db.scalars(
-        select(ResponseSession)
-        .where(*_partial_filter(form))
-        .order_by(ResponseSession.last_activity_at.desc())
+        select(ResponseSession).where(*_partial_filter(form)).order_by(ResponseSession.last_activity_at.desc())
     ).all()
     sessions = [s for s in sessions if s.partial_answers_json]  # skip sessions with nothing answered
     rows = [
@@ -159,7 +157,13 @@ def list_partials(db: Session, form: Form, *, page: int, page_size: int) -> Part
         for s in sessions
     ]
     start = (page - 1) * page_size
-    return PartialPage(columns=catalog.columns(), items=rows[start : start + page_size], total=len(rows), page=page, page_size=page_size)
+    return PartialPage(
+        columns=catalog.columns(),
+        items=rows[start : start + page_size],
+        total=len(rows),
+        page=page,
+        page_size=page_size,
+    )
 
 
 def get_submission(db: Session, form: Form, submission_id: str) -> SubmissionDetail:
@@ -190,22 +194,36 @@ def get_submission(db: Session, form: Form, submission_id: str) -> SubmissionDet
                 title=q.title,
                 type=q.type,
                 value=values.get(q.id),
-                display=format_answer(q, values[q.id], catalog.option_labels, catalog.file_names) if q.id in values else None,
-                file_url=f"/api/v1/forms/{form.id}/files/{values[q.id]}" if q.type == "file_upload" and q.id in values else None,
+                display=format_answer(q, values[q.id], catalog.option_labels, catalog.file_names)
+                if q.id in values
+                else None,
+                file_url=f"/api/v1/forms/{form.id}/files/{values[q.id]}"
+                if q.type == "file_upload" and q.id in values
+                else None,
             )
             for q in definition.questions
         ],
     )
 
 
-def _question_analytics(q: QuestionDef, values: list[Any], total: int, removed: bool, labels: dict[str, str], files: dict[str, str]):
-    base = dict(question_id=q.id, title=q.title, type=q.type, removed=removed, answered=len(values),
-                skipped=max(total - len(values), 0))
+def _question_analytics(
+    q: QuestionDef, values: list[Any], total: int, removed: bool, labels: dict[str, str], files: dict[str, str]
+):
+    base = dict(
+        question_id=q.id,
+        title=q.title,
+        type=q.type,
+        removed=removed,
+        answered=len(values),
+        skipped=max(total - len(values), 0),
+    )
 
     def choices(counter: Counter, keys: list[tuple[Any, str]]) -> list[ChoiceCount]:
         denom = len(values) or 1
-        return [ChoiceCount(label=label, count=counter[key], percent=round(100 * counter[key] / denom, 1))
-                for key, label in keys]
+        return [
+            ChoiceCount(label=label, count=counter[key], percent=round(100 * counter[key] / denom, 1))
+            for key, label in keys
+        ]
 
     if q.type in ("multiple_choice", "dropdown"):
         counter = Counter(v for value in values for v in (value if isinstance(value, list) else [value]))
@@ -256,11 +274,14 @@ def analytics(db: Session, form: Form) -> FormAnalytics:
             seen_by.update(q.id for q in definition.questions)
 
     views = db.scalar(select(func.count()).select_from(ResponseSession).where(ResponseSession.form_id == form.id)) or 0
-    starts = db.scalar(
-        select(func.count())
-        .select_from(ResponseSession)
-        .where(ResponseSession.form_id == form.id, ResponseSession.started_at.is_not(None))
-    ) or 0
+    starts = (
+        db.scalar(
+            select(func.count())
+            .select_from(ResponseSession)
+            .where(ResponseSession.form_id == form.id, ResponseSession.started_at.is_not(None))
+        )
+        or 0
+    )
     completion = round(min(100.0, 100 * len(subs) / starts), 1) if starts else None
     durations = [
         (finished - started).total_seconds()
@@ -275,7 +296,9 @@ def analytics(db: Session, form: Form) -> FormAnalytics:
     ]
     avg_completion = round(mean(durations), 1) if durations else None
     partials = sum(
-        1 for answers in db.scalars(select(ResponseSession.partial_answers_json).where(*_partial_filter(form))) if answers
+        1
+        for answers in db.scalars(select(ResponseSession.partial_answers_json).where(*_partial_filter(form)))
+        if answers
     )
 
     today = utcnow().date()
@@ -294,7 +317,9 @@ def analytics(db: Session, form: Form) -> FormAnalytics:
         avg_completion_seconds=avg_completion,
         daily=daily,
         questions=[
-            _question_analytics(q, values[q.id], seen_by[q.id], q.id in catalog.removed, catalog.option_labels, catalog.file_names)
+            _question_analytics(
+                q, values[q.id], seen_by[q.id], q.id in catalog.removed, catalog.option_labels, catalog.file_names
+            )
             for q in catalog.questions
         ],
     )
@@ -313,10 +338,12 @@ def export_csv(db: Session, form: Form) -> str:
     writer.writerow(["#", "Submitted at (UTC)", "Version", *[q.title or "Untitled" for q in catalog.questions]])
     for number, sub in enumerate(subs, start=1):
         row = _row(sub, number, catalog)
-        writer.writerow([
-            number,
-            sub.submitted_at.strftime("%Y-%m-%d %H:%M:%S"),
-            row.version_number,
-            *[row.answers.get(q.id, "") for q in catalog.questions],
-        ])
+        writer.writerow(
+            [
+                number,
+                sub.submitted_at.strftime("%Y-%m-%d %H:%M:%S"),
+                row.version_number,
+                *[row.answers.get(q.id, "") for q in catalog.questions],
+            ]
+        )
     return out.getvalue()

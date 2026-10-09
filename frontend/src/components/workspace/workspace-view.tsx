@@ -53,104 +53,112 @@ export function WorkspaceView() {
   }
 
   const renderMenu = (form: FormSummary) => (
-    <FormActionsMenu form={form} actions={actions} onRename={() => setRenaming(form)} onDelete={() => setDeleting(form)} />
+    <FormActionsMenu
+      form={form}
+      actions={actions}
+      onRename={() => setRenaming(form)}
+      onDelete={() => setDeleting(form)}
+    />
   );
 
   return (
-    <div className="flex h-dvh gap-3 bg-surface p-0 sm:p-3">
+    <div className="bg-surface flex h-dvh gap-3 p-0 sm:p-3">
       <AiPanel />
       <div className="flex min-w-0 flex-1 flex-col gap-3">
-      <AppHeader me={me} />
-      <div className="px-3 sm:px-0">
-        <AnnouncementBanner />
-      </div>
-      {/* Typeform keeps tabs, sidebar and list together in one rounded grey container. */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-panel sm:rounded-2xl">
-      <MainNav active={section} onChange={setSection} />
-
-      {section !== "Forms" ? (
-        <ComingSoon title={section} />
-      ) : (
-        <div className="flex min-h-0 flex-1">
-          <WorkspaceSidebar me={me} query={query} onQueryChange={setQuery} />
-
-          <main className="min-w-0 flex-1 overflow-y-auto px-4 py-6 sm:px-10">
-            <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-6">
-              <div className="flex items-center gap-3">
-                <h1 className="text-2xl">{me?.workspaces[0]?.name ?? "My workspace"}</h1>
-                <button
-                  onClick={() => toast("Team collaboration is coming soon")}
-                  className="flex items-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium hover:bg-hover-strong"
-                >
-                  <UserPlus size={16} /> Invite
-                </button>
-              </div>
-              <div className="flex items-center gap-2">
-                <Menu>
-                  <MenuTrigger className="flex h-9 items-center gap-2 rounded-lg border border-line bg-surface px-3 text-sm hover:bg-selected">
-                    <CalendarDays size={15} className="text-muted" /> {SORT_LABELS[sort]}
-                    <ChevronDown size={15} className="text-muted" />
-                  </MenuTrigger>
-                  <MenuContent>
-                    <MenuLabel>Sort by</MenuLabel>
-                    <MenuRadioGroup value={sort} onValueChange={(v) => setSort(v as FormSort)}>
-                      {(Object.keys(SORT_LABELS) as FormSort[]).map((key) => (
-                        <MenuRadioItem key={key} value={key}>
-                          {SORT_LABELS[key]}
-                        </MenuRadioItem>
-                      ))}
-                    </MenuRadioGroup>
-                  </MenuContent>
-                </Menu>
-                <div className="flex rounded-lg border border-line bg-surface p-0.5" role="group" aria-label="View">
-                  {(["list", "grid"] as const).map((v) => (
-                    <button
-                      key={v}
-                      onClick={() => changeView(v)}
-                      aria-pressed={view === v}
-                      aria-label={`${v} view`}
-                      className={cn(
-                        "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-sm capitalize",
-                        view === v ? "bg-hover-strong text-ink" : "text-muted hover:text-ink",
-                      )}
-                    >
-                      {v === "list" ? <List size={16} /> : <LayoutGrid size={16} />}
-                      <span className="hidden sm:inline">{v}</span>
-                    </button>
-                  ))}
-                </div>
-                <Link href="/forms/new" className={cn(buttonStyles({ size: "sm" }), "md:hidden")}>
-                  <Plus size={15} /> New
-                </Link>
-              </div>
-            </div>
-
-            {/* Search lives in the sidebar on desktop; mobile gets its own field. */}
-            <label className="relative mb-4 block md:hidden">
-              <Search size={16} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted" />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search forms"
-                className="h-10 w-full rounded-lg border border-line bg-surface pr-3 pl-9 text-sm outline-none focus:border-plum"
-              />
-            </label>
-
-            {error ? (
-              <p className="rounded-lg border border-danger/30 bg-danger/5 p-4 text-sm text-danger">{error}</p>
-            ) : forms === null ? (
-              <LoadingRows />
-            ) : forms.length === 0 ? (
-              <EmptyState searching={query.trim() !== ""} />
-            ) : view === "list" ? (
-              <FormList forms={forms} renderMenu={renderMenu} />
-            ) : (
-              <FormGrid forms={forms} renderMenu={renderMenu} />
-            )}
-          </main>
+        <AppHeader me={me} />
+        <div className="px-3 sm:px-0">
+          <AnnouncementBanner />
         </div>
-      )}
-      </div>
+        {/* Typeform keeps tabs, sidebar and list together in one rounded grey container. */}
+        <div className="bg-panel flex min-h-0 flex-1 flex-col overflow-hidden sm:rounded-2xl">
+          <MainNav active={section} onChange={setSection} />
+
+          {section !== "Forms" ? (
+            <ComingSoon title={section} />
+          ) : (
+            <div className="flex min-h-0 flex-1">
+              <WorkspaceSidebar me={me} query={query} onQueryChange={setQuery} />
+
+              <main className="min-w-0 flex-1 overflow-y-auto px-4 py-6 sm:px-10">
+                <div className="border-line mb-6 flex flex-wrap items-center justify-between gap-3 border-b pb-6">
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-2xl">{me?.workspaces[0]?.name ?? "My workspace"}</h1>
+                    <button
+                      onClick={() => toast("Team collaboration is coming soon")}
+                      className="hover:bg-hover-strong flex items-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium"
+                    >
+                      <UserPlus size={16} /> Invite
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Menu>
+                      <MenuTrigger className="border-line bg-surface hover:bg-selected flex h-9 items-center gap-2 rounded-lg border px-3 text-sm">
+                        <CalendarDays size={15} className="text-muted" /> {SORT_LABELS[sort]}
+                        <ChevronDown size={15} className="text-muted" />
+                      </MenuTrigger>
+                      <MenuContent>
+                        <MenuLabel>Sort by</MenuLabel>
+                        <MenuRadioGroup value={sort} onValueChange={(v) => setSort(v as FormSort)}>
+                          {(Object.keys(SORT_LABELS) as FormSort[]).map((key) => (
+                            <MenuRadioItem key={key} value={key}>
+                              {SORT_LABELS[key]}
+                            </MenuRadioItem>
+                          ))}
+                        </MenuRadioGroup>
+                      </MenuContent>
+                    </Menu>
+                    <div className="border-line bg-surface flex rounded-lg border p-0.5" role="group" aria-label="View">
+                      {(["list", "grid"] as const).map((v) => (
+                        <button
+                          key={v}
+                          onClick={() => changeView(v)}
+                          aria-pressed={view === v}
+                          aria-label={`${v} view`}
+                          className={cn(
+                            "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-sm capitalize",
+                            view === v ? "bg-hover-strong text-ink" : "text-muted hover:text-ink",
+                          )}
+                        >
+                          {v === "list" ? <List size={16} /> : <LayoutGrid size={16} />}
+                          <span className="hidden sm:inline">{v}</span>
+                        </button>
+                      ))}
+                    </div>
+                    <Link href="/forms/new" className={cn(buttonStyles({ size: "sm" }), "md:hidden")}>
+                      <Plus size={15} /> New
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Search lives in the sidebar on desktop; mobile gets its own field. */}
+                <label className="relative mb-4 block md:hidden">
+                  <Search
+                    size={16}
+                    className="text-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
+                  />
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search forms"
+                    className="border-line bg-surface focus:border-plum h-10 w-full rounded-lg border pr-3 pl-9 text-sm outline-none"
+                  />
+                </label>
+
+                {error ? (
+                  <p className="border-danger/30 bg-danger/5 text-danger rounded-lg border p-4 text-sm">{error}</p>
+                ) : forms === null ? (
+                  <LoadingRows />
+                ) : forms.length === 0 ? (
+                  <EmptyState searching={query.trim() !== ""} />
+                ) : view === "list" ? (
+                  <FormList forms={forms} renderMenu={renderMenu} />
+                ) : (
+                  <FormGrid forms={forms} renderMenu={renderMenu} />
+                )}
+              </main>
+            </div>
+          )}
+        </div>
       </div>
 
       {renaming && (
@@ -177,7 +185,11 @@ export function WorkspaceView() {
 
 function LoadingRows() {
   return (
-    <div className="space-y-px overflow-hidden rounded-xl border border-line bg-surface" aria-busy="true" aria-label="Loading forms">
+    <div
+      className="border-line bg-surface space-y-px overflow-hidden rounded-xl border"
+      aria-busy="true"
+      aria-label="Loading forms"
+    >
       {[0, 1, 2].map((i) => (
         <div key={i} className="flex items-center gap-3 px-4 py-3">
           <Skeleton className="h-10 w-10" />
@@ -193,12 +205,12 @@ function LoadingRows() {
 
 function EmptyState({ searching }: { searching: boolean }) {
   if (searching) {
-    return <p className="py-16 text-center text-sm text-muted">No forms match your search.</p>;
+    return <p className="text-muted py-16 text-center text-sm">No forms match your search.</p>;
   }
   return (
-    <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-line bg-surface py-16 text-center">
+    <div className="border-line bg-surface flex flex-col items-center gap-3 rounded-xl border border-dashed py-16 text-center">
       <h2 className="text-lg font-semibold">Let&apos;s create your first form</h2>
-      <p className="max-w-xs text-sm text-muted">Ask questions one at a time and get more responses.</p>
+      <p className="text-muted max-w-xs text-sm">Ask questions one at a time and get more responses.</p>
       <Link href="/forms/new" className={buttonStyles()}>
         <Plus size={16} /> Create a new form
       </Link>

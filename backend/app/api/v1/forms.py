@@ -7,7 +7,17 @@ from sqlalchemy import func, select
 
 from app.api.deps import DB, CurrentCreator, OwnedForm
 from app.models import Form, Submission, Workspace
-from app.schemas.forms import DraftSaved, DraftUpdate, FormCreate, FormDetail, FormRename, FormSort, FormSummary, MeResponse, WorkspaceInfo
+from app.schemas.forms import (
+    DraftSaved,
+    DraftUpdate,
+    FormCreate,
+    FormDetail,
+    FormRename,
+    FormSort,
+    FormSummary,
+    MeResponse,
+    WorkspaceInfo,
+)
 from app.services import forms as form_service
 from app.services import publishing
 
@@ -20,10 +30,19 @@ def me(db: DB, creator: CurrentCreator):
     for ws in creator.workspaces:
         count = db.scalar(select(func.count()).select_from(Form).where(Form.workspace_id == ws.id)) or 0
         workspaces.append(WorkspaceInfo(id=ws.id, name=ws.name, form_count=count))
-    responses = db.scalar(
-        select(func.count()).select_from(Submission).join(Form).join(Workspace).where(Workspace.creator_id == creator.id)
-    ) or 0
-    return MeResponse(id=creator.id, name=creator.name, email=creator.email, workspaces=workspaces, response_count=responses)
+    responses = (
+        db.scalar(
+            select(func.count())
+            .select_from(Submission)
+            .join(Form)
+            .join(Workspace)
+            .where(Workspace.creator_id == creator.id)
+        )
+        or 0
+    )
+    return MeResponse(
+        id=creator.id, name=creator.name, email=creator.email, workspaces=workspaces, response_count=responses
+    )
 
 
 @router.get("/forms", response_model=list[FormSummary])

@@ -33,15 +33,21 @@ export function ResultsView({ formId }: { formId: string }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([formsApi.get(formId), resultsApi.analytics(formId)]).then(([f, a]) => {
-      setForm(f);
-      setAnalytics(a);
-    }, (e) => setError(message(e)));
+    Promise.all([formsApi.get(formId), resultsApi.analytics(formId)]).then(
+      ([f, a]) => {
+        setForm(f);
+        setAnalytics(a);
+      },
+      (e) => setError(message(e)),
+    );
   }, [formId]);
 
   useEffect(() => {
     let cancelled = false;
-    resultsApi.submissions(formId, page, PAGE_SIZE).then((p) => !cancelled && setSubmissions(p), (e) => !cancelled && setError(message(e)));
+    resultsApi.submissions(formId, page, PAGE_SIZE).then(
+      (p) => !cancelled && setSubmissions(p),
+      (e) => !cancelled && setError(message(e)),
+    );
     return () => {
       cancelled = true;
     };
@@ -53,16 +59,16 @@ export function ResultsView({ formId }: { formId: string }) {
   }, [formId, show]);
 
   return (
-    <div className="flex min-h-dvh flex-col bg-surface">
+    <div className="bg-surface flex min-h-dvh flex-col">
       <ResultsTopBar formId={formId} title={form?.title ?? ""} />
-      <div className="mx-3 mb-3 flex min-h-0 flex-1 flex-col rounded-2xl bg-panel sm:mx-4 sm:mb-4">
-        <div className="flex items-center justify-between gap-4 border-b border-line px-4 sm:px-8">
-          <nav className="flex gap-6 overflow-x-auto [scrollbar-width:none]" aria-label="Results views">
+      <div className="bg-panel mx-3 mb-3 flex min-h-0 flex-1 flex-col rounded-2xl sm:mx-4 sm:mb-4">
+        <div className="border-line flex items-center justify-between gap-4 border-b px-4 sm:px-8">
+          <nav className="flex [scrollbar-width:none] gap-6 overflow-x-auto" aria-label="Results views">
             <button
               onClick={() => toast("Smart Insights are coming soon")}
-              className="-mb-px flex items-center gap-1.5 border-b-2 border-transparent py-3.5 text-sm font-medium whitespace-nowrap text-muted hover:text-ink"
+              className="text-muted hover:text-ink -mb-px flex items-center gap-1.5 border-b-2 border-transparent py-3.5 text-sm font-medium whitespace-nowrap"
             >
-              Smart Insights <span className="rounded bg-lavender px-1 text-[9px] font-semibold text-ink">SOON</span>
+              Smart Insights <span className="bg-lavender text-ink rounded px-1 text-[9px] font-semibold">SOON</span>
             </button>
             {(
               [
@@ -77,11 +83,15 @@ export function ResultsView({ formId }: { formId: string }) {
                 aria-current={tab === t ? "page" : undefined}
                 className={cn(
                   "-mb-px border-b-2 py-3.5 text-sm font-medium whitespace-nowrap",
-                  tab === t ? "border-ink text-ink" : "border-transparent text-muted hover:text-ink",
+                  tab === t ? "border-ink text-ink" : "text-muted hover:text-ink border-transparent",
                 )}
               >
                 {label}
-                {t === "responses" && submissions && <span className="ml-1.5 rounded-full bg-hover-strong px-1.5 text-xs tabular-nums">{submissions.total}</span>}
+                {t === "responses" && submissions && (
+                  <span className="bg-hover-strong ml-1.5 rounded-full px-1.5 text-xs tabular-nums">
+                    {submissions.total}
+                  </span>
+                )}
               </button>
             ))}
           </nav>
@@ -92,27 +102,49 @@ export function ResultsView({ formId }: { formId: string }) {
 
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-8">
           {error ? (
-            <p className="rounded-lg border border-danger/30 bg-danger/5 p-4 text-sm text-danger">{error}</p>
+            <p className="border-danger/30 bg-danger/5 text-danger rounded-lg border p-4 text-sm">{error}</p>
           ) : tab === "performance" ? (
-            analytics ? <PerformanceTab data={analytics} /> : <LoadingBlocks />
+            analytics ? (
+              <PerformanceTab data={analytics} />
+            ) : (
+              <LoadingBlocks />
+            )
           ) : tab === "summary" ? (
-            analytics ? <SummaryTab data={analytics} /> : <LoadingBlocks />
+            analytics ? (
+              <SummaryTab data={analytics} />
+            ) : (
+              <LoadingBlocks />
+            )
           ) : (
             <div className="space-y-4">
-              <div className="flex w-fit rounded-lg border border-line bg-surface p-0.5 text-sm" role="group" aria-label="Response type">
+              <div
+                className="border-line bg-surface flex w-fit rounded-lg border p-0.5 text-sm"
+                role="group"
+                aria-label="Response type"
+              >
                 {(["completed", "partial"] as const).map((kind) => (
                   <button
                     key={kind}
                     onClick={() => setShow(kind)}
                     aria-pressed={show === kind}
-                    className={cn("rounded-md px-3 py-1.5 capitalize", show === kind ? "bg-hover-strong font-medium" : "text-muted hover:text-ink")}
+                    className={cn(
+                      "rounded-md px-3 py-1.5 capitalize",
+                      show === kind ? "bg-hover-strong font-medium" : "text-muted hover:text-ink",
+                    )}
                   >
-                    {kind} <span className="tabular-nums">({kind === "completed" ? (submissions?.total ?? "…") : (analytics?.partials ?? "…")})</span>
+                    {kind}{" "}
+                    <span className="tabular-nums">
+                      ({kind === "completed" ? (submissions?.total ?? "…") : (analytics?.partials ?? "…")})
+                    </span>
                   </button>
                 ))}
               </div>
               {show === "completed" ? (
-                submissions ? <ResponsesTab page={submissions} onPage={setPage} onOpen={setOpenId} /> : <LoadingBlocks />
+                submissions ? (
+                  <ResponsesTab page={submissions} onPage={setPage} onOpen={setOpenId} />
+                ) : (
+                  <LoadingBlocks />
+                )
               ) : partials ? (
                 <PartialsTable page={partials} />
               ) : (

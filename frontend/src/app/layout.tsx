@@ -18,11 +18,16 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // The inline script may switch data-theme to "dark" before React hydrates.
-    <html lang="en" data-theme="light" suppressHydrationWarning className={`${inter.variable} ${karla.variable} ${montserrat.variable} ${playfair.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      data-theme="light"
+      suppressHydrationWarning
+      className={`${inter.variable} ${karla.variable} ${montserrat.variable} ${playfair.variable} h-full antialiased`}
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: COLOR_MODE_SCRIPT }} />
       </head>
-      <body className="min-h-full font-sans text-ink">
+      <body className="text-ink min-h-full font-sans">
         {children}
         <ThemedToaster />
       </body>

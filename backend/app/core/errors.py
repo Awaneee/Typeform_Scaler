@@ -31,6 +31,11 @@ class ConflictError(AppError):
     code = "conflict"
 
 
+class TooManyRequestsError(AppError):
+    status_code = 429
+    code = "rate_limited"
+
+
 class ValidationFailedError(AppError):
     status_code = 422
     code = "validation_failed"

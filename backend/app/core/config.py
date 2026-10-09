@@ -20,6 +20,13 @@ class Settings(BaseSettings):
     default_creator_email: str = "creator@example.com"
     # Where uploaded files are stored. On Railway, point it at the volume (e.g. /data/uploads).
     upload_dir: Path = BACKEND_DIR / "data" / "uploads"
+    # Total disk space uploads may use (protects small hosting volumes).
+    upload_storage_limit_mb: int = 200
+    # Re-create/republish the seeded demo forms this often (0 = off). Keeps a public demo intact
+    # even if visitors delete or unpublish them, without blocking those actions.
+    demo_restore_minutes: int = 30
+    # Per-IP limits on the public (no-login) endpoints.
+    rate_limit_enabled: bool = True
 
     @property
     def cors_origin_list(self) -> list[str]:
@@ -29,7 +36,7 @@ class Settings(BaseSettings):
     def sqlite_path(self) -> Path | None:
         prefix = "sqlite:///"
         if self.database_url.startswith(prefix):
-            return Path(self.database_url[len(prefix):])
+            return Path(self.database_url[len(prefix) :])
         return None
 
 

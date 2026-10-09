@@ -5,5 +5,11 @@ import { ResultsView } from "@/components/results/results-view";
 export const metadata: Metadata = { title: "Results · Formflow" };
 
 export default function ResultsPage({ params }: PageProps<"/forms/[id]/results">) {
-  return <Suspense fallback={null}>{params.then(({ id }) => <ResultsView formId={id} />)}</Suspense>;
+  return (
+    <Suspense fallback={null}>
+      {params.then(({ id }) => (
+        <ResultsView formId={id} />
+      ))}
+    </Suspense>
+  );
 }

@@ -43,7 +43,14 @@ export interface SubmissionDetail {
   number: number;
   submitted_at: string;
   version_number: number;
-  answers: { question_id: string; title: string; type: string; value: unknown; display: string | null; file_url: string | null }[];
+  answers: {
+    question_id: string;
+    title: string;
+    type: string;
+    value: unknown;
+    display: string | null;
+    file_url: string | null;
+  }[];
 }
 
 export interface ChoiceCount {

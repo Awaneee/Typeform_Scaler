@@ -28,6 +28,8 @@ class Form(TimestampMixin, Base):
     published_version_id: Mapped[str | None] = mapped_column(
         ForeignKey("form_versions.id", ondelete="SET NULL", use_alter=True, name="fk_forms_published_version_id")
     )
+    # Set on the seeded demo forms so they can be restored if a visitor deletes them.
+    demo_key: Mapped[str | None] = mapped_column(String(40), unique=True)
     # Theme + thank-you screen. Validated by schemas.definition.FormSettings.
     settings_json: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
 
@@ -37,7 +39,9 @@ class Form(TimestampMixin, Base):
     versions: Mapped[list["FormVersion"]] = relationship(
         foreign_keys="FormVersion.form_id", back_populates="form", cascade="all, delete-orphan", passive_deletes=True
     )
-    published_version: Mapped["FormVersion | None"] = relationship(foreign_keys=[published_version_id], post_update=True)
+    published_version: Mapped["FormVersion | None"] = relationship(
+        foreign_keys=[published_version_id], post_update=True
+    )
 
 
 class Question(TimestampMixin, Base):

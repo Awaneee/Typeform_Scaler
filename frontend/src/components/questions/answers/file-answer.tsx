@@ -21,7 +21,7 @@ export function FileAnswer({ question, theme, preview, upload }: AnswerProps) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
-  const maxMb = question.settings.max_size_mb ?? 10;
+  const maxMb = question.settings.max_size_mb ?? 5;
   const current = upload?.current;
 
   async function send(file: File | undefined) {
@@ -45,7 +45,11 @@ export function FileAnswer({ question, theme, preview, upload }: AnswerProps) {
     return (
       <div
         className="flex w-full max-w-xl items-center gap-3 rounded-[4px] border px-4 py-3"
-        style={{ color: theme.answer, borderColor: withAlpha(theme.answer, 0.6), background: withAlpha(theme.answer, 0.1) }}
+        style={{
+          color: theme.answer,
+          borderColor: withAlpha(theme.answer, 0.6),
+          background: withAlpha(theme.answer, 0.1),
+        }}
       >
         <FileText size={22} />
         <div className="min-w-0 flex-1">

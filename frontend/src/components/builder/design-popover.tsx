@@ -16,23 +16,28 @@ export function DesignPopover() {
 
   return (
     <Popover>
-      <PopoverTrigger className="flex h-8 items-center gap-1.5 rounded-lg px-3 text-sm hover:bg-hover-strong data-[state=open]:bg-hover-strong">
+      <PopoverTrigger className="hover:bg-hover-strong data-[state=open]:bg-hover-strong flex h-8 items-center gap-1.5 rounded-lg px-3 text-sm">
         <Palette size={15} /> Design
       </PopoverTrigger>
       <PopoverContent align="start" className="w-[340px] p-0">
-        <div className="flex gap-4 border-b border-line px-4 pt-3">
+        <div className="border-line flex gap-4 border-b px-4 pt-3">
           {(["mine", "gallery"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={cn("-mb-px border-b-2 pb-2 text-sm font-medium", tab === t ? "border-ink" : "border-transparent text-muted")}
+              className={cn(
+                "-mb-px border-b-2 pb-2 text-sm font-medium",
+                tab === t ? "border-ink" : "text-muted border-transparent",
+              )}
             >
               {t === "mine" ? "My themes" : "Gallery"}
             </button>
           ))}
         </div>
         {tab === "mine" ? (
-          <p className="p-6 text-center text-sm text-muted">Custom themes are coming soon. Pick one from the gallery.</p>
+          <p className="text-muted p-6 text-center text-sm">
+            Custom themes are coming soon. Pick one from the gallery.
+          </p>
         ) : (
           <div className="grid grid-cols-2 gap-3 p-4">
             {(Object.keys(THEMES) as ThemeName[]).map((name) => {
@@ -45,7 +50,7 @@ export function DesignPopover() {
                   aria-pressed={active}
                   className={cn(
                     "overflow-hidden rounded-lg border text-left transition-shadow hover:shadow-md",
-                    active ? "border-plum ring-2 ring-plum" : "border-line",
+                    active ? "border-plum ring-plum ring-2" : "border-line",
                   )}
                 >
                   <div className="space-y-1.5 p-3" style={{ background: t.background, fontFamily: t.font }}>
@@ -60,7 +65,7 @@ export function DesignPopover() {
                   <div className="flex items-center justify-between gap-2 px-3 py-1.5 text-xs">
                     <span className="min-w-0">
                       <span className="block font-medium">{t.label}</span>
-                      <span className="block truncate text-muted">{t.fontLabel}</span>
+                      <span className="text-muted block truncate">{t.fontLabel}</span>
                     </span>
                     {active && <Check size={14} className="shrink-0" />}
                   </div>
