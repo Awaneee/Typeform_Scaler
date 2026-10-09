@@ -130,3 +130,31 @@ def test_list_includes_completion_rate(client):
     assert row["completion_rate"] == 50.0
     draft = client.post("/api/v1/forms", json={"title": "Fresh"}).json()
     assert next(f for f in client.get("/api/v1/forms").json() if f["id"] == draft["id"])["completion_rate"] is None
+
+
+def test_ids_used_by_another_form_are_rejected_not_500(client):
+    opt = qid()
+    first = make_form(
+        client, [{"id": qid(), "type": "multiple_choice", "title": "A", "options": [{"id": opt, "label": "One"}]}]
+    )
+    second = client.post("/api/v1/forms", json={"title": "Second"}).json()
+
+    def save(questions):
+        body = {"revision": second["revision"], "title": "Second", "settings": {}, "questions": questions}
+        return client.put(f"/api/v1/forms/{second['id']}/draft", json=body)
+
+    reused_option = save([{"id": qid(), "type": "dropdown", "title": "B", "options": [{"id": opt, "label": "One"}]}])
+    assert reused_option.status_code == 422
+    assert reused_option.json()["error"]["ids"] == [opt]
+
+    reused_question = save([{"id": first["questions"][0]["id"], "type": "short_text", "title": "C"}])
+    assert reused_question.status_code == 422
+
+    same_option_twice = save(
+        [
+            {"id": qid(), "type": "dropdown", "title": "D", "options": [{"id": "o1", "label": "x"}]},
+            {"id": qid(), "type": "dropdown", "title": "E", "options": [{"id": "o1", "label": "y"}]},
+        ]
+    )
+    assert same_option_twice.status_code == 422
+    assert client.get(f"/api/v1/forms/{first['id']}").json()["questions"][0]["options"][0]["label"] == "One"

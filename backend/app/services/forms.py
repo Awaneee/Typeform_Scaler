@@ -3,7 +3,7 @@
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
-from app.core.errors import ConflictError, NotFoundError
+from app.core.errors import ConflictError, NotFoundError, ValidationFailedError
 from app.core.types import new_id, utcnow
 from app.models import Creator, Form, Question, QuestionOption, ResponseSession, Submission, Workspace
 from app.schemas.forms import DraftSaved, DraftUpdate, FormDetail, FormSort, FormSummary
@@ -133,6 +133,7 @@ def save_draft(db: Session, form: Form, update: DraftUpdate) -> DraftSaved:
             "This form was changed somewhere else. Reload to get the latest version.",
             extra={"current_revision": form.draft_revision},
         )
+    _check_new_ids_are_free(db, form, update)
     apply_definition(form, update)
     form.draft_revision += 1
     form.updated_at = utcnow()
@@ -142,6 +143,21 @@ def save_draft(db: Session, form: Form, update: DraftUpdate) -> DraftSaved:
         updated_at=form.updated_at,
         has_unpublished_changes=has_unpublished_changes(form),
     )
+
+
+def _check_new_ids_are_free(db: Session, form: Form, update: DraftUpdate) -> None:
+    """Question and option ids come from the client and are primary keys, so an id that
+    already belongs to another form must be refused (422) instead of failing the insert (500)."""
+    new_questions = {q.id for q in update.questions} - {q.id for q in form.questions}
+    new_options = {o.id for q in update.questions for o in q.options} - {
+        o.id for q in form.questions for o in q.options
+    }
+    taken = db.scalars(select(Question.id).where(Question.id.in_(new_questions))).all()
+    taken += db.scalars(select(QuestionOption.id).where(QuestionOption.id.in_(new_options))).all()
+    if taken:
+        raise ValidationFailedError(
+            "Some question or choice ids are already used by another form.", extra={"ids": sorted(taken)}
+        )
 
 
 def duplicate_form(db: Session, form: Form) -> Form:

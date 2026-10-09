@@ -11,6 +11,7 @@ import { QuestionNumber } from "@/components/questions/question-number";
 import { useFormRunner, type RunnerForm, type RunnerMode } from "@/hooks/use-form-runner";
 import { withAlpha } from "@/lib/color";
 import { getTheme, type Theme } from "@/lib/themes";
+import { isEmptyAnswer } from "@/lib/validation";
 import type { Question } from "@/types/form";
 
 interface FormRunnerProps {
@@ -141,13 +142,13 @@ export function FormRunner({ form, mode }: FormRunnerProps) {
                 disabled={disabled}
                 aria-label={label}
                 className={`p-1.5 transition-opacity hover:opacity-80 disabled:opacity-40 ${i === 0 ? "rounded-l-md" : "rounded-r-md"}`}
-                style={{ background: withAlpha(theme.answer, 0.12), color: theme.answer }}
+                style={{ background: theme.button, color: theme.buttonText }}
               >
                 <Icon size={20} />
               </button>
             ))}
           </div>
-          <PoweredBy />
+          <PoweredBy theme={theme} />
         </footer>
       )}
     </div>
@@ -227,7 +228,7 @@ function QuestionScreen({
             label={submitting ? "Submitting…" : okLabel}
             onClick={onSubmit}
             disabled={submitting}
-            showCheck={okLabel === "OK"}
+            dimmed={isEmptyAnswer(value)}
           />
         )}
       </div>
@@ -248,7 +249,7 @@ function WelcomeScreen({ form, theme, onStart }: { form: RunnerForm; theme: Them
         </p>
       )}
       <div className="flex justify-center">
-        <OkButton theme={theme} label={w.button_text || "Start"} onClick={onStart} showCheck={false} />
+        <OkButton theme={theme} label={w.button_text || "Start"} onClick={onStart} />
       </div>
     </div>
   );
@@ -301,11 +302,12 @@ function ThankYouScreen({ form, theme, onRestart }: { form: RunnerForm; theme: T
   );
 }
 
-function PoweredBy() {
+function PoweredBy({ theme }: { theme: Theme }) {
   return (
     <a
       href="/workspace"
-      className="pointer-events-auto hidden items-center gap-1 rounded-md bg-[#29232B] px-2.5 py-1.5 text-xs text-white sm:flex"
+      className="pointer-events-auto hidden items-center gap-1 rounded-md px-2.5 py-1.5 text-xs sm:flex"
+      style={{ background: theme.button, color: theme.buttonText }}
     >
       Powered by <strong className="font-semibold">Typeform</strong>
     </a>

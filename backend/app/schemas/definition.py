@@ -78,4 +78,7 @@ class FormDefinition(BaseModel):
     def _unique_ids(cls, questions: list[QuestionDef]) -> list[QuestionDef]:
         if len({q.id for q in questions}) != len(questions):
             raise ValueError("question ids must be unique")
+        option_ids = [o.id for q in questions for o in q.options]
+        if len(set(option_ids)) != len(option_ids):
+            raise ValueError("option ids must be unique within the form")
         return questions
