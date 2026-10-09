@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { flushSave, hasUnsavedChanges, useBuilder } from "@/store/builder-store";
 import { BuilderTopBar, type BuilderTab } from "./builder-top-bar";
 import { Canvas, type Device } from "./canvas";
+import { ChatToCreate } from "./chat-to-create";
 import { DesignPopover } from "./design-popover";
 import { LogicEditor } from "./logic-editor";
 import { QuestionList } from "./question-list";
@@ -163,6 +164,7 @@ export function Builder({ formId }: { formId: string }) {
               </button>
             </div>
             <Canvas device={device} onAdd={() => setPickerOpen(true)} />
+            <ChatToCreate />
           </main>
           <SettingsPanel onOpenLogic={() => setTab("workflow")} />
         </div>

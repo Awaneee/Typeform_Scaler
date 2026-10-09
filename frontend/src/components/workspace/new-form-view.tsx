@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { ApiError } from "@/lib/api/client";
 import { formsApi } from "@/lib/api/forms";
 
-const aiSoon = () => toast("Formflow AI form generation is coming soon. Start from scratch for now.");
+const aiSoon = () => toast("Typeform AI form generation is coming soon. Start from scratch for now.");
 
 export function NewFormView() {
   const router = useRouter();
@@ -39,7 +39,7 @@ export function NewFormView() {
       </header>
 
       <main className="bg-panel mx-3 mb-3 flex flex-1 flex-col items-center justify-center rounded-2xl px-4 py-16 sm:mx-4 sm:mb-4">
-        <p className="text-muted text-sm">Formflow AI</p>
+        <p className="text-muted text-sm">Typeform AI</p>
         <h1 className="mt-2 text-center text-2xl sm:text-[26px]">What would you like to create?</h1>
 
         {/* Lavender glow around the prompt, like Typeform's AI box. AI generation is a placeholder:

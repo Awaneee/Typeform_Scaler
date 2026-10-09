@@ -1,4 +1,4 @@
-# Formflow: a Typeform clone
+# Typeform clone
 
 [![CI](https://github.com/Awaneee/Typeform_Scaler/actions/workflows/ci.yml/badge.svg)](https://github.com/Awaneee/Typeform_Scaler/actions/workflows/ci.yml)
 
@@ -395,7 +395,7 @@ with matching HTTP status codes (404, 409, 413, 422, 500).
 cd backend; .\.venv\Scripts\Activate.ps1; ruff check .; ruff format --check .; python -m pytest
 
 # Frontend: formatting (Prettier), lint (ESLint), types, production build
-cd frontend; npm run format:check; npm run lint; npx tsc --noEmit; npm run build
+cd frontend; npm run format:check; npm run lint; npm run typecheck; npm run build
 
 # End-to-end: 47 browser tests, one per requirement in docs/REQUIREMENTS.md
 # (starts or reuses the backend on :8000 and frontend on :3000; uses the installed Chrome)
@@ -473,8 +473,9 @@ The live deployment passes the full end-to-end suite: `set E2E_BASE_URL=https://
   (creators → workspaces → forms, ownership checked on every request), so adding real login means replacing
   one dependency (`api/deps.py:current_creator`).
 - Respondents never log in. A published form is public to anyone with its link.
-- The UI mirrors Typeform's layout, colours, interactions and copy, but uses its own "formflow" wordmark rather
-  than Typeform's logo and brand assets.
+- The UI mirrors Typeform's layout, colours, interactions and copy, including the "typeform" name in the
+  interface. The logo is a plain text wordmark (no Typeform logo artwork), and browser tab titles say
+  "Typeform Clone". This is a student project, not affiliated with Typeform.
 - Features outside the brief (Contacts, Automations, Insights, integrations, AI generation, templates, payments,
   more question types) are clearly marked "coming soon" instead of being faked.
 

@@ -75,12 +75,12 @@ export function SharePanel({ publishing, onPublish, onUnpublish }: SharePanelPro
                 </p>
                 <div className="border-line flex items-center gap-4 rounded-xl border p-3">
                   <span className="bg-panel flex h-16 w-24 shrink-0 items-center justify-center rounded-lg text-sm font-semibold">
-                    formflow
+                    typeform
                   </span>
                   <div className="min-w-0">
                     <p className="truncate font-medium">{title}</p>
                     <p className="text-muted truncate text-sm">
-                      Turn data collection into an experience with Formflow.
+                      Turn data collection into an experience with Typeform.
                     </p>
                     <p className="text-muted truncate text-xs">{new URL(publicFormUrl(slug), "http://x").host}</p>
                   </div>

@@ -106,7 +106,7 @@ test.describe("Mocked / placeholder sections", () => {
     await page.goto("/workspace");
     await page.waitForLoadState("networkidle");
     await page.getByRole("button", { name: "Help me get started" }).click();
-    await expect(page.getByText("Formflow AI is coming soon")).toBeVisible();
+    await expect(page.getByText("Typeform AI is coming soon")).toBeVisible();
   });
 
   test("Simplified auth (one default logged-in creator)", async ({ page }) => {

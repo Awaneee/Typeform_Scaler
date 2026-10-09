@@ -1,6 +1,6 @@
 # Frontend (Next.js)
 
-The Formflow web app: workspace, form builder, public form flow and results.
+The Typeform clone web app: workspace, form builder, public form flow and results.
 See the [root README](../README.md) for setup, architecture and deployment.
 
 ```powershell

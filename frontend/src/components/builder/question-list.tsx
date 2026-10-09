@@ -145,7 +145,7 @@ function SortableQuestion({ question, index, selected, onSelect }: SortableQuest
       >
         <GripVertical size={14} className="text-muted/0 group-hover:text-muted -ml-1 shrink-0" aria-hidden />
         <QuestionTypeBadge type={question.type} number={index + 1} />
-        <span className={cn("min-w-0 flex-1 truncate", !question.title && "text-muted")}>
+        <span className={cn("line-clamp-2 min-w-0 flex-1 leading-snug break-words", !question.title && "text-muted")}>
           {question.title || "..."}
         </span>
         {error && <span className="bg-danger h-2 w-2 shrink-0 rounded-full" title={error} />}

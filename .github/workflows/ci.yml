@@ -40,7 +40,7 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: npm run lint
-      - run: npx tsc --noEmit
+      - run: npm run typecheck
       - run: npm run build
 
   e2e:

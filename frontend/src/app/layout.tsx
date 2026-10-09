@@ -11,8 +11,8 @@ const montserrat = Montserrat({ variable: "--font-montserrat", subsets: ["latin"
 const playfair = Playfair_Display({ variable: "--font-playfair", subsets: ["latin"], preload: false });
 
 export const metadata: Metadata = {
-  title: "Formflow",
-  description: "Build conversational forms, one question at a time.",
+  title: "Typeform Clone",
+  description: "A Typeform clone built for an SDE assignment (not affiliated with Typeform).",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

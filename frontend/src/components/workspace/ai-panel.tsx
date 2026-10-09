@@ -3,17 +3,17 @@
 import { Mic, MoreHorizontal, Plus, Send, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
-const soon = () => toast("Formflow AI is coming soon");
+const soon = () => toast("Typeform AI is coming soon");
 
 /** Left-hand AI assistant panel, as in Typeform's workspace. A placeholder for now. */
 export function AiPanel() {
   return (
     <aside
       className="bg-surface hidden w-[300px] shrink-0 flex-col rounded-2xl border border-[#e6d8f7] p-4 xl:flex"
-      aria-label="Formflow AI"
+      aria-label="Typeform AI"
     >
       <div className="flex items-center gap-2 text-sm font-medium">
-        <Sparkles size={16} className="text-[#7b4fc9]" /> Formflow AI
+        <Sparkles size={16} className="text-[#7b4fc9]" /> Typeform AI
         <span className="bg-lavender text-ink rounded-md px-1.5 py-0.5 text-[11px]">Beta</span>
       </div>
       <div className="flex flex-1 flex-col items-center justify-center gap-3 px-2 text-center">
@@ -22,7 +22,7 @@ export function AiPanel() {
         </span>
         <h2 className="text-xl leading-snug">What do you want to achieve?</h2>
         <p className="text-muted text-sm">
-          Tell Formflow AI your goal. It will help you build forms and get answers faster.
+          Tell Typeform AI your goal. It will help you build forms and get answers faster.
         </p>
         <button
           onClick={soon}
@@ -41,8 +41,8 @@ export function AiPanel() {
               soon();
             }
           }}
-          placeholder="Ask Formflow AI"
-          aria-label="Ask Formflow AI (coming soon)"
+          placeholder="Ask Typeform AI"
+          aria-label="Ask Typeform AI (coming soon)"
           className="placeholder:text-muted w-full bg-transparent px-1 py-1 text-sm outline-none"
         />
         <div className="text-muted mt-1 flex items-center gap-1">

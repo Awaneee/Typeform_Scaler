@@ -289,7 +289,7 @@ function ThankYouScreen({ form, theme, onRestart }: { form: RunnerForm; theme: T
           className="rounded-md px-2.5 py-1 text-xs font-semibold"
           style={{ background: theme.button, color: theme.buttonText }}
         >
-          {t.button_text && t.button_text !== "Create a typeform" ? t.button_text : "Create a formflow"}
+          {t.button_text || "Create a typeform"}
         </Link>
       </div>
     </>
@@ -302,7 +302,7 @@ function PoweredBy() {
       href="/workspace"
       className="pointer-events-auto hidden items-center gap-1 rounded-md bg-[#29232B] px-2.5 py-1.5 text-xs text-white sm:flex"
     >
-      Powered by <strong className="font-semibold">Formflow</strong>
+      Powered by <strong className="font-semibold">Typeform</strong>
     </a>
   );
 }

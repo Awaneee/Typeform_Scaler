@@ -2,6 +2,7 @@
 
 import { ChevronRight, Loader2, PanelsTopLeft } from "lucide-react";
 import { ColorModeMenu } from "@/components/layout/color-mode-menu";
+import { HelpButton, ProfileMenu, useMe } from "@/components/layout/profile-menu";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useBuilder } from "@/store/builder-store";
@@ -24,6 +25,7 @@ export function BuilderTopBar({ tab, onTab, onBack, onPublish, publishing }: Top
   const status = useBuilder((s) => s.status);
   const changed = useBuilder((s) => s.hasUnpublishedChanges);
   const upToDate = status === "published" && !changed;
+  const me = useMe();
 
   return (
     <header className="border-line bg-surface grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b px-4 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-4">
@@ -74,6 +76,10 @@ export function BuilderTopBar({ tab, onTab, onBack, onPublish, publishing }: Top
           {publishing && <Loader2 size={14} className="animate-spin" />}
           {upToDate ? "Published" : status === "published" ? "Publish changes" : "Publish"}
         </Button>
+        <div className="hidden items-center sm:flex">
+          <HelpButton />
+          <ProfileMenu me={me} />
+        </div>
       </div>
     </header>
   );
