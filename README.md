@@ -5,6 +5,7 @@
 A full-stack clone of Typeform: build forms with a drag-and-drop builder, publish them as a shareable link,
 collect answers through the one-question-at-a-time conversational flow, and analyse the results.
 
+- **Author:** Awanee ([@Awaneee](https://github.com/Awaneee))
 - **Live demo:** <https://typeform-scaler.vercel.app> (API: <https://backend-production-4bd9.up.railway.app/docs>)
 - **Stack:** Next.js 16 (TypeScript) · FastAPI (Python) · SQLite · SQLAlchemy 2 · Alembic
 - **Tests:** 58 backend tests (pytest) and 48 end-to-end browser tests (Playwright), one per feature, run in CI on every push
@@ -488,3 +489,7 @@ The live deployment passes the full end-to-end suite: `set E2E_BASE_URL=https://
 - SQLite fits a single server. For more traffic: PostgreSQL, object storage (S3) for uploads, and a queue for exports.
 - Possible additions: more question types (date, opinion scale, ranking), templates, webhooks, custom theme editor,
   multi-question pages.
+
+## Author
+
+Built by **Awanee** ([@Awaneee](https://github.com/Awaneee)) for the Scaler SDE Fullstack assignment.
