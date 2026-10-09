@@ -72,6 +72,7 @@ test("Keyboard navigation (Enter / ↓ next, ↑ back, letter keys for choices, 
 }) => {
   const form = await publishedSample(request);
   await page.goto(`/to/${form.slug}`);
+  await page.waitForLoadState("networkidle"); // keys typed before hydration would be lost
   await onQuestion(page, "What's your name?");
   await page.keyboard.type("Ada");
   await page.keyboard.press("ArrowDown"); // ↓ advances from a single-line text field too
