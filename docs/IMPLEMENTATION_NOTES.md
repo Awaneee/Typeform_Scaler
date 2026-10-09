@@ -194,7 +194,7 @@ caching published versions, background jobs for CSV export, and moving rate-limi
 
 **How are old responses kept correct after edits?** They point at the version they answered; the builder edits only the draft.
 
-**What did you test?** 57 pytest tests (CRUD, autosave conflicts, publishing, every validation rule, logic paths,
+**What did you test?** 58 pytest tests (CRUD, autosave conflicts, publishing, every validation rule, logic paths,
 uploads, partial responses, analytics, rate limits, demo restore, schema, migrations) and 48 Playwright tests that drive
 the real app in a browser, one per requirement. CI runs everything, plus lint and formatting, on every push.
 

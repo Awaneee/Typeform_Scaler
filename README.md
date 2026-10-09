@@ -7,7 +7,7 @@ collect answers through the one-question-at-a-time conversational flow, and anal
 
 - **Live demo:** <https://typeform-scaler.vercel.app> (API: <https://backend-production-4bd9.up.railway.app/docs>)
 - **Stack:** Next.js 16 (TypeScript) · FastAPI (Python) · SQLite · SQLAlchemy 2 · Alembic
-- **Tests:** 57 backend tests (pytest) and 48 end-to-end browser tests (Playwright), one per feature, run in CI on every push
+- **Tests:** 58 backend tests (pytest) and 48 end-to-end browser tests (Playwright), one per feature, run in CI on every push
 - **Requirements map:** [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md) links every line of the assignment to its code and the test that proves it
 - **Interview notes:** [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md)
 
@@ -390,7 +390,7 @@ with matching HTTP status codes (404, 409, 413, 422, 500).
 ## Testing
 
 ```powershell
-# Backend: lint + format check (ruff) and 57 tests: API, validation, logic, uploads, partial
+# Backend: lint + format check (ruff) and 58 tests: API, validation, logic, uploads, partial
 # responses, analytics, rate limits, demo restore, schema, and migrations keeping existing data
 cd backend; .\.venv\Scripts\Activate.ps1; ruff check .; ruff format --check .; python -m pytest
 
