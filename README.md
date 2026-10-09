@@ -12,6 +12,12 @@ collect answers through the one-question-at-a-time conversational flow, and anal
 - **Requirements map:** [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md) links every line of the assignment to its code and the test that proves it
 - **Interview notes:** [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md)
 
+**Try it in two minutes:** open the [live demo](https://typeform-scaler.vercel.app) → **Create form** → *Start from
+scratch* → add a few questions, drag one to reorder it, toggle *Required* → **Publish** and copy the share link → fill
+the form in a new tab with the keyboard (Enter, ↑/↓, letter keys) → back in **Results**, your response is in the table,
+the summary and the CSV. The seeded **Event Registration** and **Product Feedback** forms show results with realistic
+data. No login is needed anywhere.
+
 | Workspace | Builder | Form (respondent) |
 |---|---|---|
 | ![Workspace](docs/screenshots/01-workspace.png) | ![Builder](docs/screenshots/02-builder.png) | ![Respondent flow](docs/screenshots/05-respondent-flow.png) |
@@ -28,7 +34,7 @@ collect answers through the one-question-at-a-time conversational flow, and anal
 
 1. [Features](#features)
 2. [Tech stack](#tech-stack)
-3. [Running it locally (Windows / PowerShell)](#running-it-locally-windows--powershell)
+3. [Running it locally](#running-it-locally)
 4. [Architecture](#architecture)
 5. [Database schema](#database-schema)
 6. [API overview](#api-overview)
@@ -51,7 +57,7 @@ collect answers through the one-question-at-a-time conversational flow, and anal
 | **Question types** | Short text, long text, multiple choice (single or multiple), dropdown (type to filter), email, number (min/max), yes/no, rating (3–10 stars), and file upload |
 | **Per-question settings** | Required, description/help text, placeholder, max characters, min/max, multiple selection, rating steps, file size limit |
 | **Publishing** | Publishing freezes an immutable version; the share link (`/to/<slug>`) stays the same across republishes; edits stay private until "Publish changes" |
-| **Respondent flow** | Full-screen, one question at a time with direction-aware animated transitions; progress bar and "x of n answered"; keyboard: Enter / ↓ next, ↑ back, letter keys for choices, Y/N, number keys for ratings, Shift+Enter for new lines; single-choice answers auto-advance; welcome and thank-you screens; no login |
+| **Respondent flow** | Full-screen, one question at a time with direction-aware animated transitions; progress bar (and "x of n answered" for screen readers); keyboard: Enter / ↓ next, ↑ back, letter keys for choices, Y/N, number keys for ratings, Shift+Enter for new lines; single-choice answers auto-advance; welcome and thank-you screens; no login |
 | **Validation** | Same rules and messages in the browser (instant) and on the server (authoritative): required, email format, numbers and ranges, valid choices, rating bounds, max length |
 | **Results** | Views, starts, submissions and completion rate; responses over the last 14 days; per-question summaries (choice bars, rating average and distribution, number average/min/max, recent text answers); paginated responses table; full single response in a side panel; partial responses |
 | **Typeform touches** | Toasts, modals, inline editing, theme gallery, editable thank-you screen, "coming soon" placeholders for Typeform areas that are out of scope (Contacts, Automations, Integrations, Brand kit, AI, templates, payments…) |
@@ -59,7 +65,8 @@ collect answers through the one-question-at-a-time conversational flow, and anal
 ### Bonus (all implemented)
 
 - **Logic jumps:** "If the answer is / is not / is greater than / is lower than X, go to question Y or the end". The server re-walks the respondent's path, so questions a jump skipped are never required.
-- **Custom themes:** 4 presets (Classic, Lavender, Ocean, Midnight), each with its own colours, background and font.
+- **Custom themes:** 6 presets (Pearl White, Classic Blue, Inky Black, Lavender, Ocean, Midnight), each with its own
+  colours, background and font. A published version keeps the theme it was published with.
 - **CSV export** of all responses.
 - **Partial responses and completion rate:** unfinished answers are autosaved and listed separately.
 - **File upload question** with a size limit; files download from the results.
@@ -102,18 +109,30 @@ touched (`be/services/seed.py:restore_demo`).
 
 ---
 
-## Running it locally (Windows / PowerShell)
+## Running it locally
 
-Prerequisites: **Python 3.13** (`py -3.13`), **Node.js 20+**, Git. Google Chrome is only needed for the end-to-end tests.
+Prerequisites: **Python 3.13**, **Node.js 20.9+** (CI uses 24), Git. Google Chrome is only needed for the end-to-end
+tests (or run `npx playwright install chromium` and set `E2E_BROWSER_CHANNEL=` to use Playwright's own browser).
 
 ### 1. Backend (FastAPI on port 8000)
 
 ```powershell
+# Windows (PowerShell)
 cd backend
 py -3.13 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements-dev.txt
 python -m alembic upgrade head          # creates data\app.db
+python -m uvicorn app.main:app --reload --port 8000
+```
+
+```bash
+# macOS / Linux
+cd backend
+python3.13 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-dev.txt
+python -m alembic upgrade head          # creates data/app.db
 python -m uvicorn app.main:app --reload --port 8000
 ```
 
@@ -123,7 +142,7 @@ To start over with fresh demo data: `python -m scripts.seed --reset`.
 
 ### 2. Frontend (Next.js on port 3000)
 
-```powershell
+```bash
 cd frontend
 npm install
 npm run dev
@@ -260,6 +279,7 @@ erDiagram
         string slug UK
         int draft_revision
         string published_version_id FK
+        string demo_key UK "seeded demo forms only"
         json settings_json
         datetime created_at
         datetime updated_at
@@ -331,7 +351,7 @@ erDiagram
 | Table | Purpose | Notable constraints |
 |---|---|---|
 | `creators`, `workspaces` | Account and workspace (one default creator, see assumptions) | `creators.email` unique |
-| `forms` | The editable draft and its publish state | `slug` unique; `status` CHECK in (`draft`, `published`); `published_version_id` → `form_versions` ON DELETE SET NULL |
+| `forms` | The editable draft and its publish state | `slug` unique; `status` CHECK in (`draft`, `published`); `published_version_id` → `form_versions` ON DELETE SET NULL; `demo_key` unique (self-healing demo) |
 | `questions`, `question_options` | Draft content, normalised for editing | Index on (`form_id`, `position`); positions rewritten as 0…n-1 on every save |
 | `form_versions` | Immutable snapshot of the form at each publish | Unique (`form_id`, `version_number`) |
 | `submissions`, `answers` | Stored responses | `client_submission_id` unique (idempotency); unique (`submission_id`, `question_id`) |
@@ -384,23 +404,26 @@ All routes are under `/api/v1`. Interactive docs: `/docs` (Swagger) and `/redoc`
 **Health:** `GET /health`.
 
 Errors always look like `{"error": {"code": "validation_failed", "message": "...", "fields": {"<question id>": "Please fill this in."}}}`
-with matching HTTP status codes (404, 409, 413, 422, 500).
+with matching HTTP status codes: 404 not found, 409 stale draft revision, 413 file too large, 422 invalid input,
+429 rate limited, 507 upload storage full. Unexpected errors return 500 without a stack trace.
 
 ---
 
 ## Testing
 
-```powershell
+```bash
 # Backend: lint + format check (ruff) and 58 tests: API, validation, logic, uploads, partial
 # responses, analytics, rate limits, demo restore, schema, and migrations keeping existing data
-cd backend; .\.venv\Scripts\Activate.ps1; ruff check .; ruff format --check .; python -m pytest
+cd backend   # with the virtual environment activated
+ruff check . && ruff format --check . && python -m pytest
 
 # Frontend: formatting (Prettier), lint (ESLint), types, production build
-cd frontend; npm run format:check; npm run lint; npm run typecheck; npm run build
+cd frontend
+npm run format:check && npm run lint && npm run typecheck && npm run build
 
 # End-to-end: 48 browser tests, one per requirement in docs/REQUIREMENTS.md
 # (starts or reuses the backend on :8000 and frontend on :3000; uses the installed Chrome)
-cd frontend; npm run test:e2e
+cd frontend && npm run test:e2e
 ```
 
 Each end-to-end test is named after the requirement it proves (for example "Reorder questions (drag-and-drop…)"),
@@ -445,8 +468,12 @@ Live: <https://typeform-scaler.vercel.app>
 2. Environment variable: `BACKEND_URL=https://backend-production-4bd9.up.railway.app`.
 3. Share links are built from the page's own origin, so they automatically use the Vercel domain.
 
-The live deployment passes the full end-to-end suite: `set E2E_BASE_URL=https://typeform-scaler.vercel.app&& npm run test:e2e`
-(each test creates and deletes its own "E2E" forms).
+The live deployment passes the full end-to-end suite (each test creates and deletes its own "E2E" forms):
+
+```bash
+E2E_BASE_URL=https://typeform-scaler.vercel.app npm run test:e2e                 # macOS / Linux
+$env:E2E_BASE_URL="https://typeform-scaler.vercel.app"; npm run test:e2e        # PowerShell
+```
 
 ---
 
