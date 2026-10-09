@@ -175,7 +175,7 @@ test("Live preview of the form (canvas is a live WYSIWYG preview with desktop/mo
   await expect(preview.locator("main h1")).toContainText("Your name?");
   await preview.keyboard.type("Ada");
   await preview.keyboard.press("Enter");
-  await expect(preview.getByText("Thanks for completing this form")).toBeVisible();
+  await expect(preview.getByText("Thanks for completing this typeform")).toBeVisible();
   expect((await getForm(request, form.id)).response_count).toBe(0);
   await preview.close();
 });

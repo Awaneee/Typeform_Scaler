@@ -58,7 +58,11 @@ type BuilderStore = BuilderState & BuilderActions;
 const DEFAULT_SETTINGS: FormSettings = {
   theme: "pearl",
   welcome: { enabled: false, title: "", description: "", button_text: "Start" },
-  thank_you: { title: "Thanks for completing this form", description: "", button_text: "Create a typeform" },
+  thank_you: {
+    title: "Thanks for completing this typeform",
+    description: "Now create your own — it's free, easy & beautiful",
+    button_text: "Create a typeform",
+  },
 };
 
 export const useBuilder = create<BuilderStore>()((set, get) => {

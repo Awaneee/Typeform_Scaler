@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { ColorModeMenu } from "@/components/layout/color-mode-menu";
+import { HelpButton, ProfileMenu, useMe } from "@/components/layout/profile-menu";
 import { ChevronRight, PanelsTopLeft } from "lucide-react";
 import { BUILDER_TABS } from "@/components/builder/builder-top-bar";
 import { cn } from "@/lib/utils";
 
 /** Same chrome as the builder, with "Results" active; the other tabs live in the builder. */
 export function ResultsTopBar({ formId, title }: { formId: string; title: string }) {
+  const me = useMe();
   return (
     <header className="border-line bg-surface grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b px-4 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-4">
       <div className="flex min-w-0 items-center gap-2">
@@ -39,8 +41,12 @@ export function ResultsTopBar({ formId, title }: { formId: string; title: string
           );
         })}
       </nav>
-      <div className="flex justify-end">
+      <div className="flex items-center justify-end">
         <ColorModeMenu />
+        <div className="hidden items-center sm:flex">
+          <HelpButton />
+          <ProfileMenu me={me} />
+        </div>
       </div>
     </header>
   );

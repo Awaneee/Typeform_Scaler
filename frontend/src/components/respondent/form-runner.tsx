@@ -261,7 +261,7 @@ function ThankYouScreen({ form, theme, onRestart }: { form: RunnerForm; theme: T
           aria-hidden
         />
         <h1 className="text-2xl leading-snug sm:text-3xl" style={{ color: theme.question }}>
-          {t.title || "Thanks for completing this form"}
+          {t.title || "Thanks for completing this typeform"}
         </h1>
         {t.description && (
           <p className="mt-3 text-lg whitespace-pre-line" style={{ color: withAlpha(theme.question, 0.7) }}>

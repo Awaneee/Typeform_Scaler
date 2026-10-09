@@ -194,14 +194,14 @@ test("Submit stores the response (idempotent, answers kept if it fails)", async 
   await expect(page.getByRole("textbox")).toHaveValue("Grace");
   await expect(page.locator("main")).toHaveCount(1);
   await page.getByRole("button", { name: "Submit" }).click();
-  await expect(page.getByText("Thanks for completing this form")).toBeVisible();
+  await expect(page.getByText("Thanks for completing this typeform")).toBeVisible();
   expect(await responseCount(page, form.id)).toBe(2);
 });
 
 test("Thank-you screen (custom title/description from the builder)", async ({ page, request }) => {
   const form = await createForm(request, "Thank you", [q("short_text", "Name")]);
   await page.goto(`/forms/${form.id}/edit`);
-  await page.getByRole("button", { name: /Thanks for completing this form/ }).click(); // Endings item
+  await page.getByRole("button", { name: /Thanks for completing this typeform/ }).click(); // Endings item
   await page.getByRole("textbox", { name: "Thank you title" }).fill("Cheers, legend!");
   await page.getByRole("textbox", { name: "Thank you description" }).fill("We'll be in touch.");
   await page.waitForTimeout(1000);

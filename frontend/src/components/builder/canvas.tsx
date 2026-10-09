@@ -122,7 +122,7 @@ function EndingEditor({ theme }: { theme: Theme }) {
       <AutoTextarea
         value={thankYou.title}
         onChange={(e) => set({ title: e.target.value.replace(/\n/g, " ") })}
-        placeholder="Thanks for completing this form"
+        placeholder="Thanks for completing this typeform"
         aria-label="Thank you title"
         className="text-center text-2xl leading-snug placeholder:text-[var(--ph)] sm:text-3xl"
         style={{ color: theme.question, ["--ph" as string]: withAlpha(theme.question, 0.35) }}

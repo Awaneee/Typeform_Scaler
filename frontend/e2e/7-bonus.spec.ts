@@ -34,7 +34,7 @@ test("Logic jumps / conditional branching (Workflow tab rules: is / is not / gre
   await onQuestion(page, "Dietary needs?");
   await page.keyboard.type("None");
   await page.keyboard.press("Enter");
-  await expect(page.getByText("Thanks for completing this form")).toBeVisible();
+  await expect(page.getByText("Thanks for completing this typeform")).toBeVisible();
 
   // Server: the skipped required question isn't required on this path, but is on the other.
   const [attending, whyNot] = qs.map((x) => x.id);
@@ -114,7 +114,7 @@ test("Partial-response tracking / completion rate (partial answers autosaved and
       await p.keyboard.press("Enter");
       await onQuestion(p, "City");
       await p.keyboard.press("Enter");
-      await expect(p.getByText("Thanks for completing this form")).toBeVisible();
+      await expect(p.getByText("Thanks for completing this typeform")).toBeVisible();
     }
     await p.waitForTimeout(400);
     await ctx.close();
@@ -161,7 +161,7 @@ test("File-upload question type (drag & drop, size limit, stored on backend disk
   await page.getByRole("button", { name: /Choose file/ }).dispatchEvent("drop", { dataTransfer });
   await expect(page.getByText("cv.txt")).toBeVisible();
   await page.getByRole("button", { name: "Submit" }).click();
-  await expect(page.getByText("Thanks for completing this form")).toBeVisible();
+  await expect(page.getByText("Thanks for completing this typeform")).toBeVisible();
 
   await page.goto(`/forms/${form.id}/results`);
   await page.getByRole("button", { name: /^responses/i }).click();

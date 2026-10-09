@@ -48,8 +48,8 @@ class QuestionDef(BaseModel):
 
 
 class ThankYouScreen(BaseModel):
-    title: str = Field("Thanks for completing this form", max_length=500)
-    description: str = Field("", max_length=1000)
+    title: str = Field("Thanks for completing this typeform", max_length=500)
+    description: str = Field("Now create your own — it's free, easy & beautiful", max_length=1000)
     button_text: str = Field("Create a typeform", max_length=60)
 
 

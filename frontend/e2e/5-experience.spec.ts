@@ -61,7 +61,7 @@ test("Settings placeholders (theme picker + editable thank-you screen)", async (
     await expect(page.getByRole("button", { name: new RegExp(t) })).toBeVisible();
   await page.getByRole("button", { name: /Lavender/ }).click();
   await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: /Thanks for completing this form/ }).click();
+  await page.getByRole("button", { name: /Thanks for completing this typeform/ }).click();
   await expect(page.getByRole("textbox", { name: "Thank you title" })).toBeVisible();
   await page.waitForTimeout(1000);
   expect((await (await request.get(`/api/v1/forms/${form.id}`)).json()).settings.theme).toBe("lavender");
