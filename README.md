@@ -25,8 +25,8 @@ data. No login is needed anywhere.
 | ![Question picker](docs/screenshots/03-question-picker.png) | ![Logic jumps](docs/screenshots/04-logic-jumps.png) | ![Thank-you screen](docs/screenshots/06-thank-you.png) |
 | **Results: performance** | **Results: summary** | **Single response** |
 | ![Form performance](docs/screenshots/07-results-performance.png) | ![Response summary](docs/screenshots/08-results-summary.png) | ![Response detail](docs/screenshots/09-response-detail.png) |
-| **Dark mode** | | |
-| ![Dark mode](docs/screenshots/10-dark-mode.png) | | |
+| **Dark mode** | **Phone: the form** | **Phone: workspace and builder** |
+| ![Dark mode](docs/screenshots/10-dark-mode.png) | ![The form on a phone](docs/screenshots/11-phone-form.png) | ![Workspace and builder on a phone](docs/screenshots/12-phone-workspace-builder.png) |
 
 ### For evaluators: where to find the evidence
 
